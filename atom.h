@@ -2,10 +2,10 @@
 class Atom
 {
 private:
-		double x=0;
-		double y=0;
-		double z=0;
-		int atomicMass = 0;
+		double x;
+		double y;
+		double z;
+		int atomicMass;
 public:
 	Atom(float newX, float newY, float newZ, int newMass);
 	Atom();

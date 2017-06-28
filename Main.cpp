@@ -7,7 +7,7 @@
 using namespace std;
 
 #include <utility>
-#include <algorithm
+#include <algorithm>
 #include <string>
 #include <sstream>
 #include <iterator>
@@ -32,13 +32,12 @@ int main()
 			myGraphs[i] = Cutoff(molecules.back(), 0);
 
 			// compare the two graphs
-			std::pair<boost::adjacency_list<>::vertex_iterator, 
-				boost::adjacency_list<>::vertex_iterator> vs0 = boost::vertices(myGraphs[0]);
-			std::pair<boost::adjacency_list<>::vertex_iterator, 
-				boost::adjacency_list<>::vertex_iterator> vs1 = boost::vertices(myGraphs[1]);
+			typedef boost::undirected_graph<> Graph;
+			typedef Graph::vertex_iterator VertexIterator;
+			std::pair<VertexIterator, VertexIterator> vs0 = boost::vertices(myGraphs[0]);
+			std::pair<VertexIterator, VertexIterator> vvs1 = boost::vertices(myGraphs[1]);
 
 			
-			cout << (boost::vertices(myGraphs[0]) == boost::vertices(myGraphs[1])) << endl;
 		}
 	}
 

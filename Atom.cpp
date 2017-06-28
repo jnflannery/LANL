@@ -1,4 +1,5 @@
 #include "atom.h"
+#include <cmath>
 ////
 double Atom::GetX() {
 	return x;
@@ -35,4 +36,10 @@ Atom::Atom(float newX, float newY, float newZ, int newMass) {
 	y = newY;
 	z = newZ;
 	atomicMass = newMass;
+}
+float Atom::EuclidianDistance(Atom atom) {
+	float xdif = (x - atom.GetX())*(x - atom.GetX());
+	float ydif = (y - atom.GetY())*(y - atom.GetY());
+	float zdif = (z - atom.GetZ())*(z - atom.GetZ());
+	return std::sqrt(xdif + ydif + zdif);
 }

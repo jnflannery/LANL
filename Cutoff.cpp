@@ -33,6 +33,6 @@ Graph Cutoff(Molecule molecule, float rc)
 			}
 		}
 	}
-	
+
 	return gh;
 }

@@ -22,9 +22,9 @@ std::vector<Molecule> Reader::GetMolecules() {
 	while (getline(file, line)) {
 		int timestepLocation = line.find("Timestep");
 		if (timestepLocation > 0 && timestepLocation < 3000) {
-			std::cout << line.substr(timestepLocation, line.length() - timestepLocation);
-			std::cout << line + "this was the line \r\n";
-			std::cout << "number of atoms is:" << numberOfAtoms << "\r\n";
+			//std::cout << line.substr(timestepLocation, line.length() - timestepLocation);
+			//std::cout << line + "this was the line \r\n";
+			//std::cout << "number of atoms is:" << numberOfAtoms << "\r\n";
 			Molecule newMolecule = Molecule();
 			float a, x, y, z;
 			for (int atomsSoFar = 0; atomsSoFar < numberOfAtoms; atomsSoFar++)
@@ -33,13 +33,14 @@ std::vector<Molecule> Reader::GetMolecules() {
 				file >> x;
 				file >> y;
 				file >> z;
-				std::cout << x << " " << y << " " << z << "\r\n";
+				//std::cout << x << " " << y << " " << z << "\r\n";
 				Atom newAtom = Atom(x, y, z, (int)a);
 				newMolecule.AddAtom(newAtom);
-				std::cout << newMolecule.GetAtom(atomsSoFar).GetX() << " " << newMolecule.GetAtom(atomsSoFar).GetY() << " " << newMolecule.GetAtom(atomsSoFar).GetZ() << "\r\n";
-				std::cout << "molecule size is: " << newMolecule.GetNumberOfAtoms() << "\r\n";
+				//std::cout << newMolecule.GetAtom(atomsSoFar).GetX() << " " << newMolecule.GetAtom(atomsSoFar).GetY() << " " << newMolecule.GetAtom(atomsSoFar).GetZ() << "\r\n";
+				//std::cout << "molecule size is: " << newMolecule.GetNumberOfAtoms() << "\r\n";
 
 			}
+			std::cout << "molecule size is: " << newMolecule.GetNumberOfAtoms() << "\r\n";
 			molecules.push_back(newMolecule);
 		}
 	}

@@ -17,10 +17,10 @@ using namespace std;
 int main()
 {
 	// set paths to files to be compared
-	string file1 = "R://LANL/SiDiamond/Extra/300K/minimized300.xyz" ;
-	string file2 = "R://LANL/SiDiamond/Extra/300K/preminimize300.xyz" ;
+	string min = "R://LANL/SiDiamond/Extra/500K/minimized1000.xyz" ;
+	string pre_min = "R://LANL/SiDiamond/Extra/500K/preminimize1000.xyz" ;
 
-	string myFiles [2] = {file1, file2};
+	string myFiles [2] = {min, pre_min};
 	Graph myGraphs [2];
 
 	// read files
@@ -29,17 +29,17 @@ int main()
 		//Reader myReader = Reader();
 		if (myReader.Initialize(myFiles[i])) {
 			vector<Molecule> molecules = myReader.GetMolecules();
-			myGraphs[i] = Cutoff(molecules.back(), 0);
 
-			// compare the two graphs
-			typedef boost::undirected_graph<> Graph;
-			typedef Graph::vertex_iterator VertexIterator;
-			std::pair<VertexIterator, VertexIterator> vs0 = boost::vertices(myGraphs[0]);
-			std::pair<VertexIterator, VertexIterator> vvs1 = boost::vertices(myGraphs[1]);
+			//apply algorithm to get graph
+			myGraphs[i] = Cutoff(molecules.back(), 3.14);
 
-			
+
 		}
 	}
+
+	// compare the two graphs
+	cout << (myGraphs[0] == myGraphs[1]) << endl;
+
 
 	std::cin.get();
 	return 0;

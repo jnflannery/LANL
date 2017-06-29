@@ -2,21 +2,25 @@
 //C++ Program to Implement Adjacency List
 #include <iostream>
 #include <cstdlib>
+#include <set>
+#include <vector>
 using namespace std;
  
 
-//Adjacency List Node
-struct AdjListNode
+//Vertex
+struct Vertex
 {
-    int dest;
-    struct AdjListNode* next;
-};
- 
+    int id;
+	vector<int> neighbours;
 
-//Adjacency List
-struct AdjList
-{
-    struct AdjListNode *head;
+	bool operator==(const Vertex& a) const
+	{
+		return ((id == a.id) && (neighbours == a.neighbours));
+	}
+	bool operator<(const Vertex& a) const
+	{
+		return (id < a.id);
+	}
 };
  
 
@@ -25,34 +29,36 @@ class Graph
 {
     private:
         int V;
-        struct AdjList* array;
+        vector<Vertex> vertices;
     public:
         Graph(int V)
         {
             this->V = V;
-            array = new AdjList [V];
-            for (int i = 0; i < V; ++i)
-                array[i].head = NULL;
-        }
-		
-        //Creating New Adjacency List Node 
-        AdjListNode* newAdjListNode(int dest)
+            for (int i = 0; i < V; ++i) {
+				Vertex v = {i};
+                this->vertices.push_back(v);
+			}
+		}
+		Graph()
         {
-            AdjListNode* newNode = new AdjListNode;
-            newNode->dest = dest;
-            newNode->next = NULL;
-            return newNode;
-        }
+            this->V = 0;
+		}
+
+		//Get number of vertices
+		int GetNumberOfVertices(){
+			return V;
+		}
         
-        //Adding Edge to Graph
-        void addEdge(int src, int dest)
+        //Add Edge to Graph
+        void addEdge(Vertex a, Vertex b)
         {
-            AdjListNode* newNode = newAdjListNode(dest);
-            newNode->next = array[src].head;
-            array[src].head = newNode;
-            newNode = newAdjListNode(src);
-            newNode->next = array[dest].head;
-            array[dest].head = newNode;
+            a.neighbours.push_back(b.id);
+			b.neighbours.push_back(a.id);
+        }
+		void addEdge(int a, int b)
+        {
+            vertices[a].neighbours.push_back(b);
+			vertices[b].neighbours.push_back(a);
         }
         
         //Print the graph
@@ -61,14 +67,22 @@ class Graph
             int v;
             for (v = 0; v < V; ++v)
             {
-                AdjListNode* pCrawl = array[v].head;
-                cout<<"\n Adjacency list of vertex "<<v<<"\n head ";
-                while (pCrawl)
-                {
-                    cout<<"-> "<<pCrawl->dest;
-                    pCrawl = pCrawl->next;
-                }
+                cout<<"Adjacency list of vertex "<<v<<":"<<endl;
+				for (vector<int>::iterator it = vertices[v].neighbours.begin(); it != vertices[v].neighbours.end(); ++it) {
+				   cout << *it << " ";
+				} 
                 cout<<endl;
             }
         }
+
+		// compare graphs
+		bool operator==(const Graph& g) const
+		{
+			int size = vertices.size();
+			if (size != g.vertices.size()) return false;
+			for (int k = 0; k < size; ++k) {
+				if (!(vertices[k] == g.vertices[k])) return false;
+				}
+			return true;
+		}
 };

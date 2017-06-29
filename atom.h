@@ -2,20 +2,20 @@
 class Atom
 {
 private:
-		double x=0;
-		double y=0;
-		double z=0;
-		int atomicMass = 0;
+		float x;
+		float y;
+		float z;
+		int id;
 public:
-	Atom(float newX, float newY, float newZ, int newMass);
+	Atom(float newX, float newY, float newZ, int newId);
 	Atom();
 	void SetX(double);
 	void SetY(double);
 	void SetZ(double);
-	void SetAtomicMass(int);
+	void SetId(int);
 	float EuclidianDistance(Atom);
 	double GetX();
 	double GetY();
 	double GetZ();
-	int GetAtomicMass();
+	int GetId();
 };

@@ -11,15 +11,13 @@ using namespace std;
 #include <vector>
 int main()
 {
-	//you will likely have a different file name
-	string myFileName = "C://Examples/example.txt" ;
+	//you will  likely have a different file name
+	string myFileName = "C://Examples/example2.txt" ;
 	Reader myReader = Reader();
 	if (myReader.Initialize(myFileName)) {
-		vector<Molecule> molecules = myReader.GetMolecules();
-		cout << molecules.at(0).GetAtom(4).GetY();
+		Molecule molecule = myReader.GetMoleculeFromOutputFile();
 	}
 	string line;
-	cin >> line;
 
 
 

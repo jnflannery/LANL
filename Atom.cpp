@@ -31,15 +31,15 @@ Atom::Atom() {
 	z = 0;
 	id = 0;
 }
-Atom::Atom(float newX, float newY, float newZ, int newId) {
+Atom::Atom(double newX, double newY, double newZ, int newId) {
 	x = newX;
 	y = newY;
 	z = newZ;
 	id = newId;
 }
-float Atom::EuclidianDistance(Atom atom) {
-	float xdif = (x - atom.GetX())*(x - atom.GetX());
-	float ydif = (y - atom.GetY())*(y - atom.GetY());
-	float zdif = (z - atom.GetZ())*(z - atom.GetZ());
+double Atom::EuclidianDistance(Atom atom) {
+	double xdif = (x - atom.GetX())*(x - atom.GetX());
+	double ydif = (y - atom.GetY())*(y - atom.GetY());
+	double zdif = (z - atom.GetZ())*(z - atom.GetZ());
 	return std::sqrt(xdif + ydif + zdif);
 }

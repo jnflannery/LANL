@@ -4,18 +4,18 @@
 class Molecule {
 private:
 	int timestep;
-	float cubeSize;
+	double cubeSize;
 	std::vector<Atom> atoms;
 public:
-	void setCubeSize(float);
-	float getCubeSize();
+	void setCubeSize(double);
+	double getCubeSize();
 	Molecule();
 	void SetTimestep(int);
 	Molecule(int numberOfAtoms);
 	void AddAtom(Atom);
 	int GetTimestep();
 	void SetAtomWithIndex(Atom atom, int i);
-	std::vector<Atom> GetMolecule();
+	std::vector<Atom> GetAtomVector();
 	Atom GetAtom(int);
 	int GetNumberOfAtoms();
 };

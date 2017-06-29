@@ -19,10 +19,10 @@ Molecule::Molecule(int numberOfAtoms) {
 	timestep = 0;
 }
 //set or get the size of the cube
-void Molecule::setCubeSize(float newSize) {
+void Molecule::setCubeSize(double newSize) {
 	cubeSize = newSize;
 }
-float Molecule::getCubeSize() {
+double Molecule::getCubeSize() {
 	return cubeSize;
 }
 //set or get the timestep

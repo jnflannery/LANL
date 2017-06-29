@@ -72,7 +72,7 @@ Parse a line that looks like this:
 */
 Atom Reader::ParseAtomLine(std::string line) {
 	int id;
-	float x, y, z;
+	double x, y, z;
 	std::vector<std::string> outputAsStrings = split(line.c_str(), ' ');
 	id = stoi(outputAsStrings.at(0));
 	x = ScientificNotationToFloat(outputAsStrings.at(2));
@@ -87,19 +87,19 @@ Atom Reader::ParseAtomLine(std::string line) {
 }
 /*
 turn a string that looks like this: "2.2556317953628206e+001"
-into a float like 22.55631...
+into a double like 22.55631...
 */
-float Reader::ScientificNotationToFloat(std::string numberAsString) {
+double Reader::ScientificNotationToFloat(std::string numberAsString) {
 	std::vector<std::string> numbersSeparatedByAnE = split(numberAsString.c_str(), 'e');
-	float number = strtof(numbersSeparatedByAnE.at(0).c_str(), NULL); 
+	double number = std::stod(numbersSeparatedByAnE.at(0).c_str(), NULL);
 	int powerOfE = stoi(numbersSeparatedByAnE.at(1));
 	for (int i = 0;i < powerOfE;i++) {
 		number = number * 10;
 	}
 	return number;
 }
-float Reader::GetCubeSizeFromLine(std::string line) {
-	float cubeSize;
+double Reader::GetCubeSizeFromLine(std::string line) {
+	double cubeSize;
 	std::vector<std::string> splitLine = split(line.c_str());
 	cubeSize = ScientificNotationToFloat(splitLine.at(1));
 	return cubeSize;

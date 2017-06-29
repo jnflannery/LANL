@@ -40,7 +40,7 @@ std::vector<Molecule> Reader::GetMolecules() {
 				//std::cout << "molecule size is: " << newMolecule.GetNumberOfAtoms() << "\r\n";
 
 			}
-			std::cout << "molecule size is: " << newMolecule.GetNumberOfAtoms() << "\r\n";
+			std::cout << "Molecule size is: " << newMolecule.GetNumberOfAtoms() << "\r\n";
 			molecules.push_back(newMolecule);
 		}
 	}

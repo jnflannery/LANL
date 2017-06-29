@@ -1,8 +1,4 @@
-
-//C++ Program to Implement Adjacency List
 #include <iostream>
-#include <cstdlib>
-#include <set>
 #include <vector>
 using namespace std;
  
@@ -15,7 +11,8 @@ struct Vertex
 
 	bool operator==(const Vertex& a) const
 	{
-		return ((id == a.id) && (neighbours == a.neighbours));
+		return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
+
 	}
 	bool operator<(const Vertex& a) const
 	{

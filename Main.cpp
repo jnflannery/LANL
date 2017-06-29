@@ -1,21 +1,12 @@
-// example about structures
-
-//#include "Atom.h"
-//#include "Molecule.h"
 #include "reader.h"
 #include "Cutoff.h"
+
 using namespace std;
 
-#include <utility>
-#include <algorithm>
-#include <string>
-#include <sstream>
-#include <iterator>
-#include <iostream>
-#include <fstream>
-#include <vector>
 int main()
 {
+	cout << std::boolalpha << true;
+
 	// set paths to files to be compared
 	string min = "R://LANL/SiDiamond/Extra/500K/minimized1000.xyz" ;
 	string pre_min = "R://LANL/SiDiamond/Extra/500K/preminimize1000.xyz" ;
@@ -31,14 +22,13 @@ int main()
 			vector<Molecule> molecules = myReader.GetMolecules();
 
 			//apply algorithm to get graph
-			myGraphs[i] = Cutoff(molecules.back(), 3.14);
-
+			myGraphs[i] = Cutoff(molecules.back(), 2.5);
 
 		}
 	}
 
 	// compare the two graphs
-	cout << (myGraphs[0] == myGraphs[1]) << endl;
+	cout << "The graphs are same ? " << (myGraphs[0] == myGraphs[1]) << endl;
 
 
 	std::cin.get();

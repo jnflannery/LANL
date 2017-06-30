@@ -93,8 +93,15 @@ double Reader::ScientificNotationToFloat(std::string numberAsString) {
 	std::vector<std::string> numbersSeparatedByAnE = split(numberAsString.c_str(), 'e');
 	double number = std::stod(numbersSeparatedByAnE.at(0).c_str(), NULL);
 	int powerOfE = stoi(numbersSeparatedByAnE.at(1));
-	for (int i = 0;i < powerOfE;i++) {
-		number = number * 10;
+	if (powerOfE < 0) {
+		for (int i = 0;i > powerOfE;i--) {
+			number = number / 10;
+		}
+	}
+	else {
+		for (int i = 0;i < powerOfE;i++) {
+			number = number * 10;
+		}
 	}
 	return number;
 }

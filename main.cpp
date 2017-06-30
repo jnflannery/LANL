@@ -19,7 +19,6 @@ int main()
 	Reader myReader = Reader();
 	if (myReader.Initialize(myFileName)) {
 		Molecule molecule = myReader.GetMoleculeFromOutputFile();
-		std::cout << "read molecule";
 		double newcutoff = 5;
 		BoxBuilder boxbuilder = BoxBuilder (newcutoff);
 		Boxlist boxList = boxbuilder.BuildBoxes(molecule, newcutoff); 

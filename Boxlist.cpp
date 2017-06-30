@@ -2,31 +2,36 @@
 #include <vector>
 #include <iostream>
 
+// the boxlist class keeps track of all of the boxes and their x, y, z indices in a vector of boxes
+
+// add a box to a boxlist
 void Boxlist::AddBox(Box newBox)
 {
 	// std::cout << "5";
 	int IDx = newBox.GetIDx();
 	int IDy = newBox.GetIDy();
-	int IDz = newBox.GetIDz();
+	int IDz = newBox.GetIDz(); // get x, y, z, coordinates of the box
 	// std::cout << "6";
-	int VectorIndex = IDx+N*IDy+N*N*IDz;
+	int VectorIndex = IDx+N*IDy+N*N*IDz; // convert x, y, z, coordinates to 1D vector index
 	// std::cout << VectorIndex;
-	boxes.at(VectorIndex) = newBox; 
+	boxes.at(VectorIndex) = newBox; // insert the box into the boxes vector at the proper vector index
 	// std::cout << "8";
 }
 
+// retrieve a box with a given x, y, z index from the vector of boxes
 Box Boxlist::GetBox(int IDx, int IDy, int IDz)
 {
-	int VectorIndex = IDx+N*IDy+N*N*IDz;
-	Box FoundBox = boxes.at(VectorIndex);
-	return FoundBox;
+	int VectorIndex = IDx+N*IDy+N*N*IDz; // convert x, y, z coordinates into 1D vector index
+	Box FoundBox = boxes.at(VectorIndex); // find the box with this vector index
+	return FoundBox; 
 }
 
+// declare a Boxlist
 Boxlist::Boxlist(int newN)
 {
-   N = newN;
-   std::vector<Box> boxesWithSize(newN*newN*newN);
-   boxes = boxesWithSize;
+   N = newN; //N is the number of boxes in each dimension
+   std::vector<Box> boxesWithSize(newN*newN*newN); // create a vector of boxes with N^3 total entries
+   boxes = boxesWithSize; 
 }
 
 Boxlist::Boxlist()
@@ -34,9 +39,10 @@ Boxlist::Boxlist()
 	N = 0;
 }
 
+//find the x, y, z, indices of a box given its vector index
 int Boxlist::FindBoxLocationX(int VectorIndex)
 {
-	int Xcoordinate = VectorIndex % N;
+	int Xcoordinate = VectorIndex % N; 
 	return Xcoordinate; 
 }
 

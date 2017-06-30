@@ -6,7 +6,7 @@ using namespace std;
 
 Graph Cutoff(Molecule molecule, float rc)
 {
-	vector<Atom> atoms = molecule.GetMolecule();
+	vector<Atom> atoms = molecule.GetAtomVector();
 	int size = molecule.GetNumberOfAtoms();
 
 	// create graph object

@@ -5,16 +5,18 @@ private:
 		double x;
 		double y;
 		double z;
-		int atomicMass;
+		int id;
 public:
-	Atom(float newX, float newY, float newZ, int newMass);
+	Atom(double newX, double newY, double newZ, int newId);
 	Atom();
 	void SetX(double);
 	void SetY(double);
 	void SetZ(double);
-	void SetAtomicMass(int);
+	void SetId(int);
+	double EuclidianDistance(Atom);
+	double EuclidianPeriodicDistance(Atom atom, double periodicBoundary);
 	double GetX();
 	double GetY();
 	double GetZ();
-	int GetAtomicMass();
+	int GetId();
 };

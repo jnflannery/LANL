@@ -3,6 +3,7 @@
 #include <sstream>
 #include "Atom.h"
 #include "Molecule.h"
+#include "sann.h"
 #include "reader.h"
 using namespace std;
 
@@ -12,13 +13,17 @@ using namespace std;
 int main()
 {
 	//you will  likely have a different file name
-	string myFileName = "C://Examples/example2.txt" ;
+	string myFileName = "C://Examples/PlatinumCrystalLattice.txt" ;
 	Reader myReader = Reader();
 	if (myReader.Initialize(myFileName)) {
 		Molecule molecule = myReader.GetMoleculeFromOutputFile();
+		Sann sann = Sann();
+		Graph g = Graph(500);
+		cout<< "i is: " <<sann.ComputeSannAtom(molecule.GetAtom(28), molecule.GetAtomVector(), g);
+		g.printGraph();
 	}
 	string line;
-
+	cin >> line;
 
 
 	return 0;

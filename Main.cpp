@@ -13,7 +13,7 @@ using namespace std;
 int main()
 {
 	//you will  likely have a different file name
-	string myFileName = "C://Examples/PlatinumCrystalLattice.txt" ;
+	string myFileName = "R://LANL/SiDiamond/Extra/500K/minimized1000.data" ;
 	Reader myReader = Reader();
 	if (myReader.Initialize(myFileName)) {
 		Molecule molecule = myReader.GetMoleculeFromOutputFile();

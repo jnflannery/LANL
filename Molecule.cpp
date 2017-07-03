@@ -22,7 +22,7 @@ Molecule::Molecule(int numberOfAtoms) {
 void Molecule::setCubeSize(double newSize) {
 	cubeSize = newSize;
 }
-double Molecule::getCubeSize() {
+double Molecule::GetCubeSize() {
 	return cubeSize;
 }
 //set or get the timestep

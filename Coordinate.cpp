@@ -1,3 +1,4 @@
+
 #include "coordinate.h"
 
 #include <iostream>
@@ -5,22 +6,22 @@
 
 using namespace std;
 
-void PrintCoordinate(Coordinate c){
-	cout << c.x << " " << c.y << " "<< c.z << endl;
+void PrintCoordinate(Coordinate c) {
+	cout << c.x << " " << c.y << " " << c.z << endl;
 }
 
-vector<Coordinate> FindNeighbours(Coordinate coordinate, int size) {
+
+// find the neighbors of a given box. The second argument is the number of boxes on each side of the domain. 
+Box FindNeighbours(Box BoxIN, int size) {
 	// create empty list of neighbours
-	vector<Coordinate> neighbours;
-	for (int i=-1; i<2; ++i) {
-		for (int j=-1; j<2; ++j) {
-			for (int k=-1; k<2; ++k) {
+	for (int i = -1; i<2; ++i) {
+		for (int j = -1; j<2; ++j) {
+			for (int k = -1; k<2; ++k) {
 				// add neighbour to the list
-				Coordinate c = {(coordinate.x+i+8) % 8, (coordinate.y+j+8) % 8, (coordinate.z+k+8) % 8};
-				neighbours.push_back(c);
+				Coordinate c = { (BoxIN.GetIDx() + i + size) % size, (BoxIN.GetIDy() + j + size) % size, (BoxIN.GetIDz() + k + size) % size };
+				BoxIN.AddNeighbor(c);
 			}
 		}
 	}
-
-	return neighbours;
-} 
+	return BoxIN;
+}

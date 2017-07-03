@@ -1,51 +1,30 @@
+// example about structures
+#include <string>
+#include <sstream>
 #include "Atom.h"
 #include "Molecule.h"
+#include "sann.h"
 #include "reader.h"
-#include "cutoff.h"
+using namespace std;
 
 #include <iostream>
 #include <fstream>
 #include <vector>
-
-using namespace std;
-
 int main()
 {
-	cout << std::boolalpha;
-
-	// set paths to files to be compared
-	string min = "R://LANL/SiDiamond/Extra/500K/minimized1000.data" ;
-	string pre_min = "R://LANL/SiDiamond/Extra/500K/preminimize1000.data" ;
-
-	string myFiles [2] = {min, pre_min};
-	Graph myGraphs [2];
-	
-	
-
-	// read files
+	//you will  likely have a different file name
+	string myFileName = "C://Examples/PlatinumCrystalLattice.txt" ;
 	Reader myReader = Reader();
-
-	
-
-	for (int i = 0; i < 2; i++){
-		//Reader myReader = Reader();
-		if (myReader.Initialize(myFiles[i])) {
-
-			Molecule molecule = myReader.GetMoleculeFromOutputFile();
-
-
-			//apply algorithm to get graph
-			cout << "Applying Cutoff to graph " << i << endl;
-			myGraphs[i] = Cutoff(molecule, 2.5);
-
-		}
+	if (myReader.Initialize(myFileName)) {
+		Molecule molecule = myReader.GetMoleculeFromOutputFile();
+		Sann sann = Sann();
+		Graph g = Graph(500);
+		cout<< "i is: " <<sann.ComputeSannAtom(molecule.GetAtom(0), molecule.GetAtomVector(), g, molecule.GetCubeSize());
+		g.printGraph();
 	}
+	string line;
+	cin >> line;
 
-	// compare the two graphs
-	cout << "The graphs are same ? " << (myGraphs[0] == myGraphs[1]) << endl;
-
-
-	std::cin.get();
 
 	return 0;
 }

@@ -1,13 +1,9 @@
+#pragma once
 #include <vector>
+#include "boxlist.h"
 
 using namespace std;
 
-struct Coordinate{
-	int x;
-	int y;
-	int z;
-};
-
 void PrintCoordinate(Coordinate c);
 
-vector<Coordinate> FindNeighbours(Coordinate coordinate, int size);
+Box FindNeighbours(Box BoxIN, int size);

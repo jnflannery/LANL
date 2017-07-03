@@ -12,6 +12,6 @@
 #include "boxlist.h"
 class Sann {
 public:
-	int ComputeSannAtom(Atom centralAtom, vector<Atom> potentialNeighbors, Graph& g);
+	int ComputeSannAtom(Atom centralAtom, vector<Atom> potentialNeighbors, Graph& g, double periodicDistance);
 	Graph ComputeSannMolecule(Molecule molecule, Boxlist boxList);
 };

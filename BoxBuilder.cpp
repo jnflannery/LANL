@@ -10,7 +10,7 @@ BoxBuilder::BoxBuilder(double newcutoff)
 
 Boxlist BoxBuilder::BuildBoxes(Molecule mol, double cutoff)
 {
-	double domainSize = mol.getCubeSize(); // domainSize is the size of one of the edges of the entire periodic cube
+	double domainSize = mol.GetCubeSize(); // domainSize is the size of one of the edges of the entire periodic cube
 	int BoxesPerSide = floor(domainSize / cutoff); // calculate how many boxes will fit in one edge of the entire domain
 	double BoxDim = domainSize / BoxesPerSide; // define the appropriate size of one side of a box so that BoxesPerSide boxes fit in the domain
 											   // double x;  

@@ -7,6 +7,7 @@
 #include "box.h"
 #include "boxlist.h"
 #include "boxbuilder.h"
+#include "coordinate.h"
 using namespace std;
 
 #include <iostream>
@@ -22,7 +23,10 @@ int main()
 		double newcutoff = 5;
 		BoxBuilder boxbuilder = BoxBuilder (newcutoff);
 		Boxlist boxList = boxbuilder.BuildBoxes(molecule, newcutoff); 
-
+		Box myBox = FindNeighbours(boxList.GetBox(1,1,1), boxList.GetBoxSize()); 
+		std::vector<Coordinate> neighbors = myBox.GetNeighborList();
+		std::cout << "We made it here \n";
+		std::cout << neighbors.at(26).x << " " << neighbors.at(26).y << " " << neighbors.at(26).z; 
 	}
 	string line;
 	std::cin.get();

@@ -66,6 +66,7 @@
     <ClInclude Include="boxbuilder.h" />
     <ClInclude Include="atom.h" />
     <ClInclude Include="boxlist.h" />
+    <ClInclude Include="coordinate.h" />
     <ClInclude Include="molecule.h" />
     <ClInclude Include="reader.h" />
   </ItemGroup>
@@ -74,6 +75,7 @@
     <ClCompile Include="Boxbuilder.cpp" />
     <ClCompile Include="Boxlist.cpp" />
     <ClCompile Include="Atom.cpp" />
+    <ClCompile Include="Coordinate.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Molecule.cpp" />
     <ClCompile Include="Reader.cpp" />

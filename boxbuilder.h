@@ -11,4 +11,5 @@ private:
 public:
 	Boxlist BuildBoxes (Molecule, double);
 	BoxBuilder(double cutoff);
+	double GetBoxSize();
 };

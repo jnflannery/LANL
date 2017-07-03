@@ -33,6 +33,9 @@
     <ClInclude Include="reader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="coordinate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Box.cpp">
@@ -54,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Boxlist.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Coordinate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

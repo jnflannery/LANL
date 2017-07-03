@@ -76,3 +76,8 @@ void Boxlist::AssignBoxSize(double BoxSizeIN)
 {
 	BoxSize = BoxSizeIN; 
 }
+
+double Boxlist::GetBoxSize()
+{
+	return BoxSize;
+}

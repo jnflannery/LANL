@@ -15,13 +15,14 @@ using namespace std;
 int main()
 {
 	//you will  likely have a different file name
-	string myFileName = "C:\\LAMMPS 64-bit 20170127\\bin\\SiDiamond\\extradefect.data";
+	string myFileName = "C:\\LAMMPS 64-bit 20170127\\bin\\SiDiamond\\gapdefect.data";
 	Reader myReader = Reader();
 	if (myReader.Initialize(myFileName)) {
 		Molecule molecule = myReader.GetMoleculeFromOutputFile();
 		double newcutoff = 5;
 		BoxBuilder boxbuilder = BoxBuilder (newcutoff);
 		Boxlist boxList = boxbuilder.BuildBoxes(molecule, newcutoff); 
+
 	}
 	string line;
 	std::cin.get();

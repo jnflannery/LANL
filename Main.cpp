@@ -18,9 +18,9 @@ int main()
 	if (myReader.Initialize(myFileName)) {
 		Molecule molecule = myReader.GetMoleculeFromOutputFile();
 		Sann sann = Sann();
-		Graph g = Graph(500);
-		cout<< "i is: " <<sann.ComputeSannAtom(molecule.GetAtom(0), molecule.GetAtomVector(), g, molecule.GetCubeSize());
-		g.printGraph();
+		Graph g = Graph(1001);
+		cout<< "i is: " <<sann.ComputeSannAtom(molecule.GetAtom(1000), molecule.GetAtomVector(), g, molecule.GetCubeSize());
+//		g.printGraph();
 	}
 	string line;
 	cin >> line;

@@ -52,10 +52,27 @@ public:
 		a.neighbours.push_back(b.id);
 		b.neighbours.push_back(a.id);
 	}
-	void addEdge(int a, int b)
+	void addEdge(int id1, int id2)
 	{
-		vertices[a].neighbours.push_back(b);
-		vertices[b].neighbours.push_back(a);
+		vertices[id1].neighbours.push_back(id2);
+		vertices[id2].neighbours.push_back(id2);
+	}
+
+	//get vertex from id
+	Vertex getVertex(int id){
+		return vertices[id];
+	}
+
+	//Print a vertex
+	void printVertex(int id){
+		cout << "Neighbours of vertex " << id << ":\n";
+			for (vector<int>::iterator it = vertices[id].neighbours.begin(); it != vertices[id].neighbours.end(); ++it) {
+				cout << *it << " ";
+			}
+			cout << "\n";
+	}
+	void printVertex(Vertex v){
+		printVertex(v.id);
 	}
 
 	//Print the graph
@@ -64,11 +81,7 @@ public:
 		int v;
 		for (v = 0; v < V; ++v)
 		{
-			cout << "Adjacency list of vertex " << v << ":" << endl;
-			for (vector<int>::iterator it = vertices[v].neighbours.begin(); it != vertices[v].neighbours.end(); ++it) {
-				cout << *it << " ";
-			}
-			cout << endl;
+			printVertex(v);
 		}
 	}
 

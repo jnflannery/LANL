@@ -55,7 +55,7 @@ std::vector<Molecule> Reader::GetMoleculesFromDump() {
 				file >> y;
 				file >> z;
 				std::cout << x << " " << y << " " << z << "\r\n";
-				Atom newAtom = Atom(x, y, z, (int)a);
+				Atom newAtom = Atom(x, y, z, (int)a-1);
 				newMolecule.AddAtom(newAtom);
 				std::cout << newMolecule.GetAtom(atomsSoFar).GetX() << " " << newMolecule.GetAtom(atomsSoFar).GetY() << " " << newMolecule.GetAtom(atomsSoFar).GetZ() << "\r\n";
 				std::cout << "molecule size is: " << newMolecule.GetNumberOfAtoms() << "\r\n";
@@ -79,7 +79,7 @@ Atom Reader::ParseAtomLine(std::string line) {
 	y = ScientificNotationToFloat(outputAsStrings.at(3));
 	z = ScientificNotationToFloat(outputAsStrings.at(4));
 	Atom atom = Atom();
-	atom.SetId(id);
+	atom.SetId(id-1);
 	atom.SetX(x);
 	atom.SetY(y);
 	atom.SetZ(z);
@@ -135,7 +135,7 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	for (int i = 0;i < numberOfAtoms;i++) {
 		getline(file, line);
 		Atom atom = ParseAtomLine(line);
-		molecule.SetAtomWithIndex(atom, atom.GetId()-1);
+		molecule.SetAtomWithIndex(atom, atom.GetId());
 	}
 	return molecule;
 }

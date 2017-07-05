@@ -58,9 +58,14 @@ public:
 		vertices[id2].neighbours.push_back(id2);
 	}
 
-	//get vertex from id
+	//get vertex by id
 	Vertex getVertex(int id){
 		return vertices[id];
+	}
+
+	//get all vertices
+	vector<Vertex> getAllVertices(){
+		return vertices;
 	}
 
 	//Print a vertex

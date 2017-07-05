@@ -1,4 +1,6 @@
 #include "cutoff.h"
+#include "boxbuilder.h"
+#include "coordinate.h"
 
 #include <math.h>
 
@@ -11,22 +13,46 @@ Graph Cutoff(Molecule molecule, float rc)
 
 	// create graph object
 	Graph gh(size);
+	
+	// build boxes
+	BoxBuilder myBoxBuilder = BoxBuilder(rc);
+	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, rc);
 
 	// check pairs of vertices, connect if within cutoff distance
 	int edgecount = 0;
-	for (int i=0; i < size; i++) {
-		for (int j = i+1; j < size; j++) {
-			Atom atom1 = molecule.GetAtom(i);
-			Atom atom2 = molecule.GetAtom(j);
-			double dX = atom1.GetX() - atom2.GetX();
-			double dY = atom1.GetY() - atom2.GetY();
-			double dZ = atom1.GetZ() - atom2.GetZ();
-			if (pow(dX, 2) + pow(dY, 2) + pow(dZ, 2) < pow(rc, 2)) {
-				gh.addEdge(i,j);
-				++edgecount;
+	
+	vector<Box> boxes = boxlist.GetAllBoxes();
+	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox){
+		Box b = FindNeighbours(*itBox, boxlist.NumberOfBoxes());
+		vector<Coordinate> neighborhood = b.GetNeighborList();
+		vector<int> boxAtoms = b.GetAtomsFromBox();
+		// itereate through atoms in middle box
+		for (vector<int>::iterator itAtom = boxAtoms.begin(); itAtom != boxAtoms.end(); ++itAtom){
+			//iterate through neighbouring boxes/coordinates
+			for (vector<Coordinate>::iterator itNeighCoor = neighborhood.begin(); itNeighCoor != neighborhood.end(); ++itNeighCoor){
+				Box Nbox = boxlist.GetBox(*itNeighCoor);
+				vector<int> Natoms = Nbox.GetAtomsFromBox();
+				//itereate though atoms in box by given coordinate
+				for (vector<int>::iterator itNeighAtom = Natoms.begin(); itNeighAtom != Natoms.end(); ++itNeighAtom){
+					Atom atom1 = molecule.GetAtom(*itAtom);
+					Atom atom2 = molecule.GetAtom(*itNeighAtom);
+					if (atom1.GetId() != atom2.GetId()) {
+						double dX = atom1.GetX() - atom2.GetX();
+						double dY = atom1.GetY() - atom2.GetY();
+						double dZ = atom1.GetZ() - atom2.GetZ();
+						double rsq = pow(rc, 2);
+						if (pow(dX, 2) + pow(dY, 2) + pow(dZ, 2) < rsq) {
+							gh.addEdge(*itAtom,*itNeighAtom);
+							++edgecount;
+						}
+					}
+				}
 			}
 		}
 	}
-	cout << "Number of edges: " << edgecount << endl;
+	cout << "Number of edges: " << edgecount << "\n";
+
+
+	//cout << "Number of edges: " << edgecount << "\n";
 	return gh;
 }

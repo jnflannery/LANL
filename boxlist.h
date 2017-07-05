@@ -15,6 +15,8 @@ public:
 	void AssignBoxSize(double);
 	double GetBoxSize();
 	Box GetBox(int, int, int);
+	Box GetBox(Coordinate);
+	std::vector<Box> GetAllBoxes();
 	int FindBoxLocationX(int);
 	int FindBoxLocationY(int);
 	int FindBoxLocationZ(int);

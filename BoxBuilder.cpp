@@ -57,10 +57,10 @@ Boxlist BoxBuilder::BuildBoxes(Molecule mol, double cutoff)
 			for (int i = 0; i<BoxesPerSide; i++)
 			{
 				TotalAtoms = TotalAtoms + boxlist.GetBox(i, j, k).GetNumberOfAtoms();
-				std::cout << i << " " << j << " " << k << " Number of Atoms: " << boxlist.GetBox(i, j, k).GetNumberOfAtoms() << "\n";
+				//std::cout << i << " " << j << " " << k << " Number of Atoms: " << boxlist.GetBox(i, j, k).GetNumberOfAtoms() << "\n";
 			}
 		}
 	}
-	std::cout << TotalAtoms;
+	//std::cout << TotalAtoms;
 	return boxlist;
 };

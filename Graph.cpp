@@ -55,7 +55,7 @@ public:
 	void addEdge(int id1, int id2)
 	{
 		vertices[id1].neighbours.push_back(id2);
-		vertices[id2].neighbours.push_back(id2);
+		vertices[id2].neighbours.push_back(id1);
 	}
 
 	//get vertex by id
@@ -70,11 +70,11 @@ public:
 
 	//Print a vertex (using LAMMPS IDs)
 	void printVertex(int id){
-		cout << "Neighbours of vertex " << id+1 << ":\n";
-			for (vector<int>::iterator it = vertices[id].neighbours.begin(); it != vertices[id].neighbours.end(); ++it) {
-				cout << (*it)+1 << " ";
-			}
-			cout << "\n";
+		cout << "Neighbours of vertex " << (id) << ":\n";
+		for (vector<int>::iterator it = vertices[id-1].neighbours.begin(); it != vertices[id-1].neighbours.end(); ++it) {
+			cout << (((*it)-1)) << " ";
+		}
+		cout << "\n";
 	}
 	void printVertex(Vertex v){
 		printVertex(v.id);
@@ -84,7 +84,7 @@ public:
 	void printGraph()
 	{
 		int v;
-		for (v = 0; v < V; ++v)
+		for (v = 1; v <= V; ++v)
 		{
 			printVertex(v);
 		}

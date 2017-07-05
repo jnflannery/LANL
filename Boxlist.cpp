@@ -25,6 +25,21 @@ Box Boxlist::GetBox(int IDx, int IDy, int IDz)
 	Box FoundBox = boxes.at(VectorIndex); // find the box with this vector index
 	return FoundBox;
 }
+Box Boxlist::GetBox(Coordinate coordinate)
+{
+	int IDx = coordinate.x;
+	int IDy = coordinate.y;
+	int IDz = coordinate.z;
+	int VectorIndex = IDx + N*IDy + N*N*IDz; // convert x, y, z coordinates into 1D vector index
+	Box FoundBox = boxes.at(VectorIndex); // find the box with this vector index
+	return FoundBox;
+}
+
+// get all boxes in the boxlist
+std::vector<Box> Boxlist::GetAllBoxes()
+{
+	return boxes;
+}
 
 // declare a Boxlist
 Boxlist::Boxlist(int newN)

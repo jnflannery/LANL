@@ -68,11 +68,11 @@ public:
 		return vertices;
 	}
 
-	//Print a vertex
+	//Print a vertex (using LAMMPS IDs)
 	void printVertex(int id){
-		cout << "Neighbours of vertex " << id << ":\n";
+		cout << "Neighbours of vertex " << id+1 << ":\n";
 			for (vector<int>::iterator it = vertices[id].neighbours.begin(); it != vertices[id].neighbours.end(); ++it) {
-				cout << *it << " ";
+				cout << (*it)+1 << " ";
 			}
 			cout << "\n";
 	}

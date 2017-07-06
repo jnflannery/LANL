@@ -22,7 +22,7 @@ std::vector<std::string> split(const char *str, char c = ' ')
 }
 bool Reader::Initialize(std::string myFileName) {
 	fileName = myFileName;
-	
+
 	std::ifstream myFile(myFileName);
 	if (!myFile)
 	{
@@ -39,7 +39,7 @@ std::vector<Molecule> Reader::GetMoleculesFromDump() {
 	std::string line;
 	file >> numberOfAtoms;
 	getline(file, line);
-	std::vector<Molecule> molecules=std::vector<Molecule>();
+	std::vector<Molecule> molecules = std::vector<Molecule>();
 	while (getline(file, line)) {
 		int timestepLocation = line.find("Timestep");
 		if (timestepLocation > 0 && timestepLocation < 3000) {
@@ -112,11 +112,11 @@ double Reader::GetCubeSizeFromLine(std::string line) {
 	return cubeSize;
 }
 Molecule Reader::GetMoleculeFromOutputFile() {
-	int numberOfAtoms, timestep; 
+	int numberOfAtoms, timestep;
 	std::string line;
 	getline(file, line);
 	int timestepLocation = line.find("timestep");
-	timestep = stoi(line.substr(timestepLocation+11, line.length() - (timestepLocation+11)));
+	timestep = stoi(line.substr(timestepLocation + 11, line.length() - (timestepLocation + 11)));
 	getline(file, line);
 	file >> numberOfAtoms;
 	/*
@@ -124,7 +124,7 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	we will read each atom, and then put it into the molecule's atom vector in
 	the spot at Atom.id-1
 	*/
-	Molecule molecule = Molecule(numberOfAtoms); 
+	Molecule molecule = Molecule(numberOfAtoms);
 	molecule.SetTimestep(timestep);
 	//iterate over lines with no good info except for the line that has the size
 	for (int i = 0;i < 13;i++) {
@@ -135,7 +135,7 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	for (int i = 0;i < numberOfAtoms;i++) {
 		getline(file, line);
 		Atom atom = ParseAtomLine(line);
-		molecule.SetAtomWithIndex(atom, atom.GetId()-1);
+		molecule.SetAtomWithIndex(atom, atom.GetId());
 	}
 	return molecule;
 }

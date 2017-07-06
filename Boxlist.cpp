@@ -39,6 +39,12 @@ Boxlist::Boxlist()
 	N = 0;
 }
 
+// find the number of boxes in each dimension
+int Boxlist::NumberOfBoxes()
+{
+	return N;
+}
+
 //find the x, y, z, indices of a box given its vector index
 int Boxlist::FindBoxLocationX(int VectorIndex)
 {
@@ -56,4 +62,22 @@ int Boxlist::FindBoxLocationZ(int VectorIndex)
 {
 	int Zcoordinate = floor(VectorIndex / (N*N));
 	return Zcoordinate;
+}
+
+Box Boxlist::FindBoxWithAtom(Atom atomIN)
+{
+	int xindex = floor(atomIN.GetX() / BoxSize);
+	int yindex = floor(atomIN.GetY() / BoxSize);
+	int zindex = floor(atomIN.GetZ() / BoxSize);
+	return GetBox(xindex, yindex, zindex);
+}
+
+void Boxlist::AssignBoxSize(double BoxSizeIN)
+{
+	BoxSize = BoxSizeIN;
+}
+
+double Boxlist::GetBoxSize()
+{
+	return BoxSize;
 }

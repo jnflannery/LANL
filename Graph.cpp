@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <string>
+#include "molecule.h"
+#include <fstream>
 using namespace std;
 
 
@@ -31,7 +34,7 @@ public:
 	Graph(int V)
 	{
 		this->V = V;
-		for (int i = 0; i < V; ++i) {
+		for (int i = 0; i < V + 1; ++i) {
 			Vertex v = { i };
 			this->vertices.push_back(v);
 		}
@@ -62,7 +65,7 @@ public:
 	void printGraph()
 	{
 		int v;
-		for (v = 0; v < V; ++v)
+		for (v = 1; v <= V; ++v)
 		{
 			cout << "Adjacency list of vertex " << v << ":" << endl;
 			for (vector<int>::iterator it = vertices[v].neighbours.begin(); it != vertices[v].neighbours.end(); ++it) {
@@ -81,5 +84,29 @@ public:
 			if (!(vertices[k] == g.vertices[k])) return false;
 		}
 		return true;
+	}
+	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {
+
+		std::ofstream file = std::ofstream(myFileName);
+		if (!file)
+		{
+			std::cout << myFileName << " cannot be accessed and/or written to. Terminating process";
+		}
+		else {
+			file = std::ofstream(myFileName);
+			int numberOfAtomsToPrint = 0;
+			vector <int> relavantNumbers();
+			for (int i = 0;i<=V;i++) {
+				if (vertices.at(i).neighbours.size() > 0)
+					numberOfAtomsToPrint++;
+			}
+			file << numberOfAtomsToPrint << endl;
+			file << "Atoms. Timestep: 0" << endl; 
+			for (int i = 0;i<=V;i++) {
+				if (vertices.at(i).neighbours.size() > 0)
+					file << 1 << " " << m.GetAtom(i).GetX() << " " << m.GetAtom(i).GetY() << " " << m.GetAtom(i).GetZ() << endl;
+			}
+
+		}
 	}
 };

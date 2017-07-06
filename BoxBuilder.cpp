@@ -20,6 +20,8 @@ Boxlist BoxBuilder::BuildBoxes(Molecule mol, double cutoff)
 
 
 	Boxlist boxlist(BoxesPerSide);
+	boxlist.AssignBoxSize(BoxDim);
+
 	for (int k = 0; k<BoxesPerSide; k++)
 	{
 		for (int j = 0; j<BoxesPerSide; j++)

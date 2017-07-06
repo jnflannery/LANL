@@ -13,14 +13,15 @@ using namespace std;
 int main()
 {
 	//you will  likely have a different file name
-	string myFileName = "C://Examples/PlatinumCrystalLattice.txt" ;
+	string myFileName = "C://Examples/PlatinumCrystalLattice.txt";
 	Reader myReader = Reader();
 	if (myReader.Initialize(myFileName)) {
 		Molecule molecule = myReader.GetMoleculeFromOutputFile();
 		Sann sann = Sann();
 		Graph g = Graph(500);
-		cout<< "i is: " <<sann.ComputeSannAtom(molecule.GetAtom(0), molecule.GetAtomVector(), g, molecule.GetCubeSize());
+		cout << "i is: " << sann.ComputeSannAtom(molecule.GetAtom(500), molecule.GetAtomVector(), g, molecule.GetCubeSize());
 		g.printGraph();
+		g.writeGraphAsDumpFile("C://Examples/PlatinumCrystalLatticeAtom50Connection501.xyz", molecule);
 	}
 	string line;
 	cin >> line;
@@ -28,4 +29,3 @@ int main()
 
 	return 0;
 }
-

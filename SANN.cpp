@@ -58,7 +58,11 @@ int Sann::ComputeSannAtom(Atom centralAtom, vector<Atom> potentialNeighbors, Gra
 	if (i == count)
 		return -1;
 	//Everything worked great! now we add these things to the graph structure
+	cout << centralAtom.GetId() <<" "<< centralAtom.GetX()<< " " << centralAtom.GetY()<< " " << centralAtom.GetZ()<<endl;
 	for (int j = 0; j < i;j++) {
+		int currentID = potentialNeighbors.at(neighborCandidates.at(j).id).GetId();
+		int candidateID = neighborCandidates.at(j).id;
+		cout << potentialNeighbors.at(neighborCandidates.at(j).id-1).GetId() << " " << potentialNeighbors.at(neighborCandidates.at(j).id-1).GetX() << " " << potentialNeighbors.at(neighborCandidates.at(j).id-1).GetY() << " " << potentialNeighbors.at(neighborCandidates.at(j).id-1).GetZ() << endl;
 		g.addEdge(centralAtom.GetId(), neighborCandidates.at(j).id);
 	}
 	//g.printGraph();
@@ -66,7 +70,7 @@ int Sann::ComputeSannAtom(Atom centralAtom, vector<Atom> potentialNeighbors, Gra
 }
 Graph Sann::ComputeSannMolecule(Molecule molecule, Boxlist boxList){
 	Graph g = Graph(molecule.GetNumberOfAtoms());
-	for (int i = 0; i < molecule.GetNumberOfAtoms();i++) {
+	for (int i = 0; i < molecule.GetNumberOfAtoms()-1;i++) {
 		vector<Atom> potentialNeighbors=vector<Atom>();//get candidates from the boxes... how do we know which boxes we are going to use from the list?
 		ComputeSannAtom(molecule.GetAtom(i), potentialNeighbors, g, molecule.GetCubeSize());
 	}

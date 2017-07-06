@@ -1,6 +1,6 @@
+#pragma once
 #include "molecule.h"
 #include "atom.h"
-#include <boost/graph/undirected_graph.hpp>
+#include "Graph.cpp"
 
-typedef boost::undirected_graph<> Graph;
 Graph Cutoff(Molecule molecule, float rc);

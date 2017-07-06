@@ -13,7 +13,7 @@ number 522, you can later say "molecule.GetAtom(522) to get that
 atom specifically
 */
 Molecule::Molecule(int numberOfAtoms) {
-	std::vector<Atom> atomsWithSize(numberOfAtoms+1);
+	std::vector<Atom> atomsWithSize(numberOfAtoms);
 	atoms = atomsWithSize;
 	cubeSize = 0;
 	timestep = 0;

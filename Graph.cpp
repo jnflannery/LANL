@@ -3,6 +3,7 @@
 #include <string>
 #include "molecule.h"
 #include <fstream>
+#include <set>
 using namespace std;
 
 
@@ -65,11 +66,13 @@ public:
 	void printGraph()
 	{
 		int v;
-		for (v = 1; v <= V; ++v)
+		for (v = 1 ; v <= V; ++v)
 		{
 			cout << "Adjacency list of vertex " << v << ":" << endl;
-			for (vector<int>::iterator it = vertices[v].neighbours.begin(); it != vertices[v].neighbours.end(); ++it) {
-				cout << *it << " ";
+			if (vertices[v].neighbours.size() > 0) {
+				for (vector<int>::iterator it = vertices[v].neighbours.begin(); it != vertices[v].neighbours.end(); ++it)  {
+					cout << *it << " ";
+				}
 			}
 			cout << endl;
 		}

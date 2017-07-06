@@ -1,7 +1,4 @@
 #include "boxbuilder.h"
-#include "boxlist.h"
-#include <iostream>
-#include "math.h"
 
 BoxBuilder::BoxBuilder(double newcutoff)
 {
@@ -35,7 +32,7 @@ Boxlist BoxBuilder::BuildBoxes(Molecule mol, double cutoff)
 		}
 	}
 
-	for (int n = 0; n< mol.GetNumberOfAtoms(); n++)
+	for (int n = 1; n<= mol.GetNumberOfAtoms(); n++)
 	{
 		// std::cout << "We got here: ";
 		int xindex = floor(mol.GetAtom(n).GetX() / BoxDim);

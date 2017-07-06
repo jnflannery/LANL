@@ -1,6 +1,5 @@
 #include "boxlist.h"
-#include <vector>
-#include <iostream>
+
 
 // the boxlist class keeps track of all of the boxes and their x, y, z indices in a vector of boxes
 
@@ -80,4 +79,21 @@ void Boxlist::AssignBoxSize(double BoxSizeIN)
 double Boxlist::GetBoxSize()
 {
 	return BoxSize;
+}
+std::vector<Atom> Boxlist::getAtomVectorOfNeighborCandidates(Box box, int boxesPerSide, Molecule molecule) {
+	std::vector<Atom> atomsInBoxes=std::vector<Atom>();
+	std::vector<Box> boxNeighbors = std::vector<Box>();
+	box = FindNeighbours(box, boxesPerSide);
+	vector<Atom> largeBoxAtoms = box.getVectorOfAtomsFromBox(molecule);
+
+	vector<Coordinate> neighborBoxes = box.GetNeighborList();
+	for (int i = 0;i < neighborBoxes.size();i++) {
+		boxNeighbors.push_back(GetBox(neighborBoxes.at(i).x, neighborBoxes.at(i).y, neighborBoxes.at(i).z));
+	}
+	for (int i = 0;i < boxNeighbors.size();i++) {
+		for (int j = 0;j < boxNeighbors.at(i).GetNumberOfAtoms();j++) {
+			atomsInBoxes.push_back(molecule.GetAtom(boxNeighbors.at(i).GetAtomsFromBox().at(j)));
+		}
+	}
+	return atomsInBoxes;
 }

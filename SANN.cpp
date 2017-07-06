@@ -31,7 +31,7 @@ int Sann::ComputeSannAtom(Atom centralAtom, vector<Atom> potentialNeighbors, Gra
 	//add simplified potential neighbors to a vector
 	vector<AtomIdAndDistance> neighborCandidates = vector <AtomIdAndDistance>();
 	for (int i = 0; i < (int)potentialNeighbors.size()-1;i++) {
-		if(i!=centralAtom.GetId()-1)
+		if(potentialNeighbors.at(i).GetId()!=centralAtom.GetId())
 		neighborCandidates.push_back(SimplifyNeighborCandidate(centralAtom, potentialNeighbors.at(i), periodicDistance));
 	}
 	////if there aren't enough neighbors to do algorithm then quit

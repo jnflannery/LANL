@@ -50,9 +50,5 @@ Graph Cutoff(Molecule molecule, float rc)
 			}
 		}
 	}
-	cout << "Number of edges: " << edgecount << "\n";
-
-
-	//cout << "Number of edges: " << edgecount << "\n";
 	return gh;
 }

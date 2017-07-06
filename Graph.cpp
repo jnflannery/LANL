@@ -1,5 +1,8 @@
 #include <iostream>
 #include <vector>
+#include <string>
+#include "molecule.h"
+#include <fstream>
 using namespace std;
 
 
@@ -31,7 +34,7 @@ public:
 	Graph(int V)
 	{
 		this->V = V;
-		for (int i = 0; i < V; ++i) {
+		for (int i = 0; i < V + 1; ++i) {
 			Vertex v = { i };
 			this->vertices.push_back(v);
 		}
@@ -52,32 +55,10 @@ public:
 		a.neighbours.push_back(b.id);
 		b.neighbours.push_back(a.id);
 	}
-	void addEdge(int id1, int id2)
+	void addEdge(int a, int b)
 	{
-		vertices[id1].neighbours.push_back(id2);
-		vertices[id2].neighbours.push_back(id1);
-	}
-
-	//get vertex by id
-	Vertex getVertex(int id){
-		return vertices[id];
-	}
-
-	//get all vertices
-	vector<Vertex> getAllVertices(){
-		return vertices;
-	}
-
-	//Print a vertex (using LAMMPS IDs)
-	void printVertex(int id){
-		cout << "Neighbours of vertex " << (id) << ":\n";
-		for (vector<int>::iterator it = vertices[id-1].neighbours.begin(); it != vertices[id-1].neighbours.end(); ++it) {
-			cout << (((*it)-1)) << " ";
-		}
-		cout << "\n";
-	}
-	void printVertex(Vertex v){
-		printVertex(v.id);
+		vertices[a].neighbours.push_back(b);
+		vertices[b].neighbours.push_back(a);
 	}
 
 	//Print the graph
@@ -86,7 +67,11 @@ public:
 		int v;
 		for (v = 1; v <= V; ++v)
 		{
-			printVertex(v);
+			cout << "Adjacency list of vertex " << v << ":" << endl;
+			for (vector<int>::iterator it = vertices[v].neighbours.begin(); it != vertices[v].neighbours.end(); ++it) {
+				cout << *it << " ";
+			}
+			cout << endl;
 		}
 	}
 
@@ -99,5 +84,29 @@ public:
 			if (!(vertices[k] == g.vertices[k])) return false;
 		}
 		return true;
+	}
+	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {
+
+		std::ofstream file = std::ofstream(myFileName);
+		if (!file)
+		{
+			std::cout << myFileName << " cannot be accessed and/or written to. Terminating process";
+		}
+		else {
+			file = std::ofstream(myFileName);
+			int numberOfAtomsToPrint = 0;
+			vector <int> relavantNumbers();
+			for (int i = 0;i<=V;i++) {
+				if (vertices.at(i).neighbours.size() > 0)
+					numberOfAtomsToPrint++;
+			}
+			file << numberOfAtomsToPrint << endl;
+			file << "Atoms. Timestep: 0" << endl; 
+			for (int i = 0;i<=V;i++) {
+				if (vertices.at(i).neighbours.size() > 0)
+					file << 1 << " " << m.GetAtom(i).GetX() << " " << m.GetAtom(i).GetY() << " " << m.GetAtom(i).GetZ() << endl;
+			}
+
+		}
 	}
 };

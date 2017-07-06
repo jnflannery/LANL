@@ -46,8 +46,8 @@ double Atom::EuclidianDistance(Atom atom) {
 }
 //does euclidian distance except it takes into account things that are close to the periodic boundaries
 double Atom::EuclidianPeriodicDistance(Atom atom, double periodicBoundary) {
-	double xdif = std::min((x - atom.GetX()), (periodicBoundary - (x - atom.GetX())));
-	double ydif = std::min((y - atom.GetY()), (periodicBoundary - (y - atom.GetY())));
-	double zdif = std::min((z - atom.GetZ()), (periodicBoundary - (z - atom.GetZ())));
-	return std::sqrt(xdif + ydif + zdif);
+	double xdif = std::min(abs(x - atom.GetX()), abs(periodicBoundary - abs(x - atom.GetX())));
+	double ydif = std::min(abs(y - atom.GetY()), abs(periodicBoundary - abs(y - atom.GetY())));
+	double zdif = std::min(abs((z - atom.GetZ())), abs(periodicBoundary - abs(z - atom.GetZ())));
+	return std::sqrt(xdif*xdif + ydif*ydif + zdif*zdif);
 }

@@ -36,13 +36,11 @@ Graph Cutoff(Molecule molecule, float rc)
 				for (vector<int>::iterator itNeighAtom = Natoms.begin(); itNeighAtom != Natoms.end(); ++itNeighAtom){
 					Atom atom1 = molecule.GetAtom(*itAtom);
 					Atom atom2 = molecule.GetAtom(*itNeighAtom);
-					if (atom1.GetId() != atom2.GetId()) {
-						double dX = atom1.GetX() - atom2.GetX();
-						double dY = atom1.GetY() - atom2.GetY();
-						double dZ = atom1.GetZ() - atom2.GetZ();
-						double rsq = pow(rc, 2);
-						if (pow(dX, 2) + pow(dY, 2) + pow(dZ, 2) < rsq) {
+					if (atom1.GetId() < atom2.GetId()) { //use '<' to avoid adding edge twice. this assumes graph is undirected.
+						if (atom1.EuclidianPeriodicDistance(atom2, molecule.GetCubeSize()) < rc) {
+						//if (atom1.EuclidianDistance(atom2) < rc) {
 							gh.addEdge(*itAtom,*itNeighAtom);
+							//gh.addEdge(atom1.GetId(), atom2.GetId());
 							++edgecount;
 						}
 					}

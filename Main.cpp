@@ -13,7 +13,7 @@
 using namespace std;
 
 bool compareGraphsCutOff(string, string, double);
-void analyzeDataCutOff(string, int, int, int, double);
+double analyzeDataCutOff(string, int, int, int, double);
 
 int main()
 {
@@ -26,19 +26,25 @@ int main()
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 500;
-	//set cutoff distance
-	double rc = 3.1;
+	const int timeStep = 10;
+	
+	//set cutoff distance [run on full data for 2.6, 3.2]
+	const double rc = 3.2;
+	cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc);
 
-	analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc);
+	/*for (double rc = 3.16; rc<=3.20; rc+=0.005){
+		cout << rc << " " << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc) << "\n";
+	}*/
 
-	cout << "Done.";
+
+
+	cout << "\nDone.";
 	cin.get();
 
 	return 0;
 }
 
-void analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int timeStep, double rc){
+double analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int timeStep, double rc){
 	vector<short> sameTimes;
 	vector<short> diffTimes;
 	
@@ -48,12 +54,13 @@ void analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int timeS
 		
 		
 
-		bool same = compareGraphsCutOff(pre, min, 3.10);
+		bool same = compareGraphsCutOff(pre, min, rc);
 		if (same) {
 			sameTimes.push_back(time);
 		} else {
 			diffTimes.push_back(time);
 		}
+		cout << same;
 	}
 
 	//output data
@@ -65,7 +72,7 @@ void analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int timeS
 	} else {
 		file = std::ofstream(outFileName);
 		file << folderPath << "\n";
-		file << "CotOff algorithm with CUtOFf distance " << to_string(rc) << "\n";
+		file << "CotOff algorithm with CutOff distance " << to_string(rc) << "\n";
 		int sameCount = sameTimes.size();
 		int totalCount = sameCount + diffTimes.size();
 		file <<sameCount<<" graph pairs same out of "<<totalCount<<" ("<<100*float(sameCount)/float(totalCount)<<"%)\n";
@@ -78,7 +85,9 @@ void analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int timeS
 		for (vector<short>::iterator it = diffTimes.begin(); it != diffTimes.end(); ++it){
 			file << *it << "\n";
 		}
+		return float(sameCount)/float(totalCount);
 	}
+	return -1;
 }
 
 bool compareGraphsCutOff(string pre, string min, double rc){

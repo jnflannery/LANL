@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include <vector>
 #include "Atom.h"
 class Molecule {
@@ -8,7 +9,7 @@ private:
 	std::vector<Atom> atoms;
 public:
 	void setCubeSize(double);
-	double getCubeSize();
+	double GetCubeSize();
 	Molecule();
 	void SetTimestep(int);
 	Molecule(int numberOfAtoms);

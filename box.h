@@ -1,7 +1,7 @@
 #pragma once
 #include<vector>
 
-struct Coordinate{
+struct Coordinate {
 	int x;
 	int y;
 	int z;
@@ -9,11 +9,11 @@ struct Coordinate{
 
 class Box {
 private:
-		std::vector<int> atomlist;
-		int xnumber;
-		int ynumber;
-		int znumber;
-		std::vector<Coordinate> neighbors; 
+	std::vector<int> atomlist;
+	int xnumber;
+	int ynumber;
+	int znumber;
+	std::vector<Coordinate> neighbors;
 
 public:
 	Box(int newXnumber, int newYnumber, int newZnumber);

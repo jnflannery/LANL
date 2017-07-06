@@ -19,7 +19,7 @@ Box::Box()
 // add an atom to a box given its ID
 void Box::InsertAtom(int atomID)
 {
-	atomlist.push_back (atomID);
+	atomlist.push_back(atomID);
 }
 
 // find the x index of a box
@@ -37,7 +37,7 @@ int Box::GetIDy()
 // find the z index of a box
 int Box::GetIDz()
 {
-	return znumber; 
+	return znumber;
 }
 
 // print out the IDs of the atoms in a given box

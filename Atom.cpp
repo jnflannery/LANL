@@ -1,5 +1,6 @@
 #include "atom.h"
 #include <cmath>
+#include <algorithm>
 ////
 double Atom::GetX() {
 	return x;
@@ -20,7 +21,7 @@ void Atom::SetY(double newY) {
 	y = newY;
 }
 void Atom::SetZ(double newZ) {
-	z = newZ;      
+	z = newZ;
 }
 void Atom::SetId(int newId) {
 	id = newId;
@@ -42,4 +43,11 @@ double Atom::EuclidianDistance(Atom atom) {
 	double ydif = (y - atom.GetY())*(y - atom.GetY());
 	double zdif = (z - atom.GetZ())*(z - atom.GetZ());
 	return std::sqrt(xdif + ydif + zdif);
+}
+//does euclidian distance except it takes into account things that are close to the periodic boundaries
+double Atom::EuclidianPeriodicDistance(Atom atom, double periodicBoundary) {
+	double xdif = std::min(abs(x - atom.GetX()), abs(periodicBoundary - abs(x - atom.GetX())));
+	double ydif = std::min(abs(y - atom.GetY()), abs(periodicBoundary - abs(y - atom.GetY())));
+	double zdif = std::min(abs((z - atom.GetZ())), abs(periodicBoundary - abs(z - atom.GetZ())));
+	return std::sqrt(xdif*xdif + ydif*ydif + zdif*zdif);
 }

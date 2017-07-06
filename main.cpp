@@ -3,11 +3,9 @@
 #include <sstream>
 #include "Atom.h"
 #include "Molecule.h"
+#include "sann.h"
+#include "soig.h"
 #include "reader.h"
-#include "box.h"
-#include "boxlist.h"
-#include "boxbuilder.h"
-#include "coordinate.h"
 using namespace std;
 
 #include <iostream>
@@ -16,20 +14,27 @@ using namespace std;
 int main()
 {
 	//you will  likely have a different file name
-	string myFileName = "C:\\LAMMPS 64-bit 20170127\\bin\\SiDiamond\\gapdefect.data";
+	string myFileName = "C://Examples/bulklattice.data" ;
 	Reader myReader = Reader();
 	if (myReader.Initialize(myFileName)) {
 		Molecule molecule = myReader.GetMoleculeFromOutputFile();
-		double newcutoff = 5;
-		BoxBuilder boxbuilder = BoxBuilder (newcutoff);
-		Boxlist boxList = boxbuilder.BuildBoxes(molecule, newcutoff); 
-		Box myBox = FindNeighbours(boxList.GetBox(1,1,1), boxList.GetBoxSize()); 
-		std::vector<Coordinate> neighbors = myBox.GetNeighborList();
-		std::cout << "We made it here \n";
-		std::cout << neighbors.at(26).x << " " << neighbors.at(26).y << " " << neighbors.at(26).z; 
+		Graph g = Graph(1000);
+		Soig soig = Soig();
+		cout << "We made it here \n";
+		vector<AtomWithRadius> sphereList = soig.ComputeSpheresSoig(molecule, molecule.GetCubeSize());
+		cout << "We made the sphere list \n";
+		int output = soig.FindAtomNeighbors(molecule.GetAtom(250), molecule, sphereList, molecule.GetCubeSize(), g);
+		// int output = soig.CreateGraphSoig(molecule, sphereList, molecule.GetCubeSize(), g);
+		cout << "We created the graph";
+		// cout<< "i is: " <<sann.ComputeSannAtom(molecule.GetAtom(0), molecule.GetAtomVector(), g, molecule.GetCubeSize());
+		g.printGraph();
+		cout << sphereList.at(250).radius; 
+	    g.writeGraphAsDumpFile("C://Graph Testing//soigtest.txt", molecule);
 	}
 	string line;
+	cin >> line;
 	std::cin.get();
+
 
 	return 0;
 }

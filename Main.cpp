@@ -28,15 +28,25 @@ int main()
 	const int lastTime = 15000;
 	const int timeStep = 10;
 	
-	//set cutoff distance [run on full data for 2.6, 3.2]
-	const double rc = 3.2;
-	cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc);
+	//set cutoff distance [run on full data for 2.6, 3.2 for SiDiamond; 3.348=0.854(halfway between first and second shell)*3.92(lattice constant) for fcc data]
+	//const double rc = 3.2;
+	//cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc);
 
-	/*for (double rc = 3.16; rc<=3.20; rc+=0.005){
-		cout << rc << " " << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc) << "\n";
-	}*/
-
-
+	string defects [] = {"Extra", "Gap"};
+	string temperatures [] = {"50K", "300K", "500K", "1000K", "1500K", "2000K"};
+	
+	for (auto i : temperatures){
+		for (auto j : defects){
+			//SiDiamond
+			string folderPath;
+			folderPath = datapath + "SiDiamond" + "/" + j + "/" + i;
+			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, 2.6) << "\n";
+			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, 3.2) << "\n";
+			//PtFCC (rc=3.348=0.854(halfway between first and second shell)*3.92(lattice constant) for fcc data)
+			folderPath = datapath + "PtFCC" + "/" + j + "/" + i;
+			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, 3.348) << "\n";
+		}
+	}
 
 	cout << "\nDone.";
 	cin.get();
@@ -62,7 +72,7 @@ double analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int tim
 		}
 		cout << same;
 	}
-
+	cout << "\n";
 	//output data
 	string outFileName = folderPath + "/OutputCutoff" + to_string(rc) + ".txt";
 	std::ofstream file = std::ofstream(outFileName);

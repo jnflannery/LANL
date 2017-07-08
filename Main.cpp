@@ -22,31 +22,33 @@ int main()
 	const string material = "SiDiamond";
 	const string defect = "Extra";
 	const string temperature = "300K";
-	const string folderPath = datapath + material + "/" + defect + "/" + temperature;
+	string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 10;
+	const int timeStep = 1500;
 	
 	//set cutoff distance [run on full data for 2.6, 3.2 for SiDiamond; 3.348=0.854(halfway between first and second shell)*3.92(lattice constant) for fcc data]
-	//const double rc = 3.2;
+	//const double rc = 2.7;
 	//cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc);
 
-	string defects [] = {"Extra", "Gap"};
-	string temperatures [] = {"50K", "300K", "500K", "1000K", "1500K", "2000K"};
+	string defects [] = {"Gap"};
+	string temperatures [] = {"300K"};
+
+
 	
+	//find rc for pt nano part
 	for (auto i : temperatures){
-		for (auto j : defects){
-			//SiDiamond
-			string folderPath;
-			folderPath = datapath + "SiDiamond" + "/" + j + "/" + i;
-			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, 2.6) << "\n";
-			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, 3.2) << "\n";
-			//PtFCC (rc=3.348=0.854(halfway between first and second shell)*3.92(lattice constant) for fcc data)
-			folderPath = datapath + "PtFCC" + "/" + j + "/" + i;
-			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, 3.348) << "\n";
+		for (double rc = 2.6; rc<5; rc+=0.15){
+			string folderPath = datapath + "PtNanoPart/CompleteParticle" + "/" + i;
+			cout << folderPath << " " << rc << "\n";
+			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc) << "\n";
 		}
 	}
+
+
+
+
 
 	cout << "\nDone.";
 	cin.get();
@@ -108,6 +110,17 @@ bool compareGraphsCutOff(string pre, string min, double rc){
 		if (myReader.Initialize(fileNames[i])) {
 			Molecule molecule = myReader.GetMoleculeFromOutputFile();
 			graphs[i] = Cutoff(molecule, rc);
+
+
+			/*
+			graphs[i].printVertex(47);
+			graphs[i].printVertex(48);
+			graphs[i].printVertex(49);
+			graphs[i].printVertex(50);
+			graphs[i].printVertex(51);
+			graphs[i].printVertex(52);
+
+			cout << "\n";*/
 		}
 	}
 	return (graphs[0] == graphs[1]);

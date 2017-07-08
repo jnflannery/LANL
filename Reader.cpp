@@ -43,9 +43,9 @@ std::vector<Molecule> Reader::GetMoleculesFromDump() {
 	while (getline(file, line)) {
 		int timestepLocation = line.find("Timestep");
 		if (timestepLocation > 0 && timestepLocation < 3000) {
-			std::cout << line.substr(timestepLocation, line.length() - timestepLocation);
+			/*std::cout << line.substr(timestepLocation, line.length() - timestepLocation);
 			std::cout << line + "this was the line \r\n";
-			std::cout << "number of atoms is:" << numberOfAtoms << "\r\n";
+			std::cout << "number of atoms is:" << numberOfAtoms << "\r\n";*/
 			Molecule newMolecule = Molecule();
 			float a, x, y, z;
 			for (int atomsSoFar = 0; atomsSoFar < numberOfAtoms; atomsSoFar++)
@@ -55,7 +55,7 @@ std::vector<Molecule> Reader::GetMoleculesFromDump() {
 				file >> y;
 				file >> z;
 				std::cout << x << " " << y << " " << z << "\r\n";
-				Atom newAtom = Atom(x, y, z, (int)a-1);
+				Atom newAtom = Atom(x, y, z, (int)a);
 				newMolecule.AddAtom(newAtom);
 				std::cout << newMolecule.GetAtom(atomsSoFar).GetX() << " " << newMolecule.GetAtom(atomsSoFar).GetY() << " " << newMolecule.GetAtom(atomsSoFar).GetZ() << "\r\n";
 				std::cout << "molecule size is: " << newMolecule.GetNumberOfAtoms() << "\r\n";
@@ -79,7 +79,7 @@ Atom Reader::ParseAtomLine(std::string line) {
 	y = ScientificNotationToFloat(outputAsStrings.at(3));
 	z = ScientificNotationToFloat(outputAsStrings.at(4));
 	Atom atom = Atom();
-	atom.SetId(id-1);
+	atom.SetId(id);
 	atom.SetX(x);
 	atom.SetY(y);
 	atom.SetZ(z);
@@ -135,7 +135,7 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	for (int i = 0;i < numberOfAtoms;i++) {
 		getline(file, line);
 		Atom atom = ParseAtomLine(line);
-		molecule.SetAtomWithIndex(atom, atom.GetId());
+		molecule.SetAtomWithIndex(atom, atom.GetId()-1);
 	}
 	return molecule;
 }

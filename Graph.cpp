@@ -3,6 +3,7 @@
 #include <string>
 #include "molecule.h"
 #include <fstream>
+#include <set>
 using namespace std;
 
 
@@ -61,17 +62,38 @@ public:
 		vertices[b].neighbours.push_back(a);
 	}
 
+
+	//get vertex by id
+	Vertex getVertex(int id){
+		return vertices[id];
+	}
+
+	//get all vertices
+	vector<Vertex> getAllVertices(){
+		return vertices;
+	}
+
+	//Print a vertex (using LAMMPS IDs)
+	void printVertex(int id){
+		cout << "Adjacency list of vertex " << id << ":" << endl;
+		if (vertices[id].neighbours.size() > 0) {
+			for (vector<int>::iterator it = vertices[id].neighbours.begin(); it != vertices[id].neighbours.end(); ++it)  {
+				cout << *it << " ";
+			}
+		}
+		cout << "\n";
+	}
+	void printVertex(Vertex v){
+		printVertex(v.id);
+	}
+
 	//Print the graph
 	void printGraph()
 	{
 		int v;
 		for (v = 1; v <= V; ++v)
 		{
-			cout << "Adjacency list of vertex " << v << ":" << endl;
-			for (vector<int>::iterator it = vertices[v].neighbours.begin(); it != vertices[v].neighbours.end(); ++it) {
-				cout << *it << " ";
-			}
-			cout << endl;
+			printVertex(v);
 		}
 	}
 

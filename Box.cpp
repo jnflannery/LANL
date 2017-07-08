@@ -1,5 +1,5 @@
 #include "box.h"
-#include <vector>
+
 
 // declare a box at a given x, y, and z index
 Box::Box(int newXnumber, int newYnumber, int newZnumber)
@@ -60,4 +60,13 @@ std::vector<Coordinate> Box::GetNeighborList()
 void Box::AddNeighbor(Coordinate NeighborCoord)
 {
 	neighbors.push_back(NeighborCoord);
+}
+
+std::vector<Atom> Box::getVectorOfAtomsFromBox(Molecule molecule)
+{
+	std::vector<Atom> originalBoxAtoms =std::vector<Atom>();
+	for (int i = 0;i < GetAtomsFromBox().size();i++) {
+		originalBoxAtoms.push_back(molecule.GetAtom(GetAtomsFromBox().at(i)));
+	}
+	return originalBoxAtoms;
 }

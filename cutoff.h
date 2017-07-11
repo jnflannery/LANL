@@ -4,4 +4,4 @@
 #include "atom.h"
 #include "Graph.cpp"
 
-Graph Cutoff(Molecule molecule, float rc);
+Graph Cutoff(Molecule molecule, double rc);

@@ -14,6 +14,9 @@ public:
 	void SetZ(double);
 	void SetId(int);
 	double EuclidianDistance(Atom);
+	double PeriodicDistanceX(Atom atom, double periodicBoundary);
+	double PeriodicDistanceY(Atom atom, double periodicBoundary);
+	double PeriodicDistanceZ(Atom atom, double periodicBoundary);
 	double EuclidianPeriodicDistance(Atom atom, double periodicBoundary);
 	double GetX();
 	double GetY();

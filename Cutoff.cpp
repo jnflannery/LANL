@@ -6,7 +6,7 @@
 
 using namespace std;
 
-Graph Cutoff(Molecule molecule, float rc)
+Graph Cutoff(Molecule molecule, double rc)
 {
 	vector<Atom> atoms = molecule.GetAtomVector();
 	int size = molecule.GetNumberOfAtoms();

@@ -15,7 +15,11 @@ struct Vertex
 
 	bool operator==(const Vertex& a) const
 	{
-		return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
+		if (neighbours.size() != a.neighbours.size()) return false;
+		set<int> n1(neighbours.begin(), neighbours.end());
+		set<int> n2(a.neighbours.begin(), a.neighbours.end());
+		return (n1 == n2);
+		//return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
 
 	}
 	bool operator<(const Vertex& a) const

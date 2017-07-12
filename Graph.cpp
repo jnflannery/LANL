@@ -1,3 +1,6 @@
+#ifndef GRAPH_CPP
+#define GRAPH_CPP
+
 #include <iostream>
 #include <vector>
 #include <string>
@@ -15,9 +18,9 @@ struct Vertex
 
 	bool operator==(const Vertex& a) const
 	{
-		if (neighbours.size() != a.neighbours.size()) return false;
 		set<int> n1(neighbours.begin(), neighbours.end());
 		set<int> n2(a.neighbours.begin(), a.neighbours.end());
+		if (n1.size() != n2.size()) return false;
 		return (n1 == n2);
 		//return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
 
@@ -80,8 +83,9 @@ public:
 	//Print a vertex (using LAMMPS IDs)
 	void printVertex(int id){
 		cout << "Adjacency list of vertex " << id << ":" << endl;
+		set<int> n1(vertices[id].neighbours.begin(), vertices[id].neighbours.end());
 		if (vertices[id].neighbours.size() > 0) {
-			for (vector<int>::iterator it = vertices[id].neighbours.begin(); it != vertices[id].neighbours.end(); ++it)  {
+			for (set<int>::iterator it = n1.begin(); it != n1.end(); ++it)  {
 				cout << *it << " ";
 			}
 		}
@@ -136,3 +140,5 @@ public:
 		}
 	}
 };
+
+#endif

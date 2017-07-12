@@ -38,8 +38,7 @@ Graph Shadow(Molecule molecule, double rc, double S)
 					Atom atom = molecule.GetAtom(*itAtom);
 					Atom pot_neigh = molecule.GetAtom(*itNeighAtom);
 					if (atom.GetId() == pot_neigh.GetId()) continue;
-					if (atom.EuclidianPeriodicDistance(pot_neigh, molecule.GetCubeSize()) < rc) continue;
-					
+					if (atom.EuclidianPeriodicDistance(pot_neigh, molecule.GetCubeSize()) >= rc) continue;
 					// check if any other atom shadows pot_neigh
 					bool shadowed = false;
 					for (vector<int>::iterator it_oth_atom = Natoms.begin(); it_oth_atom != Natoms.end(); ++it_oth_atom) {

@@ -23,9 +23,9 @@ Graph Cutoff(Molecule molecule, double rc)
 	
 	vector<Box> boxes = boxlist.GetAllBoxes();
 	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox){
-		Box b = FindNeighbours(*itBox, boxlist.NumberOfBoxes());
-		vector<Coordinate> neighborhood = b.GetNeighborList();
-		vector<int> boxAtoms = b.GetAtomsFromBox();
+		Box box = FindNeighbours(*itBox, boxlist.NumberOfBoxes());
+		vector<Coordinate> neighborhood = box.GetNeighborList();
+		vector<int> boxAtoms = box.GetAtomsFromBox();
 		// itereate through atoms in middle box
 		for (vector<int>::iterator itAtom = boxAtoms.begin(); itAtom != boxAtoms.end(); ++itAtom){
 			//iterate through neighbouring boxes/coordinates
@@ -38,9 +38,7 @@ Graph Cutoff(Molecule molecule, double rc)
 					Atom atom2 = molecule.GetAtom(*itNeighAtom);
 					if (atom1.GetId() < atom2.GetId()) { //use '<' to avoid adding edge twice. this assumes graph is undirected.
 						if (atom1.EuclidianPeriodicDistance(atom2, molecule.GetCubeSize()) < rc) {
-						//if (atom1.EuclidianDistance(atom2) < rc) {
-							gh.addEdge(*itAtom,*itNeighAtom);
-							//gh.addEdge(atom1.GetId(), atom2.GetId());
+							gh.addEdge(atom1.GetId(), atom2.GetId());
 							++edgecount;
 						}
 					}

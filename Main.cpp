@@ -4,7 +4,7 @@
 #include "Atom.h"
 #include "Molecule.h"
 #include "shadow.h"
-//#include "cutoff.h"
+#include "cutoff.h"
 #include "reader.h"
 
 #include <iostream>
@@ -18,20 +18,22 @@ double analyzeDataCutOff(string, int, int, int, double, bool output = false);
 
 bool compareGraphsShadow(string, string, double, double);
 double analyzeDataShadow(string, int, int, int, double, double, bool output = false);
+double OutputDataShadow(string folderPath, double rc, double S, vector<short> sameTimes, vector<short> diffTimes);
 
 int main()
 {
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/Data/";
-	const string material = "PtFCC";
+	const string material = "SiDiamond";
 	const string defect = "Gap";
-	const string temperature = "300K";
+	const string temperature = "500K";
 	string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 1850;
-	
+	const int timeStep = 33020;
+	const bool makeOutputFile = false;
+
 	//set cutoff distance [run on full data for 2.6, 3.2 for SiDiamond; 3.348=0.854(halfway between first and second shell)*3.92(lattice constant) for fcc data]
 	//const double rc = 2.7;
 	//cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc);
@@ -39,12 +41,15 @@ int main()
 	string defects [] = {"Extra"};
 	string temperatures [] = {"100K", "150K", "200K", "250K"};
 	
-	for (double S = .1; S<=.9; S+=.2){
-		for (double rc = 3.348; rc<=3.348; rc+=.5){
-		cout << "\n" << rc << " " << S << "\n";
-			cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S);
+
+//CHECK SHADOW ALGORITHM PARAMETERS
+	/*
+	for (double S = 1; S>=.5; S-=.1){
+		for (double rc = 2.6; rc<=2.7; rc+=.05){
+		cout << "\n" << folderPath+" " << rc << " " << S << "\n";
+			cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S, makeOutputFile);
 		}
-	}
+	}*/
 	/*
 	pre-results to check
 	si diamond gap 50K 
@@ -56,9 +61,43 @@ int main()
 		4.5		#takes ages
 	*/
 
+//COMPARE SHADOW AND CUTOFF
+	double Rs[] = {1.0, 2.0, 2.6, 2.8, 3.2};
+	double Ss[] = {0.5, 0.8, 1.1, 1.4, 0.0};
+
+	for (auto S : Ss){
+		for (auto rc : Rs){
+			cout << folderPath << " " << rc << " " << S << endl;
+			for (int time = firstTime; time <= lastTime; time+=timeStep){
+				string file = folderPath + "/preminimize" + to_string(time) + ".data";
+				Reader myReader = Reader();
+				if (myReader.Initialize(file)) {
+					Molecule molecule = myReader.GetMoleculeFromOutputFile();
+					Graph gShadow = Shadow(molecule, rc, S);
+					Graph gCutOff = Cutoff(molecule, rc);
+					bool same = (gShadow == gCutOff);
+					cout << same;
+					if (!same){
+						for (int i = 1; i < 1000; ++i){
+							if (gShadow.getVertex(i) == gCutOff.getVertex(i)) 
+								continue;
+							gShadow.printVertex(i);
+							gCutOff.printVertex(i);
+							break;
+						}
+					}
+
+				}
+			}
+			cout << endl;
+		}
+	}
+
+
+
 	double rc = 4.2;
 	double S = .4;
-	//cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S);
+	//cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S, makeOutputFile);
 	
 	/*
 	// test on specific graph
@@ -85,7 +124,7 @@ int main()
 		for (double rc = 3.348; rc==3.348; rc+=0.15){
 			string folderPath = datapath + "PtFCC/Extra" + "/" + i;
 			cout << folderPath << " " << rc << "\n";
-			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc) << "\n";
+			cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc, makeOutputFile) << "\n";
 		}
 	}*/
 
@@ -154,44 +193,19 @@ double analyzeDataShadow(string folderPath, int firstTime, int lastTime, int tim
 		string pre = folderPath + "/minimized" + to_string(time) + ".data";
 		string min = folderPath + "/preminimize" + to_string(time)+ ".data";
 		
-		
-
 		bool same = compareGraphsShadow(pre, min, rc, S);
-		if (same) {
+		if (same) 
 			sameTimes.push_back(time);
-		} else {
+		else 
 			diffTimes.push_back(time);
-		}
 		cout << same;
 	}
 	cout << "\n";
 	//output data
-	if (output) {
-		string outFileName = folderPath + "/OutputShadow" + to_string(rc) + "-" + to_string(S) + ".txt";
-		std::ofstream file = std::ofstream(outFileName);
-		if (!file)
-			{
-				std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
-		} else {
-			file = std::ofstream(outFileName);
-			file << folderPath << "\n";
-			file << "CotOff algorithm with CutOff distance " << to_string(rc) << "\n";
-			int sameCount = sameTimes.size();
-			int totalCount = sameCount + diffTimes.size();
-			file <<sameCount<<" graph pairs same out of "<<totalCount<<" ("<<100*float(sameCount)/float(totalCount)<<"%)\n";
-
-			file << "\nTIMESTAMPS FOR SAME GRAPHS:\n";
-			for (vector<short>::iterator it = sameTimes.begin(); it != sameTimes.end(); ++it){
-				file << *it << "\n";
-			}
-			file << "\nTIMESTAMPS FOR DIFFERENT GRAPHS:\n";
-			for (vector<short>::iterator it = diffTimes.begin(); it != diffTimes.end(); ++it){
-				file << *it << "\n";
-			}
-			return float(sameCount)/float(totalCount);
-		}
-	}
-	return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
+	if (output) 
+		return OutputDataShadow(folderPath, rc, S, sameTimes, diffTimes);
+	else
+		return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
 }
 /*bool compareGraphsCutOff(string pre, string min, double rc){
 	string fileNames[2] = {pre, min};
@@ -233,4 +247,32 @@ bool compareGraphsShadow(string pre, string min, double rc, double S){
 		}
 	}
 	return (graphs[0] == graphs[1]);
+}
+
+double OutputDataShadow(string folderPath, double rc, double S, vector<short> sameTimes, vector<short> diffTimes){
+	{
+		string outFileName = folderPath + "/OutputShadow" + to_string(rc) + "-" + to_string(S) + ".txt";
+		std::ofstream file = std::ofstream(outFileName);
+		if (!file)
+			{
+				std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
+		} else {
+			file = std::ofstream(outFileName);
+			file << folderPath << "\n";
+			file << "CotOff algorithm with CutOff distance " << to_string(rc) << "\n";
+			int sameCount = sameTimes.size();
+			int totalCount = sameCount + diffTimes.size();
+			file <<sameCount<<" graph pairs same out of "<<totalCount<<" ("<<100*float(sameCount)/float(totalCount)<<"%)\n";
+
+			file << "\nTIMESTAMPS FOR SAME GRAPHS:\n";
+			for (vector<short>::iterator it = sameTimes.begin(); it != sameTimes.end(); ++it){
+				file << *it << "\n";
+			}
+			file << "\nTIMESTAMPS FOR DIFFERENT GRAPHS:\n";
+			for (vector<short>::iterator it = diffTimes.begin(); it != diffTimes.end(); ++it){
+				file << *it << "\n";
+			}
+			return double(sameCount)/double(totalCount);
+		}
+	}
 }

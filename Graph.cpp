@@ -116,7 +116,6 @@ public:
 		return true;
 	}
 	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {
-
 		std::ofstream file = std::ofstream(myFileName);
 		if (!file)
 		{
@@ -132,9 +131,36 @@ public:
 			}
 			file << numberOfAtomsToPrint << endl;
 			file << "Atoms. Timestep: 0" << endl; 
-			for (int i = 0;i<=V;i++) {
+			for (int i = 0;i<V;i++) {
 				if (vertices.at(i).neighbours.size() > 0)
 					file << 1 << " " << m.GetAtom(i).GetX() << " " << m.GetAtom(i).GetY() << " " << m.GetAtom(i).GetZ() << endl;
+			}
+
+		}
+	}
+		void outputGraph(std::string myFileName, Molecule m) {
+		std::ofstream file = std::ofstream(myFileName);
+		if (!file)
+		{
+			std::cout << myFileName << " cannot be accessed and/or written to. Terminating process";
+		}
+		else {
+			file = std::ofstream(myFileName);
+			int numberOfAtomsToPrint = 0;
+			vector <int> relavantNumbers();
+			for (int i = 0;i<=V;i++) {
+				if (vertices.at(i).neighbours.size() > 0)
+					numberOfAtomsToPrint++;
+			}
+			file << numberOfAtomsToPrint << endl;
+			file << "Atoms. Timestep: 0" << endl; 
+			for (int i = 0;i<V;i++) {
+				file << i << ": ";
+				set<int> n1(vertices.at(i).neighbours.begin(), vertices.at(i).neighbours.end());
+				for (auto id : n1){
+					file << id << " ";
+				}
+				file << endl;
 			}
 
 		}

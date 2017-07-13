@@ -25,14 +25,14 @@ int main()
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/Data/";
 	const string material = "SiDiamond";
-	const string defect = "Gap";
-	const string temperature = "500K";
+	const string defect = "Perfect3";
+	const string temperature = "50K";
 	string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 33020;
-	const bool makeOutputFile = false;
+	const int timeStep = 2990;
+	
 
 	//set cutoff distance [run on full data for 2.6, 3.2 for SiDiamond; 3.348=0.854(halfway between first and second shell)*3.92(lattice constant) for fcc data]
 	//const double rc = 2.7;
@@ -41,15 +41,37 @@ int main()
 	string defects [] = {"Extra"};
 	string temperatures [] = {"100K", "150K", "200K", "250K"};
 	
+	
+//CHECK SHADOW ALGORITHM 
+	{
+	const bool makeOutputFile = false;//true;
+	double Ss[] = {0.9, 0.7, 0.3, 0.5, 1.2, .4, 1.6};
+	double rc = 8;
+	for (auto S : Ss){
+		cout << "\n" << folderPath+" " << " " << S << "\n";
+		cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S, makeOutputFile);
+	}
+	}
 
-//CHECK SHADOW ALGORITHM PARAMETERS
-	/*
-	for (double S = 1; S>=.5; S-=.1){
-		for (double rc = 2.6; rc<=2.7; rc+=.05){
-		cout << "\n" << folderPath+" " << rc << " " << S << "\n";
-			cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S, makeOutputFile);
+
+/*/TEST ON SPECIFIC FILE
+	{
+	string pre = "R://LANL/Data/SiDiamond/Extra/50K/preminimize5010.data";
+	string min = "R://LANL/Data/SiDiamond/Extra/50K/minimized5010.data";
+	string fileNames[2] = {pre, min};
+	Graph graphs[2];
+	for (int i = 0; i<2; ++i){
+		Reader myReader = Reader();
+		if (myReader.Initialize(fileNames[i])) {
+			Molecule molecule = myReader.GetMoleculeFromOutputFile();
+			graphs[i] = Shadow(molecule, 3.14, 0.2);
 		}
+	}
+	cout << (graphs[0] == graphs[1]);
 	}*/
+
+
+
 	/*
 	pre-results to check
 	si diamond gap 50K 
@@ -61,9 +83,9 @@ int main()
 		4.5		#takes ages
 	*/
 
-//COMPARE SHADOW AND CUTOFF
-	double Rs[] = {1.0, 2.0, 2.6, 2.8, 3.2};
-	double Ss[] = {0.5, 0.8, 1.1, 1.4, 0.0};
+/*//COMPARE SHADOW AND CUTOFF
+	double Rs[] = {2.6, 3.2};
+	double Ss[] = {0.3, 0.5, 0.8};
 
 	for (auto S : Ss){
 		for (auto rc : Rs){
@@ -91,30 +113,17 @@ int main()
 			}
 			cout << endl;
 		}
-	}
+	}*/
 
 
 
-	double rc = 4.2;
-	double S = .4;
+//	double rc = 4.2;
+	//double S = .4;
 	//cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S, makeOutputFile);
 	
-	/*
-	// test on specific graph
-	string pre = "R://LANL/Data/SiDiamond/Gap/500K/preminimize8010.data";
-	string min = "R://LANL/Data/SiDiamond/Gap/500K/minimized8010.data";
-	string fileNames[2] = {pre, min};
-	Graph graphs[2];
-	for (int i = 0; i<2; ++i){
-		Reader myReader = Reader();
-		if (myReader.Initialize(fileNames[i])) {
-			Molecule molecule = myReader.GetMoleculeFromOutputFile();
-			graphs[i] = Shadow(molecule, 3, 0.2);
-			graphs[i].printVertex(113);
-		}
-	}
-	cout << (graphs[0] == graphs[1]);
-	*/
+	
+
+	
 
 
 
@@ -192,7 +201,6 @@ double analyzeDataShadow(string folderPath, int firstTime, int lastTime, int tim
 	for (int time = firstTime; time <= lastTime; time+=timeStep){
 		string pre = folderPath + "/minimized" + to_string(time) + ".data";
 		string min = folderPath + "/preminimize" + to_string(time)+ ".data";
-		
 		bool same = compareGraphsShadow(pre, min, rc, S);
 		if (same) 
 			sameTimes.push_back(time);
@@ -239,13 +247,14 @@ bool compareGraphsShadow(string pre, string min, double rc, double S){
 		if (myReader.Initialize(fileNames[i])) {
 			Molecule molecule = myReader.GetMoleculeFromOutputFile();
 			graphs[i] = Shadow(molecule, rc, S);
-
+			//graphs[i].outputGraph(fileNames[i]+".graph", molecule);
 			//check a vertex
 			/*cout << "\n";
 			graphs[i].printVertex(52);
 			cout << "\n";*/
 		}
 	}
+	
 	return (graphs[0] == graphs[1]);
 }
 

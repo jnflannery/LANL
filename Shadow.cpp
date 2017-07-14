@@ -1,11 +1,11 @@
 #include "shadow.h"
 #include "boxbuilder.h"
 #include "coordinate.h"
-
+#include <tuple> 
 #include <math.h>
 
 using namespace std;
-#include <tuple> 
+typedef tuple<double, double, double> triplet;
 
 Graph Shadow(Molecule molecule, double rc, double S)
 {
@@ -64,9 +64,9 @@ Graph Shadow(Molecule molecule, double rc, double S)
 
 
 bool shadows(Atom atom, Atom pot_neigh, Atom oth_atom, double S, Molecule molecule){
-	triplet a (atom.PeriodicDistanceX(oth_atom, molecule.GetCubeSize()), atom.PeriodicDistanceY(oth_atom, molecule.GetCubeSize()), atom.PeriodicDistanceZ(oth_atom, molecule.GetCubeSize()));
-	triplet b (atom.PeriodicDistanceX(pot_neigh, molecule.GetCubeSize()), atom.PeriodicDistanceY(pot_neigh, molecule.GetCubeSize()), atom.PeriodicDistanceZ(pot_neigh, molecule.GetCubeSize()));
-	
+	triplet a = atom.VectorTo(oth_atom, molecule.GetCubeSize());
+	triplet b = atom.VectorTo(pot_neigh, molecule.GetCubeSize());
+
 	if (size(a) > size(b)) return false;
 
 	double theta = acos(dot_product(a, b) / (size(a)*size(b)));
@@ -77,10 +77,3 @@ bool shadows(Atom atom, Atom pot_neigh, Atom oth_atom, double S, Molecule molecu
 	return false;
 }
 
-double dot_product(triplet a, triplet b){
-	return sqrt(get<0>(a)*get<0>(b) + get<1>(a)*get<1>(b) + get<2>(a)*get<2>(b));
-}
-
-double size(triplet a){
-	return dot_product(a, a);
-}

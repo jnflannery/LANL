@@ -14,12 +14,17 @@ public:
 	void SetZ(double);
 	void SetId(int);
 	double EuclidianDistance(Atom);
-	double PeriodicDistanceX(Atom atom, double periodicBoundary);
-	double PeriodicDistanceY(Atom atom, double periodicBoundary);
-	double PeriodicDistanceZ(Atom atom, double periodicBoundary);
+	double PeriodicDiffX(Atom atom, double periodicBoundary);
+	double PeriodicDiffY(Atom atom, double periodicBoundary);
+	double PeriodicDiffZ(Atom atom, double periodicBoundary);
 	double EuclidianPeriodicDistance(Atom atom, double periodicBoundary);
 	double GetX();
 	double GetY();
 	double GetZ();
 	int GetId();
+	triplet VectorTo(Atom,  double periodicBoundary);
 };
+
+double dot_product(triplet a, triplet b);
+double size(triplet a);
+triplet Add(triplet, triplet);

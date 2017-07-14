@@ -25,7 +25,7 @@ int main()
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/Data/";
 	const string material = "SiDiamond";
-	const string defect = "Perfect3";
+	const string defect = "Perfect";
 	const string temperature = "50K";
 	string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
@@ -265,6 +265,7 @@ double OutputDataShadow(string folderPath, double rc, double S, vector<short> sa
 		if (!file)
 			{
 				std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
+				return -1;
 		} else {
 			file = std::ofstream(outFileName);
 			file << folderPath << "\n";

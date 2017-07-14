@@ -7,7 +7,9 @@
 #include "molecule.h"
 #include <fstream>
 #include <set>
+
 using namespace std;
+
 
 
 //Vertex
@@ -21,8 +23,7 @@ struct Vertex
 		set<int> n1(neighbours.begin(), neighbours.end());
 		set<int> n2(a.neighbours.begin(), a.neighbours.end());
 		if (n1.size() != n2.size()) return false;
-		return (n1 == n2);
-		//return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
+		return (n1 == n2);//return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
 
 	}
 	bool operator<(const Vertex& a) const
@@ -50,6 +51,10 @@ public:
 	Graph()
 	{
 		this->V = 0;
+	}
+	Graph(vector<Vertex> verts){
+		this->V = verts.size();
+		this->vertices = verts;
 	}
 
 	//Get number of vertices

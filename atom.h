@@ -6,6 +6,9 @@ private:
 	double x;
 	double y;
 	double z;
+	double Fx;
+	double Fy;
+	double Fz;
 	int id;
 public:
 	Atom(double newX, double newY, double newZ, int newId);
@@ -19,5 +22,11 @@ public:
 	double GetX();
 	double GetY();
 	double GetZ();
+	double GetFx();
+	double GetFy();
+	double GetFz();
+	void SetFx(double);
+	void SetFy(double);
+	void SetFz(double);
 	int GetId();
 };

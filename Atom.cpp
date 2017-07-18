@@ -11,6 +11,15 @@ double Atom::GetY() {
 double Atom::GetZ() {
 	return z;
 }
+double Atom::GetFx(){
+	return Fx;
+}
+double Atom::GetFy(){
+	return Fy;
+}
+double Atom::GetFz(){
+	return Fz;
+}
 int Atom::GetId() {
 	return id;
 }
@@ -22,6 +31,15 @@ void Atom::SetY(double newY) {
 }
 void Atom::SetZ(double newZ) {
 	z = newZ;
+}
+void Atom::SetFx(double newFx) {
+	Fx = newFx;
+}
+void Atom::SetFy(double newFy) {
+	Fy = newFy;
+}
+void Atom::SetFz(double newFz) {
+	Fz = newFz;
 }
 void Atom::SetId(int newId) {
 	id = newId;

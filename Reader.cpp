@@ -1,5 +1,6 @@
 #include "reader.h"
 #include <string>
+using namespace std;
 #include <sstream>
 #include <vector>
 #include <iterator>
@@ -138,4 +139,36 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 		molecule.SetAtomWithIndex(atom, atom.GetId());
 	}
 	return molecule;
+}
+/*
+remember to initilze to your new file when you do this
+*/
+void Reader::AddForcesToMolecule(Molecule & molecule)
+{
+	int numberOfAtoms, atomId, force, atomType;
+	double fx, fy, fz;
+	std::string line;
+	getline(file, line);
+	getline(file, line);
+	getline(file, line);
+	file >> numberOfAtoms;
+	for (int i = 0;i < 6;i++) {
+		getline(file, line);
+	}
+	for (int i = 0;i < numberOfAtoms;i++) {
+		file >> atomId;
+		file >> atomType;
+		file >> fx;
+		file >> fy;
+		file >> fz;
+		getline(file, line);
+		Atom atomToSet = molecule.GetAtom(atomId);
+		atomToSet.SetFx(fx);
+		atomToSet.SetFy(fy);
+		atomToSet.SetFz(fz);
+		molecule.SetAtomWithIndex(atomToSet, atomId);
+		if (atomId == 1) {
+			std::cout << fx << endl;
+		}
+	}
 }

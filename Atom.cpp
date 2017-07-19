@@ -23,6 +23,30 @@ void Atom::SetY(double newY) {
 void Atom::SetZ(double newZ) {
 	z = newZ;
 }
+void Atom::SetFx(double newFx)
+{
+	fx = newFx;
+}
+void Atom::SetFy(double newFY)
+{
+	fy = newFY;
+}
+void Atom::SetFz(double newFz)
+{
+	fz = newFz;
+}
+double Atom::GetFx()
+{
+	return fx;
+}
+double Atom::GetFy()
+{
+	return fy;
+}
+double Atom::GetFz()
+{
+	return fz;
+}
 void Atom::SetId(int newId) {
 	id = newId;
 }

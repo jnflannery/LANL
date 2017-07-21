@@ -68,6 +68,17 @@ public:
 	vector<MaybeVertex> getAllVertices(){
 		return vertices;
 	}
+	//Add Edge to Graph
+	void addEdge(Vertex a, Vertex b)
+	{
+		a.neighbors.push_back(b.id);
+		b.neighbors.push_back(a.id);
+	}
+	void addEdge(int a, int b)
+	{
+		vertices[a].neighbors.push_back(b);
+		vertices[b].neighbors.push_back(a);
+	}
 	//Add MaybeEdge to Graph
 	void addMaybeEdge(MaybeVertex a, MaybeVertex b)
 	{
@@ -102,9 +113,6 @@ public:
 		}
 	}
 
-	Graph MaybeToGraph(){
-		;
-	}
 
 	// compare graphs
 	bool operator==(const MaybeGraph& g) const
@@ -117,5 +125,6 @@ public:
 		return true;
 	}
 };
+
 
 #endif

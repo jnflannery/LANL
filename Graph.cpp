@@ -16,12 +16,12 @@ using namespace std;
 struct Vertex
 {
 	int id;
-	vector<int> neighbours;
+	vector<int> neighbors;
 
 	bool operator==(const Vertex& a) const
 	{
-		set<int> n1(neighbours.begin(), neighbours.end());
-		set<int> n2(a.neighbours.begin(), a.neighbours.end());
+		set<int> n1(neighbors.begin(), neighbors.end());
+		set<int> n2(a.neighbors.begin(), a.neighbors.end());
 		if (n1.size() != n2.size()) return false;
 		return (n1 == n2);//return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
 
@@ -65,13 +65,13 @@ public:
 	//Add Edge to Graph
 	void addEdge(Vertex a, Vertex b)
 	{
-		a.neighbours.push_back(b.id);
-		b.neighbours.push_back(a.id);
+		a.neighbors.push_back(b.id);
+		b.neighbors.push_back(a.id);
 	}
 	void addEdge(int a, int b)
 	{
-		vertices[a].neighbours.push_back(b);
-		vertices[b].neighbours.push_back(a);
+		vertices[a].neighbors.push_back(b);
+		vertices[b].neighbors.push_back(a);
 	}
 
 
@@ -88,8 +88,8 @@ public:
 	//Print a vertex (using LAMMPS IDs)
 	void printVertex(int id){
 		cout << "Adjacency list of vertex " << id << ":" << endl;
-		set<int> n1(vertices[id].neighbours.begin(), vertices[id].neighbours.end());
-		if (vertices[id].neighbours.size() > 0) {
+		set<int> n1(vertices[id].neighbors.begin(), vertices[id].neighbors.end());
+		if (vertices[id].neighbors.size() > 0) {
 			for (set<int>::iterator it = n1.begin(); it != n1.end(); ++it)  {
 				cout << *it << " ";
 			}
@@ -129,15 +129,15 @@ public:
 		else {
 			file = std::ofstream(myFileName);
 			int numberOfAtomsToPrint = 0;
-			vector <int> relavantNumbers();
+			vector<int> relavantNumbers();
 			for (int i = 0;i<=V;i++) {
-				if (vertices.at(i).neighbours.size() > 0)
+				if (vertices.at(i).neighbors.size() > 0)
 					numberOfAtomsToPrint++;
 			}
 			file << numberOfAtomsToPrint << endl;
 			file << "Atoms. Timestep: 0" << endl; 
 			for (int i = 0;i<V;i++) {
-				if (vertices.at(i).neighbours.size() > 0)
+				if (vertices.at(i).neighbors.size() > 0)
 					file << 1 << " " << m.GetAtom(i).GetX() << " " << m.GetAtom(i).GetY() << " " << m.GetAtom(i).GetZ() << endl;
 			}
 
@@ -154,14 +154,14 @@ public:
 			int numberOfAtomsToPrint = 0;
 			vector <int> relavantNumbers();
 			for (int i = 0;i<=V;i++) {
-				if (vertices.at(i).neighbours.size() > 0)
+				if (vertices.at(i).neighbors.size() > 0)
 					numberOfAtomsToPrint++;
 			}
 			file << numberOfAtomsToPrint << endl;
 			file << "Atoms. Timestep: 0" << endl; 
 			for (int i = 0;i<V;i++) {
 				file << i << ": ";
-				set<int> n1(vertices.at(i).neighbours.begin(), vertices.at(i).neighbours.end());
+				set<int> n1(vertices.at(i).neighbors.begin(), vertices.at(i).neighbors.end());
 				for (auto id : n1){
 					file << id << " ";
 				}

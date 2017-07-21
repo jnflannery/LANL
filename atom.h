@@ -1,4 +1,9 @@
 #pragma once
+
+#include <tuple>
+using namespace std;
+typedef tuple<double, double, double> triplet;
+
 class Atom
 {
 private:
@@ -27,4 +32,5 @@ public:
 
 double dot_product(triplet a, triplet b);
 double size(triplet a);
-triplet Add(triplet, triplet);
+triplet add(triplet, triplet);
+triplet mult(double, triplet);

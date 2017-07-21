@@ -5,4 +5,6 @@
 #include "Graph.cpp"
 #include "MaybeGraph.cpp"
 
-MaybeGraph CutoffMaybe(Molecule molecule, double rc, double Rc);
+Graph CutoffMaybe(Molecule molecule, double rc, double Rc);
+
+Graph MaybeToGraphCentroid(MaybeGraph gh, Molecule mol);

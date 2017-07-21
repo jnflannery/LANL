@@ -1,9 +1,9 @@
 #include "atom.h"
 #include <cmath>
 #include <algorithm>
-#include <tuple>
+
 using namespace std;
-typedef tuple<double, double, double> triplet;
+
 
 ////
 double Atom::GetX() {
@@ -79,6 +79,10 @@ double size(triplet a){
 	return dot_product(a, a);
 }
 
-triplet Add(triplet a, triplet b){
+triplet add(triplet a, triplet b){
 	return triplet(get<0>(a)+get<0>(b), get<1>(a)+get<1>(b), get<2>(a)+get<2>(b));
+}
+
+triplet mult(double c, triplet a){
+	return triplet(get<0>(a)*c, get<1>(a)*c, get<2>(a)*c);
 }

@@ -4,7 +4,7 @@
 #include "Atom.h"
 #include "Molecule.h"
 #include "shadow.h"
-#include "cutoff.h"
+#include "cutoffmaybe.h"
 #include "reader.h"
 
 #include <iostream>
@@ -16,6 +16,9 @@ using namespace std;
 bool compareGraphsCutOff(string, string, double);
 double analyzeDataCutOff(string, int, int, int, double, bool output = false);
 
+bool compareGraphsCutoffMaybe(string, string, double, double);
+double analyzeDataCentroidCutoff(string, int, int, int, double, double, bool output = false);
+
 bool compareGraphsShadow(string, string, double, double);
 double analyzeDataShadow(string, int, int, int, double, double, bool output = false);
 double OutputDataShadow(string folderPath, double rc, double S, vector<short> sameTimes, vector<short> diffTimes);
@@ -24,15 +27,16 @@ int main()
 {
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/Data/";
-	const string material = "SiDiamond";
-	const string defect = "Perfect";
-	const string temperature = "50K";
+	const string material = "PtFCC";
+	const string defect = "Gap";
+	const string temperature = "800K";
 	string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 2990;
+	const int timeStep = 550;
 	
+	const bool makeOutputFile = false;//true;
 
 	//set cutoff distance [run on full data for 2.6, 3.2 for SiDiamond; 3.348=0.854(halfway between first and second shell)*3.92(lattice constant) for fcc data]
 	//const double rc = 2.7;
@@ -40,18 +44,23 @@ int main()
 
 	string defects [] = {"Extra"};
 	string temperatures [] = {"100K", "150K", "200K", "250K"};
+
+
+//CHECK CUTOFF WITH CENTROID MAYBE-RESOLUTION
+	double rc(3.348);
+	double Rc(3.4);
+	cout << analyzeDataCentroidCutoff(folderPath, firstTime, lastTime, timeStep, rc, Rc, makeOutputFile);	
 	
-	
-//CHECK SHADOW ALGORITHM 
+/*//CHECK SHADOW ALGORITHM 
 	{
-	const bool makeOutputFile = false;//true;
+	
 	double Ss[] = {0.9, 0.7, 0.3, 0.5, 1.2, .4, 1.6};
 	double rc = 8;
 	for (auto S : Ss){
 		cout << "\n" << folderPath+" " << " " << S << "\n";
 		cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S, makeOutputFile);
 	}
-	}
+	}*/
 
 
 /*/TEST ON SPECIFIC FILE
@@ -108,7 +117,6 @@ int main()
 							break;
 						}
 					}
-
 				}
 			}
 			cout << endl;
@@ -215,6 +223,27 @@ double analyzeDataShadow(string folderPath, int firstTime, int lastTime, int tim
 	else
 		return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
 }
+double analyzeDataCentroidCutoff(string folderPath, int firstTime, int lastTime, int timeStep, double rc, double Rc, bool output){
+	vector<short> sameTimes;
+	vector<short> diffTimes;
+	
+	for (int time = firstTime; time <= lastTime; time+=timeStep){
+		string pre = folderPath + "/minimized" + to_string(time) + ".data";
+		string min = folderPath + "/preminimize" + to_string(time)+ ".data";
+		bool same = compareGraphsCutoffMaybe(pre, min, rc, Rc);
+		if (same) 
+			sameTimes.push_back(time);
+		else 
+			diffTimes.push_back(time);
+		cout << same;
+	}
+	cout << "\n";
+	//output data
+	if (output) 
+		return OutputDataShadow(folderPath, rc, Rc, sameTimes, diffTimes);
+	else
+		return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
+}
 /*bool compareGraphsCutOff(string pre, string min, double rc){
 	string fileNames[2] = {pre, min};
 	Graph graphs[2];
@@ -239,6 +268,18 @@ double analyzeDataShadow(string folderPath, int firstTime, int lastTime, int tim
 	return (graphs[0] == graphs[1]);
 }
 */
+bool compareGraphsCutoffMaybe(string pre, string min, double rc, double Rc){
+	string fileNames[2] = {pre, min};
+	Graph graphs[2];
+	for (int i = 0; i<2; ++i){
+		Reader myReader = Reader();
+		if (myReader.Initialize(fileNames[i])) {
+			Molecule molecule = myReader.GetMoleculeFromOutputFile();
+			graphs[i] = CutoffMaybe(molecule, rc, Rc);
+		}
+	}
+	return (graphs[0] == graphs[1]);
+}
 bool compareGraphsShadow(string pre, string min, double rc, double S){
 	string fileNames[2] = {pre, min};
 	Graph graphs[2];

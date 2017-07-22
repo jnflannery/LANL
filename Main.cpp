@@ -5,6 +5,7 @@
 #include "Molecule.h"
 #include "shadow.h"
 #include "cutoffmaybe.h"
+#include "cutoff.h"
 #include "reader.h"
 
 #include <iostream>
@@ -18,6 +19,7 @@ double analyzeDataCutOff(string, int, int, int, double, bool output = false);
 
 bool compareGraphsCutoffMaybe(string, string, double, double);
 double analyzeDataCentroidCutoff(string, int, int, int, double, double, bool output = false);
+double OutputDataCentroidCutoff(string folderPath, double rc, double S, vector<short> sameTimes, vector<short> diffTimes);
 
 bool compareGraphsShadow(string, string, double, double);
 double analyzeDataShadow(string, int, int, int, double, double, bool output = false);
@@ -28,40 +30,38 @@ int main()
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/Data/";
 	const string material = "PtFCC";
-	const string defect = "Gap";
-	const string temperature = "800K";
+	const string defect = "Extra";
+	const string temperature = "100K";
 	string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 550;
+	const int timeStep = 10;
 	
-	const bool makeOutputFile = false;//true;
+	const bool makeOutputFile = true;//true;
 
 	//set cutoff distance [run on full data for 2.6, 3.2 for SiDiamond; 3.348=0.854(halfway between first and second shell)*3.92(lattice constant) for fcc data]
 	//const double rc = 2.7;
 	//cout << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc);
 
-	string defects [] = {"Extra"};
-	string temperatures [] = {"100K", "150K", "200K", "250K"};
-
-
-//CHECK CUTOFF WITH CENTROID MAYBE-RESOLUTION
-	double rc(3.348);
-	double Rc(3.4);
-	cout << analyzeDataCentroidCutoff(folderPath, firstTime, lastTime, timeStep, rc, Rc, makeOutputFile);	
 	
-/*//CHECK SHADOW ALGORITHM 
-	{
-	
-	double Ss[] = {0.9, 0.7, 0.3, 0.5, 1.2, .4, 1.6};
-	double rc = 8;
-	for (auto S : Ss){
-		cout << "\n" << folderPath+" " << " " << S << "\n";
-		cout << analyzeDataShadow(folderPath, firstTime, lastTime, timeStep, rc, S, makeOutputFile);
+	//CHECK CUTOFF WITH CENTROID MAYBE-RESOLUTION
+	string temperatureExtras [] = {"50K", "100K", "150K", "200K", "250K", "300K", "500K", "1000K", "1500K", "2000K"};
+	double rc = 3.320;
+	double Rc = 3.380;
+	for (auto temperature : temperatureExtras){
+		string folderPath = datapath + material + "/" + "Extra" + "/" + temperature;
+		cout << "\n" << folderPath+" " << " Centroid cutoff 3.320 - 3.380\n";
+		cout << analyzeDataCentroidCutoff(folderPath, firstTime, lastTime, timeStep, rc, Rc, makeOutputFile);
 	}
-	}*/
-
+	string temperatureGap [] = {"50K", "300K", "500K", "600K", "700K", "800K", "900K", "1000K", "1500K", "2000K"};
+	rc = 3.320;
+	Rc = 3.380;
+	for (auto temperature : temperatureGap){
+		string folderPath = datapath + material + "/" + "Gap" + "/" + temperature;
+		cout << "\n" << folderPath+" " << " Centroid cutoff 3.320 - 3.380\n";
+		cout << analyzeDataCentroidCutoff(folderPath, firstTime, lastTime, timeStep, rc, Rc, makeOutputFile);
+	}
 
 /*/TEST ON SPECIFIC FILE
 	{
@@ -154,7 +154,7 @@ int main()
 
 	return 0;
 }
-/*
+
 double analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int timeStep, double rc, bool output){
 	vector<short> sameTimes;
 	vector<short> diffTimes;
@@ -162,9 +162,6 @@ double analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int tim
 	for (int time = firstTime; time <= lastTime; time+=timeStep){
 		string pre = folderPath + "/minimized" + to_string(time) + ".data";
 		string min = folderPath + "/preminimize" + to_string(time)+ ".data";
-		
-		
-
 		bool same = compareGraphsCutOff(pre, min, rc);
 		if (same) {
 			sameTimes.push_back(time);
@@ -199,9 +196,67 @@ double analyzeDataCutOff(string folderPath, int firstTime, int lastTime, int tim
 			}
 			return float(sameCount)/float(totalCount);
 		}
-	{
+	}
 	return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
-}*/
+}
+bool compareGraphsCutOff(string pre, string min, double rc){
+	string fileNames[2] = {pre, min};
+	Graph graphs[2];
+	for (int i = 0; i<2; ++i){
+		Reader myReader = Reader();
+		if (myReader.Initialize(fileNames[i])) {
+			Molecule molecule = myReader.GetMoleculeFromOutputFile();
+			graphs[i] = Cutoff(molecule, rc);
+
+
+			/*
+			graphs[i].printVertex(47);
+			graphs[i].printVertex(48);
+			graphs[i].printVertex(49);
+			graphs[i].printVertex(50);
+			graphs[i].printVertex(51);
+			graphs[i].printVertex(52);
+
+			cout << "\n";*/
+		}
+	}
+	return (graphs[0] == graphs[1]);
+}
+
+double analyzeDataCentroidCutoff(string folderPath, int firstTime, int lastTime, int timeStep, double rc, double Rc, bool output){
+	vector<short> sameTimes;
+	vector<short> diffTimes;
+	
+	for (int time = firstTime; time <= lastTime; time+=timeStep){
+		string pre = folderPath + "/minimized" + to_string(time) + ".data";
+		string min = folderPath + "/preminimize" + to_string(time)+ ".data";
+		bool same = compareGraphsCutoffMaybe(pre, min, rc, Rc);
+		if (same) 
+			sameTimes.push_back(time);
+		else 
+			diffTimes.push_back(time);
+		cout << same;
+	}
+	cout << "\n";
+	//output data
+	if (output) 
+		return OutputDataCentroidCutoff(folderPath, rc, Rc, sameTimes, diffTimes);
+	else
+		return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
+}
+bool compareGraphsCutoffMaybe(string pre, string min, double rc, double Rc){
+	string fileNames[2] = {pre, min};
+	Graph graphs[2];
+	for (int i = 0; i<2; ++i){
+		Reader myReader = Reader();
+		if (myReader.Initialize(fileNames[i])) {
+			Molecule molecule = myReader.GetMoleculeFromOutputFile();
+			graphs[i] = CutoffMaybe(molecule, rc, Rc);
+		}
+	}
+	return (graphs[0] == graphs[1]);
+}
+
 double analyzeDataShadow(string folderPath, int firstTime, int lastTime, int timeStep, double rc, double S, bool output){
 	vector<short> sameTimes;
 	vector<short> diffTimes;
@@ -222,63 +277,6 @@ double analyzeDataShadow(string folderPath, int firstTime, int lastTime, int tim
 		return OutputDataShadow(folderPath, rc, S, sameTimes, diffTimes);
 	else
 		return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
-}
-double analyzeDataCentroidCutoff(string folderPath, int firstTime, int lastTime, int timeStep, double rc, double Rc, bool output){
-	vector<short> sameTimes;
-	vector<short> diffTimes;
-	
-	for (int time = firstTime; time <= lastTime; time+=timeStep){
-		string pre = folderPath + "/minimized" + to_string(time) + ".data";
-		string min = folderPath + "/preminimize" + to_string(time)+ ".data";
-		bool same = compareGraphsCutoffMaybe(pre, min, rc, Rc);
-		if (same) 
-			sameTimes.push_back(time);
-		else 
-			diffTimes.push_back(time);
-		cout << same;
-	}
-	cout << "\n";
-	//output data
-	if (output) 
-		return OutputDataShadow(folderPath, rc, Rc, sameTimes, diffTimes);
-	else
-		return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
-}
-/*bool compareGraphsCutOff(string pre, string min, double rc){
-	string fileNames[2] = {pre, min};
-	Graph graphs[2];
-	for (int i = 0; i<2; ++i){
-		Reader myReader = Reader();
-		if (myReader.Initialize(fileNames[i])) {
-			Molecule molecule = myReader.GetMoleculeFromOutputFile();
-			graphs[i] = Cutoff(molecule, rc);
-
-
-			/*
-			graphs[i].printVertex(47);
-			graphs[i].printVertex(48);
-			graphs[i].printVertex(49);
-			graphs[i].printVertex(50);
-			graphs[i].printVertex(51);
-			graphs[i].printVertex(52);
-
-			cout << "\n";
-		}
-	}
-	return (graphs[0] == graphs[1]);
-}
-*/
-bool compareGraphsCutoffMaybe(string pre, string min, double rc, double Rc){
-	string fileNames[2] = {pre, min};
-	Graph graphs[2];
-	for (int i = 0; i<2; ++i){
-		Reader myReader = Reader();
-		if (myReader.Initialize(fileNames[i])) {
-			Molecule molecule = myReader.GetMoleculeFromOutputFile();
-			graphs[i] = CutoffMaybe(molecule, rc, Rc);
-		}
-	}
-	return (graphs[0] == graphs[1]);
 }
 bool compareGraphsShadow(string pre, string min, double rc, double S){
 	string fileNames[2] = {pre, min};
@@ -310,7 +308,7 @@ double OutputDataShadow(string folderPath, double rc, double S, vector<short> sa
 		} else {
 			file = std::ofstream(outFileName);
 			file << folderPath << "\n";
-			file << "CotOff algorithm with CutOff distance " << to_string(rc) << "\n";
+			file << "Shadow algorithm with parameters " << to_string(rc) << " " << to_string(S) << "\n";
 			int sameCount = sameTimes.size();
 			int totalCount = sameCount + diffTimes.size();
 			file <<sameCount<<" graph pairs same out of "<<totalCount<<" ("<<100*float(sameCount)/float(totalCount)<<"%)\n";
@@ -327,3 +325,29 @@ double OutputDataShadow(string folderPath, double rc, double S, vector<short> sa
 		}
 	}
 }
+double OutputDataCentroidCutoff(string folderPath, double rc, double Rc, vector<short> sameTimes, vector<short> diffTimes){
+		string outFileName = folderPath + "/OutputCentroidCutoff" + to_string(rc) + "-" + to_string(Rc) + ".txt";
+		std::ofstream file = std::ofstream(outFileName);
+		if (!file)
+			{
+				std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
+				return -1;
+		} else {
+			file = std::ofstream(outFileName);
+			file << folderPath << "\n";
+			file << "Cutoff algorithm with centroid-based decision for potential neighbors and parameters " << to_string(rc) << " " << to_string(Rc) << "\n";
+			int sameCount = sameTimes.size();
+			int totalCount = sameCount + diffTimes.size();
+			file <<sameCount<<" graph pairs same out of "<<totalCount<<" ("<<100*float(sameCount)/float(totalCount)<<"%)\n";
+
+			file << "\nTIMESTAMPS FOR SAME GRAPHS:\n";
+			for (vector<short>::iterator it = sameTimes.begin(); it != sameTimes.end(); ++it){
+				file << *it << "\n";
+			}
+			file << "\nTIMESTAMPS FOR DIFFERENT GRAPHS:\n";
+			for (vector<short>::iterator it = diffTimes.begin(); it != diffTimes.end(); ++it){
+				file << *it << "\n";
+			}
+			return double(sameCount)/double(totalCount);
+		}
+	}

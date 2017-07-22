@@ -13,7 +13,7 @@ typedef tuple<double, double, double> triplet;
 	int size = molecule.GetNumberOfAtoms();
 
 	// create graph object
-	MaybeGraph gh(size);
+	Graph gh(size);
 
 	// build boxes
 	BoxBuilder myBoxBuilder = BoxBuilder(rc);
@@ -51,7 +51,7 @@ typedef tuple<double, double, double> triplet;
 	return MaybeToGraphCentroid(gh, molecule);
 }
 
- Graph MaybeToGraphCentroid(MaybeGraph gh, Molecule mol){
+ Graph MaybeToGraphCentroid(Graph gh, Molecule mol){
 	for (auto V : gh.getAllVertices()){
 		
 		triplet center(0, 0, 0);
@@ -64,20 +64,14 @@ typedef tuple<double, double, double> triplet;
 			center = add(center, VtoN);
 		}
 		for (auto N : V.maybeNeighbors){
-			Atom Vatom = mol.GetAtom(V.id);
-			Atom Natom = mol.GetAtom(N);
+			Atom Vatom = mol.GetAtom(V.id-1);
+			Atom Natom = mol.GetAtom(N-1);
 			triplet VtoN = Vatom.VectorTo(Natom, mol.GetCubeSize());
 			//check if adding moves cetre closer to V
-			triplet	newcenter = mult(weight/(weight+1.0), add(center, VtoN));
-			//addedge if so
-			if (size(newcenter) > size(center)) gh.addEdge(V.id, N);
+			triplet	newcenter = add( mult( weight/(weight+1.0), center ), mult( 1.0/(weight+1.0), VtoN ) );
+			//add an edge if it is
+			if (size(newcenter) < size(center)) gh.addEdge(V.id, N);
 		}
 	}
-	auto maybes = gh.getAllVertices();
-	vector<Vertex> verts;
-	for (auto m : maybes){
-		verts.push_back(m.MaybeToVertex());
-	}
-	Graph graph = Graph(verts);
-	return graph;
+	return gh;
  }

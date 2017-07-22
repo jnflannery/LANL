@@ -17,6 +17,7 @@ struct Vertex
 {
 	int id;
 	vector<int> neighbors;
+	vector<int> maybeNeighbors;
 
 	bool operator==(const Vertex& a) const
 	{
@@ -74,6 +75,17 @@ public:
 		vertices[b].neighbors.push_back(a);
 	}
 
+	//Add MaybeEdge to Graph
+	void addMaybeEdge(Vertex a, Vertex b)
+	{
+		a.maybeNeighbors.push_back(b.id);
+		b.maybeNeighbors.push_back(a.id);
+	}
+	void addMaybeEdge(int a, int b)
+	{
+		vertices[a].maybeNeighbors.push_back(b);
+		vertices[b].maybeNeighbors.push_back(a);
+	}
 
 	//get vertex by id
 	Vertex getVertex(int id){
@@ -88,8 +100,16 @@ public:
 	//Print a vertex (using LAMMPS IDs)
 	void printVertex(int id){
 		cout << "Adjacency list of vertex " << id << ":" << endl;
-		set<int> n1(vertices[id].neighbors.begin(), vertices[id].neighbors.end());
 		if (vertices[id].neighbors.size() > 0) {
+			set<int> n1(vertices[id].neighbors.begin(), vertices[id].neighbors.end());
+			for (set<int>::iterator it = n1.begin(); it != n1.end(); ++it)  {
+				cout << *it << " ";
+			}
+		}
+		cout << "\n";
+		if (vertices[id].maybeNeighbors.size() > 0) {
+			set<int> n1(vertices[id].neighbors.begin(), vertices[id].neighbors.end());
+			cout << "Potential neighbors of " << id << ":" << endl;
 			for (set<int>::iterator it = n1.begin(); it != n1.end(); ++it)  {
 				cout << *it << " ";
 			}

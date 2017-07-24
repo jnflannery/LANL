@@ -15,7 +15,11 @@ struct Vertex
 
 	bool operator==(const Vertex& a) const
 	{
-		return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
+		set<int> vertexA(neighbours.begin(), neighbours.end());
+		set<int> vertexB (a.neighbours.begin(), a.neighbours.end());
+		if (vertexA.size() != vertexB.size())
+			return false;
+		return ((id == a.id) && (vertexA==vertexB));
 
 	}
 	bool operator<(const Vertex& a) const
@@ -77,16 +81,43 @@ public:
 			cout << endl;
 		}
 	}
+	bool compareAndReturnMismatches (const Graph& g, vector<int>& mismatches) 
+	{
+		bool isTrue = true;
+		int size = vertices.size();
+		if (size != g.vertices.size()) {
+			cout << "wrong vertices size???" << endl;
+			return false;
+		}
+		for (int k = 0; k < size; ++k) {
+			if (!(vertices[k] == g.vertices[k])) {
+				mismatches.push_back(k);
+				isTrue = false;
+
+			}
+		}
+		cout << endl;
+		return isTrue;
+	}
 
 	// compare graphs
 	bool operator==(const Graph& g) const
 	{
+		bool isTrue = true;
 		int size = vertices.size();
-		if (size != g.vertices.size()) return false;
-		for (int k = 0; k < size; ++k) {
-			if (!(vertices[k] == g.vertices[k])) return false;
+		if (size != g.vertices.size()) {
+			cout << "wrong vertices size???" << endl;
+			return false;
 		}
-		return true;
+		for (int k = 0; k < size; ++k) {
+			if (!(vertices[k] == g.vertices[k])) {
+				cout << k << " ";
+				isTrue = false;
+				
+			}
+		}
+		cout << endl;
+		return isTrue;
 	}
 	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {
 

@@ -51,10 +51,10 @@ int main()
 	double Rc = 3.380;
 	for (auto temperature : temperatureExtras){
 		string folderPath = datapath + material + "/" + "Extra" + "/" + temperature;
-		cout << "\n" << folderPath+" " << " Centroid cutoff 3.320 - 3.380\n";
-		cout << analyzeDataCentroidCutoff(folderPath, firstTime, lastTime, timeStep, rc, Rc, makeOutputFile);
+		//cout << "\n" << folderPath+" " << " Centroid cutoff 3.320 - 3.380\n";
+		//cout << analyzeDataCentroidCutoff(folderPath, firstTime, lastTime, timeStep, rc, Rc, makeOutputFile);
 	}
-	string temperatureGap [] = {"50K", "300K", "500K", "600K", "700K", "800K", "900K", "1000K", "1500K", "2000K"};
+	string temperatureGap [] = {"700K"};//"50K", "300K", "500K", "600K", "700K", "800K", "900K", "1000K", "1500K", "2000K"};
 	rc = 3.320;
 	Rc = 3.380;
 	for (auto temperature : temperatureGap){

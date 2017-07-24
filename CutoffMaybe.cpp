@@ -16,8 +16,8 @@ typedef tuple<double, double, double> triplet;
 	Graph gh(size);
 
 	// build boxes
-	BoxBuilder myBoxBuilder = BoxBuilder(rc);
-	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, rc);
+	BoxBuilder myBoxBuilder = BoxBuilder(Rc);
+	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, Rc);
 	// check pairs of vertices, connect if within cutoff distance	
 	vector<Box> boxes = boxlist.GetAllBoxes();
 	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox){

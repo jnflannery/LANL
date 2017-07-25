@@ -1,7 +1,7 @@
 #include "cutoffmaybe.h"
 #include "boxbuilder.h"
 #include "coordinate.h"
-#include "maybetographcentroid.h"
+#include "maybetograph.h"
 #include <tuple>
 #include <math.h>
 
@@ -46,5 +46,16 @@ typedef tuple<double, double, double> triplet;
 			}
 		}
 	}
-	return MaybeToGraphCentroid(gh, molecule);
+	return gh;
 }
+
+ Graph CutoffWithForces(Molecule mol, double rc, double Rc){
+	Graph gh = CutoffMaybe(mol, rc, Rc);
+	return MaybeToGraphForces(gh, mol);
+ }
+
+ Graph CutoffCentroid(Molecule mol, double rc, double Rc){
+	Graph gh = CutoffMaybe(mol, rc, Rc);
+	cout << "C";
+	return MaybeToGraphCentroid(gh, mol);
+ }

@@ -5,5 +5,5 @@
 #include "Graph.cpp"
 
 Graph CutoffMaybe(Molecule molecule, double rc, double Rc);
-
-Graph MaybeToGraphCentroid(Graph gh, Molecule mol);
+Graph CutoffWithForces(Molecule molecule, double rc, double Rc);
+Graph CutoffCentroid(Molecule molecule, double rc, double Rc);

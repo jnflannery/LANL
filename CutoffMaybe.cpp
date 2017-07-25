@@ -1,21 +1,23 @@
-#include "cutoff.h"
+#include "cutoffmaybe.h"
 #include "boxbuilder.h"
 #include "coordinate.h"
+#include "maybetographcentroid.h"
+#include <tuple>
 #include <math.h>
 
 using namespace std;
+typedef tuple<double, double, double> triplet;
 
-Graph Cutoff(Molecule molecule, double rc)
+ Graph CutoffMaybe(Molecule molecule, double rc, double Rc)
 {
 	vector<Atom> atoms = molecule.GetAtomVector();
 	int size = molecule.GetNumberOfAtoms();
-
 	// create graph object
 	Graph gh(size);
-
 	// build boxes
-	BoxBuilder myBoxBuilder = BoxBuilder(rc);
-	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, rc);
+	BoxBuilder myBoxBuilder = BoxBuilder(Rc);
+	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, Rc);
+	// check pairs of vertices, connect if within cutoff distance	
 	vector<Box> boxes = boxlist.GetAllBoxes();
 	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox){
 		Box box = FindNeighbours(*itBox, boxlist.NumberOfBoxes());
@@ -32,13 +34,17 @@ Graph Cutoff(Molecule molecule, double rc)
 					Atom atom1 = molecule.GetAtom(*itAtom);
 					Atom atom2 = molecule.GetAtom(*itNeighAtom);
 					if (atom1.GetId() < atom2.GetId()) { //use '<' to avoid adding edge twice. this assumes graph is undirected.
-						if (atom1.EuclidianPeriodicDistance(atom2, molecule.GetCubeSize()) < rc) {
+						double dist = atom1.EuclidianPeriodicDistance(atom2, molecule.GetCubeSize());
+						if (dist < rc){
 							gh.addEdge(atom1.GetId(), atom2.GetId());
+						}
+						else if (dist < Rc){
+							gh.addMaybeEdge(atom1.GetId(), atom2.GetId());
 						}
 					}
 				}
 			}
 		}
 	}
-	return gh;
+	return MaybeToGraphCentroid(gh, molecule);
 }

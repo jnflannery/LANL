@@ -5,7 +5,7 @@
 using namespace std;
 
 void PrintCoordinate(Coordinate c) {
-	cout << c.x << " " << c.y << " " << c.z << endl;
+	cout << c.x << " " << c.y << " " << c.z << "\n";
 }
 
 

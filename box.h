@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include<vector>
 #include "atom.h"
 #include "molecule.h"

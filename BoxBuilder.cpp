@@ -47,7 +47,7 @@ Boxlist BoxBuilder::BuildBoxes(Molecule mol, double cutoff)
 	}
 
 	// this loop below is just for debugging to check how many atoms are in each box and that all atoms are put in boxes. 
-	for (int k = 0; k<BoxesPerSide; k++)
+	/*for (int k = 0; k<BoxesPerSide; k++)
 	{
 		for (int j = 0; j<BoxesPerSide; j++)
 		{
@@ -58,6 +58,6 @@ Boxlist BoxBuilder::BuildBoxes(Molecule mol, double cutoff)
 			}
 		}
 	}
-	std::cout << TotalAtoms;
+	std::cout << TotalAtoms;*/
 	return boxlist;
 };

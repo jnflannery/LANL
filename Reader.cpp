@@ -127,6 +127,15 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	*/
 	Molecule molecule = Molecule(numberOfAtoms);
 	molecule.SetTimestep(timestep);
+	vector<string> fileNameVector = split(fileName.c_str(), '/');
+	vector<string> fileEnd = split(fileNameVector.at(fileNameVector.size() - 1).c_str(), '_');
+	vector<string> splitFileEnd = split(fileEnd.at(fileEnd.size()-1).c_str(), '.');
+	//string newTimestep = splitFileEnd.at(0).substr(9, splitFileEnd.at(0).size() - 9);
+	try { molecule.SetStepsAdvancedPastTimestep(stoi(splitFileEnd.at(0))); }
+	catch (exception e) {
+		cout << "file has formatting preventing timestep from being read" << endl;
+		molecule.SetStepsAdvancedPastTimestep(-1);
+	}
 	//iterate over lines with no good info except for the line that has the size
 	for (int i = 0;i < 13;i++) {
 		getline(file, line);

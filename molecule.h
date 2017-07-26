@@ -1,4 +1,5 @@
 #pragma once
+#pragma once
 #include <vector>
 #include "Atom.h"
 class Molecule {

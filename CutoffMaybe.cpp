@@ -1,6 +1,7 @@
 #include "cutoffmaybe.h"
 #include "boxbuilder.h"
 #include "coordinate.h"
+#include "maybetograph.h"
 #include <tuple>
 #include <math.h>
 
@@ -11,10 +12,8 @@ typedef tuple<double, double, double> triplet;
 {
 	vector<Atom> atoms = molecule.GetAtomVector();
 	int size = molecule.GetNumberOfAtoms();
-
 	// create graph object
 	Graph gh(size);
-
 	// build boxes
 	BoxBuilder myBoxBuilder = BoxBuilder(Rc);
 	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, Rc);
@@ -35,7 +34,6 @@ typedef tuple<double, double, double> triplet;
 					Atom atom1 = molecule.GetAtom(*itAtom);
 					Atom atom2 = molecule.GetAtom(*itNeighAtom);
 					if (atom1.GetId() < atom2.GetId()) { //use '<' to avoid adding edge twice. this assumes graph is undirected.
-						
 						double dist = atom1.EuclidianPeriodicDistance(atom2, molecule.GetCubeSize());
 						if (dist < rc){
 							gh.addEdge(atom1.GetId(), atom2.GetId());
@@ -48,30 +46,15 @@ typedef tuple<double, double, double> triplet;
 			}
 		}
 	}
-	return MaybeToGraphCentroid(gh, molecule);
+	return gh;
 }
 
- Graph MaybeToGraphCentroid(Graph gh, Molecule mol){
-	for (auto V : gh.getAllVertices()){
-		
-		triplet center(0, 0, 0);
-		double weight = V.neighbors.size();
-		for (auto N : V.neighbors){
-			//add N-V to C
-			Atom Vatom = mol.GetAtom(V.id-1);
-			Atom Natom = mol.GetAtom(N-1);
-			triplet VtoN = Vatom.VectorTo(Natom, mol.GetCubeSize());
-			center = add(center, VtoN);
-		}
-		for (auto N : V.maybeNeighbors){
-			Atom Vatom = mol.GetAtom(V.id-1);
-			Atom Natom = mol.GetAtom(N-1);
-			triplet VtoN = Vatom.VectorTo(Natom, mol.GetCubeSize());
-			//check if adding moves cetre closer to V
-			triplet	newcenter = add( mult( weight/(weight+1.0), center ), mult( 1.0/(weight+1.0), VtoN ) );
-			//add an edge if it is
-			if (size(newcenter) < size(center)) gh.addEdge(V.id, N);
-		}
-	}
-	return gh;
+ Graph CutoffWithForces(Molecule mol, double rc, double Rc){
+	Graph gh = CutoffMaybe(mol, rc, Rc);
+	return MaybeToGraphForces(gh, mol);
+ }
+
+ Graph CutoffCentroid(Molecule mol, double rc, double Rc){
+	Graph gh = CutoffMaybe(mol, rc, Rc);
+	return MaybeToGraphCentroid(gh, mol);
  }

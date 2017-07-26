@@ -1,7 +1,6 @@
 #include "cutoff.h"
 #include "boxbuilder.h"
 #include "coordinate.h"
-
 #include <math.h>
 
 using namespace std;
@@ -13,14 +12,10 @@ Graph Cutoff(Molecule molecule, double rc)
 
 	// create graph object
 	Graph gh(size);
-	
+
 	// build boxes
 	BoxBuilder myBoxBuilder = BoxBuilder(rc);
 	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, rc);
-
-	// check pairs of vertices, connect if within cutoff distance
-	int edgecount = 0;
-	
 	vector<Box> boxes = boxlist.GetAllBoxes();
 	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox){
 		Box box = FindNeighbours(*itBox, boxlist.NumberOfBoxes());
@@ -39,7 +34,6 @@ Graph Cutoff(Molecule molecule, double rc)
 					if (atom1.GetId() < atom2.GetId()) { //use '<' to avoid adding edge twice. this assumes graph is undirected.
 						if (atom1.EuclidianPeriodicDistance(atom2, molecule.GetCubeSize()) < rc) {
 							gh.addEdge(atom1.GetId(), atom2.GetId());
-							++edgecount;
 						}
 					}
 				}

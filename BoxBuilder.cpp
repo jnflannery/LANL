@@ -1,7 +1,4 @@
 #include "boxbuilder.h"
-#include "boxlist.h"
-#include <iostream>
-#include "math.h"
 
 BoxBuilder::BoxBuilder(double newcutoff)
 {
@@ -35,7 +32,7 @@ Boxlist BoxBuilder::BuildBoxes(Molecule mol, double cutoff)
 		}
 	}
 
-	for (int n = 0; n< mol.GetNumberOfAtoms(); n++)
+	for (int n = 1; n<= mol.GetNumberOfAtoms(); n++)
 	{
 		// std::cout << "We got here: ";
 		int xindex = floor(mol.GetAtom(n).GetX() / BoxDim);
@@ -50,17 +47,17 @@ Boxlist BoxBuilder::BuildBoxes(Molecule mol, double cutoff)
 	}
 
 	// this loop below is just for debugging to check how many atoms are in each box and that all atoms are put in boxes. 
-	for (int k = 0; k<BoxesPerSide; k++)
+	/*for (int k = 0; k<BoxesPerSide; k++)
 	{
 		for (int j = 0; j<BoxesPerSide; j++)
 		{
 			for (int i = 0; i<BoxesPerSide; i++)
 			{
 				TotalAtoms = TotalAtoms + boxlist.GetBox(i, j, k).GetNumberOfAtoms();
-				//std::cout << i << " " << j << " " << k << " Number of Atoms: " << boxlist.GetBox(i, j, k).GetNumberOfAtoms() << "\n";
+				std::cout << i << " " << j << " " << k << " Number of Atoms: " << boxlist.GetBox(i, j, k).GetNumberOfAtoms() << "\n";
 			}
 		}
 	}
-	//std::cout << TotalAtoms;
+	std::cout << TotalAtoms;*/
 	return boxlist;
 };

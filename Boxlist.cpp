@@ -33,7 +33,6 @@ Box Boxlist::GetBox(Coordinate coordinate)
 	Box FoundBox = boxes.at(VectorIndex); // find the box with this vector index
 	return FoundBox;
 }
-
 vector<Box> Boxlist::GetAllBoxes(){
 	return boxes;
 }

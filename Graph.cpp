@@ -1,16 +1,12 @@
 #ifndef GRAPH_CPP
 #define GRAPH_CPP
-
 #include <iostream>
 #include <vector>
 #include <string>
 #include "molecule.h"
 #include <fstream>
 #include <set>
-
 using namespace std;
-
-
 
 //Vertex
 struct Vertex
@@ -21,10 +17,11 @@ struct Vertex
 
 	bool operator==(const Vertex& a) const
 	{
-		set<int> n1(neighbors.begin(), neighbors.end());
-		set<int> n2(a.neighbors.begin(), a.neighbors.end());
-		if (n1.size() != n2.size()) return false;
-		return (n1 == n2);//return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
+		set<int> vertexA(neighbors.begin(), neighbors.end());
+		set<int> vertexB (a.neighbors.begin(), a.neighbors.end());
+		if (vertexA.size() != vertexB.size())
+			return false;
+		return ((id == a.id) && (vertexA==vertexB));
 
 	}
 	bool operator<(const Vertex& a) const
@@ -32,7 +29,6 @@ struct Vertex
 		return (id < a.id);
 	}
 };
-
 
 //Class Graph
 class Graph
@@ -54,27 +50,9 @@ public:
 		this->V = 0;
 	}
 	Graph(vector<Vertex> verts){
-		this->V = verts.size();
+		this->V = verts.size();		
 		this->vertices = verts;
 	}
-
-	//Get number of vertices
-	int GetNumberOfVertices() {
-		return V;
-	}
-
-	//Add Edge to Graph
-	void addEdge(Vertex a, Vertex b)
-	{
-		a.neighbors.push_back(b.id);
-		b.neighbors.push_back(a.id);
-	}
-	void addEdge(int a, int b)
-	{
-		vertices[a].neighbors.push_back(b);
-		vertices[b].neighbors.push_back(a);
-	}
-
 	//Add MaybeEdge to Graph
 	void addMaybeEdge(Vertex a, Vertex b)
 	{
@@ -118,52 +96,78 @@ public:
 	}
 	void printVertex(Vertex v){
 		printVertex(v.id);
+}
+	//Get number of vertices
+	int GetNumberOfVertices() {
+		return V;
+	}
+
+	//Add Edge to Graph
+	void addEdge(Vertex a, Vertex b)
+	{
+		a.neighbors.push_back(b.id);
+		b.neighbors.push_back(a.id);
+	}
+	void addEdge(int a, int b)
+	{
+		vertices[a].neighbors.push_back(b);
+		vertices[b].neighbors.push_back(a);
 	}
 
 	//Print the graph
 	void printGraph()
 	{
 		int v;
-		for (v = 1; v <= V; ++v)
+		for (v = 1 ; v <= V; ++v)
 		{
-			printVertex(v);
+			cout << "Adjacency list of vertex " << v << ":" << endl;
+			if (vertices[v].neighbors.size() > 0) {
+				for (vector<int>::iterator it = vertices[v].neighbors.begin(); it != vertices[v].neighbors.end(); ++it)  {
+					cout << *it << " ";
+				}
+			}
+			cout << endl;
 		}
+	}
+	bool compareAndReturnMismatches (const Graph& g, vector<int>& mismatches) 
+	{
+		bool isTrue = true;
+		int size = vertices.size();
+		if (size != g.vertices.size()) {
+			cout << "wrong vertices size???" << endl;
+			return false;
+		}
+		for (int k = 0; k < size; ++k) {
+			if (!(vertices[k] == g.vertices[k])) {
+				mismatches.push_back(k);
+				isTrue = false;
+
+			}
+		}
+		cout << endl;
+		return isTrue;
 	}
 
 	// compare graphs
 	bool operator==(const Graph& g) const
 	{
+		bool isTrue = true;
 		int size = vertices.size();
-		if (size != g.vertices.size()) return false;
-		for (int k = 0; k < size; ++k) {
-			if (!(vertices[k] == g.vertices[k])) return false;
+		if (size != g.vertices.size()) {
+			cout << "wrong vertices size???" << endl;
+			return false;
 		}
-		return true;
+		for (int k = 0; k < size; ++k) {
+			if (!(vertices[k] == g.vertices[k])) {
+				//cout << k << " ";
+				isTrue = false;
+				
+			}
+		}
+		return isTrue;
 	}
 	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {
-		std::ofstream file = std::ofstream(myFileName);
-		if (!file)
-		{
-			std::cout << myFileName << " cannot be accessed and/or written to. Terminating process";
-		}
-		else {
-			file = std::ofstream(myFileName);
-			int numberOfAtomsToPrint = 0;
-			vector<int> relavantNumbers();
-			for (int i = 0;i<=V;i++) {
-				if (vertices.at(i).neighbors.size() > 0)
-					numberOfAtomsToPrint++;
-			}
-			file << numberOfAtomsToPrint << endl;
-			file << "Atoms. Timestep: 0" << endl; 
-			for (int i = 0;i<V;i++) {
-				if (vertices.at(i).neighbors.size() > 0)
-					file << 1 << " " << m.GetAtom(i).GetX() << " " << m.GetAtom(i).GetY() << " " << m.GetAtom(i).GetZ() << endl;
-			}
 
-		}
-	}
-		void outputGraph(std::string myFileName, Molecule m) {
 		std::ofstream file = std::ofstream(myFileName);
 		if (!file)
 		{
@@ -179,17 +183,12 @@ public:
 			}
 			file << numberOfAtomsToPrint << endl;
 			file << "Atoms. Timestep: 0" << endl; 
-			for (int i = 0;i<V;i++) {
-				file << i << ": ";
-				set<int> n1(vertices.at(i).neighbors.begin(), vertices.at(i).neighbors.end());
-				for (auto id : n1){
-					file << id << " ";
-				}
-				file << endl;
+			for (int i = 0;i<=V;i++) {
+				if (vertices.at(i).neighbors.size() > 0)
+					file << 1 << " " << m.GetAtom(i).GetX() << " " << m.GetAtom(i).GetY() << " " << m.GetAtom(i).GetZ() << endl;
 			}
 
 		}
 	}
 };
-
 #endif

@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include "molecule.h"
 #include <vector>
@@ -15,4 +16,5 @@ public:
 	double ScientificNotationToFloat(std::string numberAsString);
 	double GetCubeSizeFromLine(std::string line);
 	Molecule GetMoleculeFromOutputFile();
+	void AddForcesToMolecule(Molecule& molecule);
 };

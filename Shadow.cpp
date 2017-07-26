@@ -3,6 +3,7 @@
 #include "coordinate.h"
 #include <tuple> 
 #include <math.h>
+#include "maybetograph.h"
 
 using namespace std;
 typedef tuple<double, double, double> triplet;

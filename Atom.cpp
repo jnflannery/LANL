@@ -68,10 +68,23 @@ double Atom::EuclidianDistance(Atom atom) {
 	double zdif = (z - atom.GetZ())*(z - atom.GetZ());
 	return std::sqrt(xdif + ydif + zdif);
 }
+
+double Atom::getPeriodicDistanceOneD(double x, double y, double periodicDist)
+{
+	double dx = x - y;
+	if (dx > periodicDist * 0.5)
+		dx = dx - periodicDist;
+	if (dx <= -periodicDist * 0.5)
+		dx = dx + periodicDist;
+	return std::abs(dx);
+}
 //does euclidian distance except it takes into account things that are close to the periodic boundaries
-double Atom::EuclidianPeriodicDistance(Atom atom, double periodicBoundary) {
+double Atom::EuclidianPeriodicDistance(Atom atom, double periodicBoundary) {/*
 	double xdif = std::min(abs(x - atom.GetX()), abs(periodicBoundary - abs(x - atom.GetX())));
 	double ydif = std::min(abs(y - atom.GetY()), abs(periodicBoundary - abs(y - atom.GetY())));
-	double zdif = std::min(abs((z - atom.GetZ())), abs(periodicBoundary - abs(z - atom.GetZ())));
+	double zdif = std::min(abs((z - atom.GetZ())), abs(periodicBoundary - abs(z - atom.GetZ())));*/
+	double xdif = getPeriodicDistanceOneD(x, atom.GetX(), periodicBoundary);
+	double ydif = getPeriodicDistanceOneD(y, atom.GetY(), periodicBoundary);
+	double zdif = getPeriodicDistanceOneD(z, atom.GetZ(), periodicBoundary);
 	return std::sqrt(xdif*xdif + ydif*ydif + zdif*zdif);
 }

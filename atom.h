@@ -21,6 +21,7 @@ public:
 	void SetFy(double);
 	void SetFz(double);
 
+	double getPeriodicDistanceOneD(double, double, double);
 	double GetFx();
 	double GetFy();
 	double GetFz();

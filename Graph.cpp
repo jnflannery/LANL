@@ -2,8 +2,10 @@
 #include <vector>
 #include <string>
 #include "molecule.h"
+#include <algorithm>
 #include <fstream>
 #include <set>
+#include "errorstats.h"
 using namespace std;
 
 
@@ -15,8 +17,33 @@ struct Vertex
 
 	bool operator==(const Vertex& a) const
 	{
-		return ((id == a.id) && (is_permutation(neighbours.begin(), neighbours.end(), a.neighbours.begin())));
+		set<int> vertexA(neighbours.begin(), neighbours.end());
+		set<int> vertexB (a.neighbours.begin(), a.neighbours.end());
+		if (vertexA.size() != vertexB.size())
+			return false;
+		return ((id == a.id) && (vertexA==vertexB));
 
+	}
+	bool compareAndReturnDifferences(const Vertex& a, ErrorStats & errors) {
+		if (id == 10) {
+			cout << endl;
+		}
+		set<int> vertexA(neighbours.begin(), neighbours.end());
+		set<int> vertexB(a.neighbours.begin(), a.neighbours.end());
+		vector<int> x = vector<int>();
+		vector <int> y = vector<int>();
+		std::set<int>::iterator it;
+		for ( it = vertexA.begin(); it != vertexA.end(); ++it)
+		{
+			if (!vertexB.count(*it))
+				errors.mismatchedAtoms.at(id).push_back(*it);
+		}
+		for (it = vertexB.begin(); it != vertexB.end(); ++it)
+		{
+			if (!vertexA.count(*it))
+				errors.mismatchedAtoms.at(id).push_back(*it);
+		}
+		return ((id == a.id) && (vertexA == vertexB)); 
 	}
 	bool operator<(const Vertex& a) const
 	{
@@ -77,16 +104,46 @@ public:
 			cout << endl;
 		}
 	}
+	bool compareAndReturnMismatches (const Graph& g, ErrorStats & errors) 
+	{
+		bool isTrue = true;
+		int size = vertices.size();
+		if (size != g.vertices.size()) {
+			cout << "wrong vertices size???" << endl;
+			return false;
+		}
+		for (int k = 0; k < size; ++k) {
+			if (k == 9) {
+				cout << endl;
+			}
+			if (!(vertices[k].compareAndReturnDifferences(g.vertices[k],errors))) {
+				isTrue = false;
+
+			}
+		}
+		errors.setAll();
+		cout << endl;
+		return isTrue;
+	}
 
 	// compare graphs
 	bool operator==(const Graph& g) const
 	{
+		bool isTrue = true;
 		int size = vertices.size();
-		if (size != g.vertices.size()) return false;
-		for (int k = 0; k < size; ++k) {
-			if (!(vertices[k] == g.vertices[k])) return false;
+		if (size != g.vertices.size()) {
+			cout << "wrong vertices size???" << endl;
+			return false;
 		}
-		return true;
+		for (int k = 0; k < size; ++k) {
+			if (!(vertices[k] == g.vertices[k])) {
+				cout << k << " ";
+				isTrue = false;
+				
+			}
+		}
+		cout << endl;
+		return isTrue;
 	}
 	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {
 

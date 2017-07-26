@@ -1,109 +1,202 @@
+// example about structures
 #include <string>
 #include <sstream>
-#include "Atom.h"
-#include "Molecule.h"
-#include "cutoff.h"
-#include "reader.h"
-#include "soig.h"
-
 #include <iostream>
 #include <fstream>
 #include <vector>
 
+#include "Atom.h"
+#include "Molecule.h"
+// #include "shadow.h"
+#include "cutoffmaybe.h"
+#include "cutoff.h"
+// #include "cutoffwithforces.h"
+#include "reader.h"
+// #include "distancecomparison.h"
+
+/* When new algorithm is added, change 'outputData' and 'compareGraphs' accordingly. */
+enum AlgorithmName
+{
+	CUTOFF,
+	CUTOFF_MAYBE,
+	CUTOFF_FORCES,
+	SANN,
+	SHADOW,
+	CUTOFF_DOUBLECENTROID
+};
+
 using namespace std;
 
-bool compareGraphsSOIG(string, string, double);
-double analyzeDataSOIG(string, int, int, int, double);
+bool compareGraphs(AlgorithmName, string, string, vector<double>, string);
+double analyzeData(AlgorithmName, string, int, int, int, vector<double>, string, bool output = false);
+double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<short>, string);
 
 int main()
 {
-//choose data to run the algorithm on
-const string datapath = "R://LANL/Data/";
-const string material = "SiDiamond";
-const string defect = "Extra";
-const string temperature = "300K";
-const string folderPath = datapath + material + "/" + defect + "/" + temperature;
-// choose timestamps. available data: from 5010 to 15000, timestep 10.
-const int firstTime = 5010;
-const int lastTime = 5100;
-const int timeStep = 10;
- 
-//set cutoff distance
-// const double rc = 3.2;
-cout << analyzeDataSOIG(folderPath, firstTime, lastTime, timeStep);
+	//choose data to run the algorithm on
+	const string datapath = "R://LANL/DataUpdatedAgain/";
+	string material = "SiDiamond";
+	string defect = "Extra";
+	string temperature = "1000K";
+	string folderPath = datapath + material + "/" + defect + "/" + temperature;
+	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
+	string MinimizationLevel = "0"; 
+	// choose timestamps. available data: from 5010 to 15000, timestep 10.
+	const int firstTime = 5010;
+	const int lastTime = 15000;
+	const int timeStep = 400;
+	const bool makeOutputFile = true;
 
-/*for (double rc = 3.16; rc<=3.20; rc+=0.005){
-cout << rc << " " << analyzeDataCutOff(folderPath, firstTime, lastTime, timeStep, rc) << "\n";
-}*/
+	// Analyze data from single file (specified above)
+	double rc = 3.200;
+	double Rc = 3.240;
+	vector<double> parameters;
+	parameters.push_back(rc);
+	parameters.push_back(Rc);
+	cout << "1 \n";
+	cout << analyzeData(CUTOFF_DOUBLECENTROID, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevel, makeOutputFile);
 
 
+	// Run on multiple temperatures
+	// CHECK CUTOFF WITH CENTROID MAYBE-RESOLUTION
+	/*
+	string temperatures [] = {"50K", "100K", "150K", "200K", "250K", "300K", "500K", "1000K", "1500K", "2000K"};
+	rc = 3.320;
+	Rc = 3.380;
+	parameters;
+	for (auto temperature : temperatures){
+		string folderPath = datapath + material + "/" + defect + "/" + temperature;
+		cout << "\n" << folderPath+" " << " Centroid cutoff "<<rc<<" - "<<Rc<<"\n";
+		cout << analyzeData(CUTOFF_FORCES, folderPath, firstTime, lastTime, timeStep, parameters, makeOutputFile);
+	}
+	*/
 
-cout << "\nDone.";
-cin.get();
+	cout << "\nDone.";
+	cin.get();
 
-return 0;
+	return 0;
 }
 
-double analyzeDataSOIG(string folderPath, int firstTime, int lastTime, int timeStep){
-vector<short> sameTimes;
-vector<short> diffTimes;
- 
-for (int time = firstTime; time <= lastTime; time+=timeStep){
-string pre = folderPath + "/minimized" + to_string(time) + ".data";
-string min = folderPath + "/preminimize" + to_string(time)+ ".data";
- 
- 
+bool compareGraphs(AlgorithmName algorithm, string folderPath, int time, vector<double> parameters, string MinimizationLevel){
+	string pre = folderPath + "/minimize_" + MinimizationLevel + "_" + to_string(time) + ".data";
+	string min = folderPath + "/minimize_tol_8_" + to_string(time)+ ".data";
+	string force = folderPath + "/forces_" + MinimizationLevel + "_" + to_string(time) + ".force";
+	string fileNames[2] = {pre, min};
+	Graph graphs[2];
+	for (int i = 0; i<2; ++i){
+		Reader myReader = Reader();
+		if (myReader.Initialize(fileNames[i])) {
+			Molecule molecule = myReader.GetMoleculeFromOutputFile();
+			
 
-bool same = compareGraphsSOIG(pre, min);
-if (same) {
-sameTimes.push_back(time);
-} else {
-diffTimes.push_back(time);
-}
-cout << same;
-}
+			switch (algorithm)
+			{ 
+			case CUTOFF:
+				double rc;
+				rc = parameters[0];
+				graphs[i] = Cutoff(molecule, rc);
+				break;
+			case CUTOFF_MAYBE:
+				double Rc;
+				rc = parameters[0];
+				Rc = parameters[1];
+				graphs[i] = CutoffCentroid(molecule, rc, Rc);
 
-//output data
-string outFileName = folderPath + "/OutputSOIG.txt";
-std::ofstream file = std::ofstream(outFileName);
-if (!file)
-{
-std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
-} else {
-file = std::ofstream(outFileName);
-file << folderPath << "\n";
-file << "SOIG Algorithm \n";
-int sameCount = sameTimes.size();
-int totalCount = sameCount + diffTimes.size();
-file <<sameCount<<" graph pairs same out of "<<totalCount<<" ("<<100*float(sameCount)/float(totalCount)<<"%)\n";
+				break;
+			case SHADOW:
+				double S;
+				rc = parameters[0];
+				S = parameters[1];
+				// graphs[i] = Shadow(molecule, rc, S);
+				break;
+			case CUTOFF_FORCES:
+				rc = parameters[0];
+				Rc = parameters[1];
+				myReader.Initialize(force);
+				myReader.AddForcesToMolecule(molecule);
+				graphs[i] = CutoffWithForces(molecule, rc, Rc);
+				break;
+			case CUTOFF_DOUBLECENTROID:
+				rc = parameters[0];
+				Rc = parameters[1];
+				graphs[i] = CutoffDoubleCentroid(molecule, rc, Rc);
+				break;
+			default:
+				cout << "UNKNOWN ALGORITHM.\n";
+				break;
+			}
+		}
+	}
+	return (graphs[0] == graphs[1]);
+}
+double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, int lastTime, int timeStep, vector<double> parameters, string MinimizationLevel, bool output){
+	vector<short> sameTimes;
+	vector<short> diffTimes;
+	for (int time = firstTime; time <= lastTime; time+=timeStep){
+		bool same = compareGraphs(algorithm, folderPath, time, parameters, MinimizationLevel);
+		if (same) 
+			sameTimes.push_back(time);
+		else 
+			diffTimes.push_back(time);
+		cout << same;
+	}
+	cout << "\n";
+	//output data
+	if (output) 
+		return outputData(algorithm, folderPath, parameters, sameTimes, diffTimes, MinimizationLevel);
+	else
+		return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
+}
+double outputData(AlgorithmName algorithm, string folderPath, vector<double> parameters, vector<short> sameTimes, vector<short> diffTimes, string MinimizationLevel){
 
-file << "\nTIMESTAMPS FOR SAME GRAPHS:\n";
-for (vector<short>::iterator it = sameTimes.begin(); it != sameTimes.end(); ++it){
-file << *it << "\n";
-}
-file << "\nTIMESTAMPS FOR DIFFERENT GRAPHS:\n";
-for (vector<short>::iterator it = diffTimes.begin(); it != diffTimes.end(); ++it){
-file << *it << "\n";
-}
-return float(sameCount)/float(totalCount);
-}
-return -1;
-}
+	{
+		string outFileName = folderPath + "/";
+		switch (algorithm)
+		{ 
+		case CUTOFF:
+			outFileName += "Cutoff";
+			break;
+		case CUTOFF_MAYBE:
+			outFileName += "Cutoff_Maybe";
+			break;
+		case SHADOW:
+			outFileName += "Shadow";
+			break;
+		case CUTOFF_FORCES:
+			outFileName += "Cutoff_Forces";
+			break;
+		case CUTOFF_DOUBLECENTROID:
+			outFileName += "Cutoff_DoubleCentroid";
+			break;
+		default:
+			cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
+			break;
+		}
+		for (double p : parameters){
+			outFileName += "-" + to_string(p);
+		}
+		outFileName += "_" + MinimizationLevel;
+		std::ofstream file = std::ofstream(outFileName);
+		if (!file)
+			{
+				std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
+				return -1;
+		} else {
+			file = std::ofstream(outFileName);
+			file << outFileName << "\n";
+			int sameCount = sameTimes.size();
+			int totalCount = sameCount + diffTimes.size();
+			file <<sameCount<<" graph pairs same out of "<<totalCount<<" ("<<100*float(sameCount)/float(totalCount)<<"%)\n";
 
-bool compareGraphsSOIG(string pre, string min){
-string fileNames[2] = {pre, min};
-Graph graphs[2];
-for (int i = 0; i<2; ++i){
-	Reader myReader = Reader();
-	if (myReader.Initialize(fileNames[i])) {
-	Molecule molecule = myReader.GetMoleculeFromOutputFile();
-	Soig soig = Soig();
-	vector<AtomWithRadius> sphereList = soig.ComputeSpheresSoig(molecule, molecule.GetCubeSize());
-	int output = soig.CreateGraphSoig(molecule, sphereList, molecule.GetCubeSize(), g);
-	graphs[i] = g;
-// graphs[i] = Cutoff(molecule, rc);
+			file << "\nTIMESTAMPS FOR SAME GRAPHS:\n";
+			for (vector<short>::iterator it = sameTimes.begin(); it != sameTimes.end(); ++it){
+				file << *it << "\n";
+			}
+			file << "\nTIMESTAMPS FOR DIFFERENT GRAPHS:\n";
+			for (vector<short>::iterator it = diffTimes.begin(); it != diffTimes.end(); ++it){
+				file << *it << "\n";
+			}
+			return double(sameCount)/double(totalCount);
+		}
+	}
 }
-}
-return (graphs[0] == graphs[1]);
-}
- 

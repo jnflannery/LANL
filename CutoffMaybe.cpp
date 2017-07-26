@@ -56,5 +56,6 @@ typedef tuple<double, double, double> triplet;
 
  Graph CutoffCentroid(Molecule mol, double rc, double Rc){
 	Graph gh = CutoffMaybe(mol, rc, Rc);
+	cout << "C";
 	return MaybeToGraphCentroid(gh, mol);
  }

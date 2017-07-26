@@ -1,3 +1,4 @@
+// example about structures
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -159,7 +160,6 @@ double outputData(AlgorithmName algorithm, string folderPath, vector<double> par
 			break;
 		default:
 			cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
-			outFileName += "UNKNOWN_ALGORITHM";
 			break;
 		}
 		for (double p : parameters){

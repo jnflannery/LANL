@@ -1,4 +1,4 @@
-#include "maybetograph.h"
+#include "maybetographcentroid.h"
 
 
  Graph MaybeToGraphCentroid(Graph gh, Molecule mol){
@@ -21,26 +21,6 @@
 			triplet	newcenter = add( mult( weight/(weight+1.0), center ), mult( 1.0/(weight+1.0), VtoN ) );
 			//add an edge if it is
 			if (size(newcenter) < size(center)) gh.addEdge(V.id, N);
-		}
-	}
-	return gh;
- }
-
-  Graph MaybeToGraphForces(Graph gh, Molecule mol){
-	for (auto V : gh.getAllVertices()){
-		
-		for (auto N : V.maybeNeighbors){
-			Atom Vatom = mol.GetAtom(V.id-1);
-			Atom Natom = mol.GetAtom(N-1);
-			triplet VtoN = Vatom.VectorTo(Natom, mol.GetCubeSize());
-			triplet ForceVectorEdgeAtom(Natom.GetFx(), Natom.GetFy(), Natom.GetFz());
-			triplet ForceVectorCenterAtom(Vatom.GetFx(), Vatom.GetFy(), Vatom.GetFz());
-			ForceVectorCenterAtom = mult(-1, ForceVectorCenterAtom);
-			triplet ForceVector = add(ForceVectorEdgeAtom, ForceVectorCenterAtom);
-			double projection = dot_product(VtoN, ForceVectorEdgeAtom)/Vatom.EuclidianPeriodicDistance(Natom, mol.GetCubeSize());
-			//add an edge if it is
-			double epsilon = 0.1;
-			if (projection > epsilon) gh.addEdge(V.id, N);
 		}
 	}
 	return gh;

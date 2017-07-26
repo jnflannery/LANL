@@ -159,11 +159,12 @@ public:
 		}
 		for (int k = 0; k < size; ++k) {
 			if (!(vertices[k] == g.vertices[k])) {
-				//cout << k << " ";
+				cout << k << " ";
 				isTrue = false;
 				
 			}
 		}
+		cout << endl;
 		return isTrue;
 	}
 	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {

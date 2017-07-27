@@ -26,9 +26,10 @@ enum AlgorithmName
 
 using namespace std;
 
-bool compareGraphs(AlgorithmName, string, string, vector<double>, string, ErrorStats&);
-double analyzeData(AlgorithmName, string, int, int, int, vector<double>, string, bool output = false);
-double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<short>, string);
+double analyzeData(AlgorithmName, string, int, int, int, vector<double>, vector<string>, bool output = false);
+vector<Graph> getGraphs(AlgorithmName, string, string, vector<double>, vector<string>, ErrorStats &);
+bool compareGraphs(Graph, Graph, ErrorStats &);
+double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<short>, vector<string>, vector<ErrorStats>);
 
 int main()
 {
@@ -39,12 +40,12 @@ int main()
 	string temperature = "50K";
 	string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
-	string MinimizationLevel = "0"; 
+	vector<string> MinimizationLevels; MinimizationLevels.push_back("0"); 
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
 	const int timeStep = 400;
-	const bool makeOutputFile = true;
+	const bool makeOutputFile = (timeStep == 10);
 
 	// Analyze data from single file (specified above)
 	double rc = 3.348;
@@ -52,7 +53,7 @@ int main()
 	vector<double> parameters;
 	parameters.push_back(rc);
 	parameters.push_back(Rc);
-	cout << analyzeData(CUTOFF_FORCES, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevel, makeOutputFile);
+	cout << analyzeData(CUTOFF_FORCES, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, makeOutputFile);
 
 
 	// Run on multiple temperatures
@@ -75,44 +76,43 @@ int main()
 	return 0;
 }
 
-bool compareGraphs(AlgorithmName algorithm, string folderPath, int time, vector<double> parameters, string MinimizationLevel){
-	string pre = folderPath + "/minimize_" + MinimizationLevel + "_" + to_string(time) + ".data";
-	string min = folderPath + "/minimize_tol_8_" + to_string(time)+ ".data";
-	string force = folderPath + "/forces_" + MinimizationLevel + "_" + to_string(time) + ".force";
-	string fileNames[2] = {pre, min};
-	Graph graphs[2];
-	for (int i = 0; i<2; ++i){
+bool getGraphs(AlgorithmName algorithm, string folderPath, int time, vector<double> parameters, vector<string> MinimizationLevels, ErrorStats & stats){
+	int number_of_tests = sizeof(MinimizationLevels)-1;
+	vector<Graph> graphs;
+	for (auto tol : MinimizationLevels){
+		string file = folderPath + "/minimize_" + tol + "_" + to_string(time) + ".data";
 		Reader myReader = Reader();
-		if (myReader.Initialize(fileNames[i])) {
+		if (myReader.Initialize(file)) {
 			Molecule molecule = myReader.GetMoleculeFromOutputFile();
-			
+			int moleculeSize = molecule.GetNumberOfAtoms();
+			stats.initializeWithSize(moleculeSize);
 
 			switch (algorithm)
 			{ 
 			case CUTOFF:
 				double rc;
 				rc = parameters[0];
-				graphs[i] = Cutoff(molecule, rc);
+				graphs.push_back(Cutoff(molecule, rc));
 				break;
 			case CUTOFF_MAYBE:
 				double Rc;
 				rc = parameters[0];
 				Rc = parameters[1];
-				graphs[i] = CutoffCentroid(molecule, rc, Rc);
+				graphs.push_back(CutoffCentroid(molecule, rc, Rc));
 
 				break;
 			case SHADOW:
 				double S;
 				rc = parameters[0];
 				S = parameters[1];
-				// graphs[i] = Shadow(molecule, rc, S);
+				graphs.push_back(Shadow(molecule, rc, S));
 				break;
 			case CUTOFF_FORCES:
 				rc = parameters[0];
 				Rc = parameters[1];
 				myReader.Initialize(force);
 				myReader.AddForcesToMolecule(molecule);
-				graphs[i] = CutoffWithForces(molecule, rc, Rc);
+				graphs.push_back(CutoffWithForces(molecule, rc, Rc));
 				break;
 			default:
 				cout << "UNKNOWN ALGORITHM.\n";
@@ -120,28 +120,38 @@ bool compareGraphs(AlgorithmName algorithm, string folderPath, int time, vector<
 			}
 		}
 	}
-	return (graphs[0] == graphs[1]);
+
+	if (graphs[0] == graphs[1]) return true;
+	else {
+		graphs[0].compareAndReturnMismatches(graphs[1], stats);
+		return false;
+	}
 }
-double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, int lastTime, int timeStep, vector<double> parameters, string MinimizationLevel, bool output){
+double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, int lastTime, int timeStep, vector<double> parameters, vector<string> MinimizationLevels, bool output){
 	vector<short> sameTimes;
 	vector<short> diffTimes;
+	vector<ErrorStats> statsForMolecules = vector <ErrorStats>();
+
 	for (int time = firstTime; time <= lastTime; time+=timeStep){
 		ErrorStats stats = ErrorStats();
-		bool same = compareGraphs(algorithm, folderPath, time, parameters, MinimizationLevel, stats);
+		vector<Graph> graphs = getGraphs(algorithm, folderPath, time, parameters, MinimizationLevels, stats);
+
 		if (same) 
 			sameTimes.push_back(time);
-		else 
+		else {
 			diffTimes.push_back(time);
+			statsForMolecules.push_back(stats);
+		}
 		cout << same;
 	}
 	cout << "\n";
 	//output data
 	if (output) 
-		return outputData(algorithm, folderPath, parameters, sameTimes, diffTimes, MinimizationLevel);
+		return outputData(algorithm, folderPath, parameters, sameTimes, diffTimes, MinimizationLevels, statsForMolecules);
 	else
 		return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
 }
-double outputData(AlgorithmName algorithm, string folderPath, vector<double> parameters, vector<short> sameTimes, vector<short> diffTimes, string MinimizationLevel){
+double outputData(AlgorithmName algorithm, string folderPath, vector<double> parameters, vector<short> sameTimes, vector<short> diffTimes, vector<string> MinimizationLevels, vector<ErrorStats> statsForMolecules){
 
 	{
 		string outFileName = folderPath + "/";
@@ -184,8 +194,21 @@ double outputData(AlgorithmName algorithm, string folderPath, vector<double> par
 				file << *it << "\n";
 			}
 			file << "\nTIMESTAMPS FOR DIFFERENT GRAPHS:\n";
-			for (vector<short>::iterator it = diffTimes.begin(); it != diffTimes.end(); ++it){
-				file << *it << "\n";
+			for (int j = 0; j < diffTimes.size();j++) {
+				file << diffTimes.at(j) << endl;
+
+				file << "Percent vertices wrong: " << statsForMolecules.at(j).getPercentWrongVertices() << endl;
+				file << "Avg number edges mismatched: " << statsForMolecules.at(j).getAvgNumMismatched() << endl;
+				file << "Most frequently mismatched atom: " << statsForMolecules.at(j).getMostFrequentlyWrongAtom() << endl;
+				file << "Percent who mistakenly added mismatched atom: " << statsForMolecules.at(j).getPercentWrongForMostFrequentlyWrong() << endl;
+				file << "Wrong atoms are: ";
+				for (int k = 0; k < statsForMolecules.at(j).mismatchedAtoms.size(); k++) {
+					if (statsForMolecules.at(j).mismatchedAtoms.at(k).size() > 0) {
+						file << k << ", ";
+					}
+				}
+				file << endl;
+				file << endl;
 			}
 			return double(sameCount)/double(totalCount);
 		}

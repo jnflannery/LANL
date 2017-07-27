@@ -133,13 +133,24 @@ bool compareGraphs(Graph min, Graph pre, ErrorStats & stats){
 }
 
 double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, int lastTime, int timeStep, vector<double> parameters, vector<string> MinimizationLevels, bool output){
-	vector<short> sameTimes;
-	vector<short> diffTimes;
+	vector<vector<short>> sameTimes;
+	vector<vector<short>> diffTimes;
 	vector<ErrorStats> statsForMolecules = vector <ErrorStats>();
 
 	for (int time = firstTime; time <= lastTime; time+=timeStep){
 		ErrorStats stats = ErrorStats();
 		vector<Graph> graphs = getGraphs(algorithm, folderPath, time, parameters, MinimizationLevels, stats);
+		vector<short> sameTime;
+		vector<short> diffTime;
+
+		int graphs_to_compare = sizeof(graphs);
+		for(int i = 1; i <= graphs_to_compare; i++){
+			
+		
+		
+		}
+
+
 
 		if (same) 
 			sameTimes.push_back(time);

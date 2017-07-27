@@ -76,11 +76,12 @@ int main()
 	return 0;
 }
 
-bool getGraphs(AlgorithmName algorithm, string folderPath, int time, vector<double> parameters, vector<string> MinimizationLevels, ErrorStats & stats){
+vector<Graph> getGraphs(AlgorithmName algorithm, string folderPath, int time, vector<double> parameters, vector<string> MinimizationLevels, ErrorStats & stats){
 	int number_of_tests = sizeof(MinimizationLevels)-1;
 	vector<Graph> graphs;
 	for (auto tol : MinimizationLevels){
 		string file = folderPath + "/minimize_" + tol + "_" + to_string(time) + ".data";
+		string force;
 		Reader myReader = Reader();
 		if (myReader.Initialize(file)) {
 			Molecule molecule = myReader.GetMoleculeFromOutputFile();
@@ -110,6 +111,7 @@ bool getGraphs(AlgorithmName algorithm, string folderPath, int time, vector<doub
 			case CUTOFF_FORCES:
 				rc = parameters[0];
 				Rc = parameters[1];
+				force = folderPath + "/forces_" + tol + "_" + to_string(time) + ".force";
 				myReader.Initialize(force);
 				myReader.AddForcesToMolecule(molecule);
 				graphs.push_back(CutoffWithForces(molecule, rc, Rc));
@@ -120,13 +122,16 @@ bool getGraphs(AlgorithmName algorithm, string folderPath, int time, vector<doub
 			}
 		}
 	}
-
-	if (graphs[0] == graphs[1]) return true;
+	return graphs;
+}
+bool compareGraphs(Graph min, Graph pre, ErrorStats & stats){
+	if (min == pre) return true;
 	else {
-		graphs[0].compareAndReturnMismatches(graphs[1], stats);
+		min.compareAndReturnMismatches(pre, stats);
 		return false;
 	}
 }
+
 double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, int lastTime, int timeStep, vector<double> parameters, vector<string> MinimizationLevels, bool output){
 	vector<short> sameTimes;
 	vector<short> diffTimes;

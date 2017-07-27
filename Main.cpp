@@ -7,12 +7,12 @@
 
 #include "Atom.h"
 #include "Molecule.h"
-// #include "shadow.h"
+#include "shadow.h"
 #include "cutoffmaybe.h"
 #include "cutoff.h"
-// #include "cutoffwithforces.h"
+#include "maybetograph.h"
 #include "reader.h"
-// #include "distancecomparison.h"
+#include "distancecomparison.h"
 
 /* When new algorithm is added, change 'outputData' and 'compareGraphs' accordingly. */
 enum AlgorithmName
@@ -26,7 +26,7 @@ enum AlgorithmName
 
 using namespace std;
 
-bool compareGraphs(AlgorithmName, string, string, vector<double>, string);
+bool compareGraphs(AlgorithmName, string, string, vector<double>, string, ErrorStats&);
 double analyzeData(AlgorithmName, string, int, int, int, vector<double>, string, bool output = false);
 double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<short>, string);
 
@@ -126,7 +126,8 @@ double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, in
 	vector<short> sameTimes;
 	vector<short> diffTimes;
 	for (int time = firstTime; time <= lastTime; time+=timeStep){
-		bool same = compareGraphs(algorithm, folderPath, time, parameters, MinimizationLevel);
+		ErrorStats stats = ErrorStats();
+		bool same = compareGraphs(algorithm, folderPath, time, parameters, MinimizationLevel, stats);
 		if (same) 
 			sameTimes.push_back(time);
 		else 

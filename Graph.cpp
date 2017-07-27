@@ -6,6 +6,7 @@
 #include "molecule.h"
 #include <fstream>
 #include <set>
+#include "errorstats.h"
 using namespace std;
 
 //Vertex
@@ -27,6 +28,27 @@ struct Vertex
 	bool operator<(const Vertex& a) const
 	{
 		return (id < a.id);
+	}
+	bool compareAndReturnDifferences(const Vertex& a, ErrorStats & errors) {
+		if (id == 10) {
+			cout << endl;
+		}
+		set<int> vertexA(neighbors.begin(), neighbors.end());
+		set<int> vertexB(a.neighbors.begin(), a.neighbors.end());
+		vector<int> x = vector<int>();
+		vector <int> y = vector<int>();
+		std::set<int>::iterator it;
+		for ( it = vertexA.begin(); it != vertexA.end(); ++it)
+		{
+			if (!vertexB.count(*it))
+				errors.mismatchedAtoms.at(id).push_back(*it);
+		}
+		for (it = vertexB.begin(); it != vertexB.end(); ++it)
+		{
+			if (!vertexA.count(*it))
+				errors.mismatchedAtoms.at(id).push_back(*it);
+		}
+		return ((id == a.id) && (vertexA == vertexB)); 
 	}
 };
 
@@ -74,7 +96,27 @@ public:
 	vector<Vertex> getAllVertices(){
 		return vertices;
 	}
+	bool compareAndReturnMismatches (const Graph& g, ErrorStats & errors) 
+	{
+		bool isTrue = true;
+		int size = vertices.size();
+		if (size != g.vertices.size()) {
+			cout << "wrong vertices size???" << endl;
+			return false;
+		}
+		for (int k = 0; k < size; ++k) {
+			if (k == 9) {
+				cout << endl;
+			}
+			if (!(vertices[k].compareAndReturnDifferences(g.vertices[k],errors))) {
+				isTrue = false;
 
+			}
+		}
+		errors.setAll();
+		cout << endl;
+		return isTrue;
+	}
 	//Print a vertex (using LAMMPS IDs)
 	void printVertex(int id){
 		cout << "Adjacency list of vertex " << id << ":" << endl;

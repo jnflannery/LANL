@@ -46,11 +46,11 @@ void Molecule::SetStepsAdvancedPastTimestep(int steps)
 }
 //get atom at a certain index
 Atom Molecule::GetAtom(int i) {
-	return atoms.at(i - 1);
+	return atoms.at(i-1);
 }
 //put atom into certain index
 void Molecule::SetAtomWithIndex(Atom atom, int i) {
-	atoms.at(i - 1) = atom;
+	atoms.at(i-1) = atom;
 }
 std::vector<Atom> Molecule::GetAtomVector() {
 	return atoms;

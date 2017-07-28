@@ -1,4 +1,3 @@
-
 #pragma once
 #include <string>
 #include "molecule.h"
@@ -18,5 +17,5 @@ public:
 	double GetCubeSizeFromLine(std::string line);
 	Molecule GetMoleculeFromOutputFile();
 	void AddForcesToMolecule(Molecule& molecule);
-	std::vector<std::string> Reader::split(const char *str, char c);
+	std::vector<std::string> Reader::split(const char *str, char c );
 };

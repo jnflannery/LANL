@@ -17,18 +17,18 @@ Graph Cutoff(Molecule molecule, double rc)
 	BoxBuilder myBoxBuilder = BoxBuilder(rc);
 	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, rc);
 	vector<Box> boxes = boxlist.GetAllBoxes();
-	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox) {
+	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox){
 		Box box = FindNeighbours(*itBox, boxlist.NumberOfBoxes());
 		vector<Coordinate> neighborhood = box.GetNeighborList();
 		vector<int> boxAtoms = box.GetAtomsFromBox();
 		// itereate through atoms in middle box
-		for (vector<int>::iterator itAtom = boxAtoms.begin(); itAtom != boxAtoms.end(); ++itAtom) {
+		for (vector<int>::iterator itAtom = boxAtoms.begin(); itAtom != boxAtoms.end(); ++itAtom){
 			//iterate through neighbouring boxes/coordinates
-			for (vector<Coordinate>::iterator itNeighCoor = neighborhood.begin(); itNeighCoor != neighborhood.end(); ++itNeighCoor) {
+			for (vector<Coordinate>::iterator itNeighCoor = neighborhood.begin(); itNeighCoor != neighborhood.end(); ++itNeighCoor){
 				Box Nbox = boxlist.GetBox(*itNeighCoor);
 				vector<int> Natoms = Nbox.GetAtomsFromBox();
 				//itereate though atoms in box by given coordinate
-				for (vector<int>::iterator itNeighAtom = Natoms.begin(); itNeighAtom != Natoms.end(); ++itNeighAtom) {
+				for (vector<int>::iterator itNeighAtom = Natoms.begin(); itNeighAtom != Natoms.end(); ++itNeighAtom){
 					Atom atom1 = molecule.GetAtom(*itAtom);
 					Atom atom2 = molecule.GetAtom(*itNeighAtom);
 					if (atom1.GetId() < atom2.GetId()) { //use '<' to avoid adding edge twice. this assumes graph is undirected.

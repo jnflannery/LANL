@@ -25,7 +25,7 @@ void Atom::SetY(double newY) {
 	y = newY;
 }
 void Atom::SetZ(double newZ) {
-	z = newZ;
+	z = newZ;      
 }
 void Atom::SetId(int newId) {
 	id = newId;
@@ -72,14 +72,14 @@ double Atom::EuclidianDistance(Atom atom) {
 	double zdif = (z - atom.GetZ())*(z - atom.GetZ());
 	return std::sqrt(xdif + ydif + zdif);
 }
-double Atom::PeriodicDiffX(Atom atom, double periodicBoundary) {
-	return (abs(x - atom.GetX()) < abs(periodicBoundary - abs(x - atom.GetX()))) ? (atom.GetX() - x) : ((x<atom.GetX() ? atom.GetX() - periodicBoundary - x : atom.GetX() + periodicBoundary - x));
+double Atom::PeriodicDiffX(Atom atom, double periodicBoundary){
+	return (abs(x - atom.GetX()) < abs(periodicBoundary - abs(x - atom.GetX()))) ? (atom.GetX()-x) : ((x<atom.GetX() ? atom.GetX()-periodicBoundary-x : atom.GetX()+periodicBoundary-x));
 }
-double Atom::PeriodicDiffY(Atom atom, double periodicBoundary) {
-	return (abs(y - atom.GetY()) < abs(periodicBoundary - abs(y - atom.GetY()))) ? (atom.GetY() - y) : ((y<atom.GetY() ? atom.GetY() - periodicBoundary - y : atom.GetY() + periodicBoundary - y));
+double Atom::PeriodicDiffY(Atom atom, double periodicBoundary){
+	return (abs(y - atom.GetY()) < abs(periodicBoundary - abs(y - atom.GetY()))) ? (atom.GetY()-y) : ((y<atom.GetY() ? atom.GetY()-periodicBoundary-y : atom.GetY()+periodicBoundary-y));
 }
-double Atom::PeriodicDiffZ(Atom atom, double periodicBoundary) {
-	return (abs(z - atom.GetZ()) < abs(periodicBoundary - abs(z - atom.GetZ()))) ? (atom.GetZ() - z) : ((z<atom.GetZ() ? atom.GetZ() - periodicBoundary - z : atom.GetZ() + periodicBoundary - z));
+double Atom::PeriodicDiffZ(Atom atom, double periodicBoundary){
+	return (abs(z - atom.GetZ()) < abs(periodicBoundary - abs(z - atom.GetZ()))) ? (atom.GetZ()-z) : ((z<atom.GetZ() ? atom.GetZ()-periodicBoundary-z : atom.GetZ()+periodicBoundary-z));
 }
 double Atom::getPeriodicDistanceOneD(double x, double y, double periodicDist)
 {

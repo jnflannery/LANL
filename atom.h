@@ -37,5 +37,5 @@ public:
 	double Atom::GetFy();
 	double Atom::GetFz();
 	int GetId();
-	triplet VectorTo(Atom, double periodicBoundary);
+	triplet VectorTo(Atom,  double periodicBoundary);
 };

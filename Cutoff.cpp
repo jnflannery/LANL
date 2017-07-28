@@ -9,10 +9,8 @@ Graph Cutoff(Molecule molecule, double rc)
 {
 	vector<Atom> atoms = molecule.GetAtomVector();
 	int size = molecule.GetNumberOfAtoms();
-
 	// create graph object
 	Graph gh(size);
-
 	// build boxes
 	BoxBuilder myBoxBuilder = BoxBuilder(rc);
 	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, rc);

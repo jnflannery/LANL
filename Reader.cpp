@@ -5,7 +5,7 @@ using namespace std;
 #include <vector>
 #include <iterator>
 
-std::vector<std::string> split(const char *str, char c = ' ')
+std::vector<std::string> Reader::split(const char *str, char c = ' ')
 {
 	std::vector<std::string> result;
 
@@ -167,8 +167,8 @@ void Reader::AddForcesToMolecule(Molecule & molecule)
 		atomToSet.SetFy(fy);
 		atomToSet.SetFz(fz);
 		molecule.SetAtomWithIndex(atomToSet, atomId);
-		if (atomId == 1) {
+		/*if (atomId == 1) {
 			std::cout << fx << endl;
-		}
+		}*/
 	}
 }

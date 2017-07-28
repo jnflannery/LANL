@@ -1,5 +1,3 @@
-
-
 #ifndef GRAPH_CPP
 #define GRAPH_CPP
 #include <iostream>
@@ -34,13 +32,10 @@ struct Vertex
 		return (id < a.id);
 	}
 	bool compareAndReturnDifferences(const Vertex& a, ErrorStats & errors) {
-		if (id == 10) {
-			cout << endl;
-		}
 		set<int> vertexA(neighbors.begin(), neighbors.end());
 		set<int> vertexB(a.neighbors.begin(), a.neighbors.end());
-		vector<int> x = vector<int>();
-		vector <int> y = vector<int>();
+		if((id == a.id) && (vertexA == vertexB))
+			return true;
 		std::set<int>::iterator it;
 		for (it = vertexA.begin(); it != vertexA.end(); ++it)
 		{
@@ -241,9 +236,6 @@ public:
 			return false;
 		}
 		for (int k = 0; k < size; ++k) {
-			if (k == 9) {
-				cout << endl;
-			}
 			if (!(vertices[k].compareAndReturnDifferences(g.vertices[k], errors))) {
 				isTrue = false;
 
@@ -265,14 +257,11 @@ public:
 #include <set>
 #include "errorstats.h"
 using namespace std;
-
-
 //Vertex
 struct Vertex
 {
 	int id;
 	vector<int> neighbours;
-
 	bool operator==(const Vertex& a) const
 	{
 		set<int> vertexA(neighbours.begin(), neighbours.end());
@@ -280,7 +269,6 @@ struct Vertex
 		if (vertexA.size() != vertexB.size())
 			return false;
 		return ((id == a.id) && (vertexA==vertexB));
-
 	}
 	bool compareAndReturnDifferences(const Vertex& a, ErrorStats & errors) {
 		if (id == 10) {
@@ -308,8 +296,6 @@ struct Vertex
 		return (id < a.id);
 	}
 };
-
-
 //Class Graph
 class Graph
 {
@@ -329,12 +315,10 @@ public:
 	{
 		this->V = 0;
 	}
-
 	//Get number of vertices
 	int GetNumberOfVertices() {
 		return V;
 	}
-
 	//Add Edge to Graph
 	void addEdge(Vertex a, Vertex b)
 	{
@@ -346,7 +330,6 @@ public:
 		vertices[a].neighbours.push_back(b);
 		vertices[b].neighbours.push_back(a);
 	}
-
 	//Print the graph
 	void printGraph()
 	{
@@ -363,7 +346,6 @@ public:
 		}
 	}
 	
-
 	// compare graphs
 	bool operator==(const Graph& g) const
 	{
@@ -384,7 +366,6 @@ public:
 		return isTrue;
 	}
 	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {
-
 		std::ofstream file = std::ofstream(myFileName);
 		if (!file)
 		{
@@ -404,7 +385,6 @@ public:
 				if (vertices.at(i).neighbours.size() > 0)
 					file << 1 << " " << m.GetAtom(i).GetX() << " " << m.GetAtom(i).GetY() << " " << m.GetAtom(i).GetZ() << endl;
 			}
-
 		}
 	}
 	int getHashValue() {
@@ -436,7 +416,6 @@ public:
 			}
 			if (!(vertices[k].compareAndReturnDifferences(g.vertices[k], errors))) {
 				isTrue = false;
-
 			}
 		}
 		errors.setAll();

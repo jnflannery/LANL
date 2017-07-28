@@ -5,7 +5,7 @@ using namespace std;
 #include <vector>
 #include <iterator>
 
-std::vector<std::string> split(const char *str, char c = ' ')
+std::vector<std::string> Reader::split(const char *str, char c = ' ')
 {
 	std::vector<std::string> result;
 

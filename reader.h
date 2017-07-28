@@ -17,4 +17,5 @@ public:
 	double GetCubeSizeFromLine(std::string line);
 	Molecule GetMoleculeFromOutputFile();
 	void AddForcesToMolecule(Molecule& molecule);
+	std::vector<std::string> Reader::split(const char *str, char c );
 };

@@ -32,13 +32,10 @@ struct Vertex
 		return (id < a.id);
 	}
 	bool compareAndReturnDifferences(const Vertex& a, ErrorStats & errors) {
-		if (id == 10) {
-			cout << endl;
-		}
 		set<int> vertexA(neighbors.begin(), neighbors.end());
 		set<int> vertexB(a.neighbors.begin(), a.neighbors.end());
-		vector<int> x = vector<int>();
-		vector <int> y = vector<int>();
+		if((id == a.id) && (vertexA == vertexB))
+			return true;
 		std::set<int>::iterator it;
 		for (it = vertexA.begin(); it != vertexA.end(); ++it)
 		{
@@ -239,9 +236,6 @@ public:
 			return false;
 		}
 		for (int k = 0; k < size; ++k) {
-			if (k == 9) {
-				cout << endl;
-			}
 			if (!(vertices[k].compareAndReturnDifferences(g.vertices[k], errors))) {
 				isTrue = false;
 

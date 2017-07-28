@@ -9,6 +9,7 @@ private:
 	double avgNumMismatched;
 	double percentWrongForMostFrequentlyWrong;
 	std::vector<int> countsMismatched;
+	int timeStep;
 public:
 	std::vector< std::vector <int> > mismatchedAtoms;
 	void setPercentWrongVertices();
@@ -23,4 +24,6 @@ public:
 	double getAvgPercentMismatched();
 	std::vector<int> getCountsMismatched();
 	double getPercentWrongForMostFrequentlyWrong();
+	void setTimestep(int);
+	int getTimestep();
 };

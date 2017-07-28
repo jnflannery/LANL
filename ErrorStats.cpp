@@ -46,7 +46,12 @@ void ErrorStats::setAvgNumMismatched()
 	}
 	avgNumMismatched = (double)k / (double)(count);
 }
-
+void ErrorStats::setTimestep(int t){
+	timeStep=t;
+}
+int ErrorStats::getTimestep(){
+	return timeStep;
+}
 void ErrorStats::setAll()
 {
 	setAvgNumMismatched();

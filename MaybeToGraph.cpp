@@ -30,8 +30,8 @@
 	for (auto V : gh.getAllVertices()){
 		
 		for (auto N : V.maybeNeighbors){
-			Atom Vatom = mol.GetAtom(V.id-1);
-			Atom Natom = mol.GetAtom(N-1);
+			Atom Vatom = mol.GetAtom(V.id);
+			Atom Natom = mol.GetAtom(N);
 			triplet VtoN = Vatom.VectorTo(Natom, mol.GetCubeSize());
 			triplet ForceVectorEdgeAtom(Natom.GetFx(), Natom.GetFy(), Natom.GetFz());
 			triplet ForceVectorCenterAtom(Vatom.GetFx(), Vatom.GetFy(), Vatom.GetFz());
@@ -39,8 +39,39 @@
 			triplet ForceVector = add(ForceVectorEdgeAtom, ForceVectorCenterAtom);
 			double projection = dot_product(VtoN, ForceVectorEdgeAtom)/Vatom.EuclidianPeriodicDistance(Natom, mol.GetCubeSize());
 			//add an edge if it is
-			double epsilon = 0.1;
+			double epsilon = 0.2;
 			if (projection > epsilon) gh.addEdge(V.id, N);
+		}
+	}
+	return gh;
+ }
+
+   Graph MaybeToGraphDoubleCentroid(Graph gh, Molecule mol){
+	for (auto V : gh.getAllVertices()){
+		triplet centerV(0, 0, 0);
+		double weight = V.neighbors.size();
+		for (auto N : V.neighbors){
+			//add N-V to C
+			Atom Vatom = mol.GetAtom(V.id);
+			Atom Natom = mol.GetAtom(N);
+			triplet VtoN = Vatom.VectorTo(Natom, mol.GetCubeSize());
+			centerV = add(centerV, VtoN);
+		}
+		for (auto N : V.maybeNeighbors){
+			triplet centerN(0,0,0);
+			Atom Vatom = mol.GetAtom(V.id);
+			Vertex NVertex = gh.getVertex(N);
+			Atom Natom = mol.GetAtom(N);
+			triplet VtoNeighbor = Vatom.VectorTo(Natom, mol.GetCubeSize());
+			for (auto Q: NVertex.neighbors){
+				Atom Qatom = mol.GetAtom(Q);
+				triplet NtoQ = Natom.VectorTo(Qatom, mol.GetCubeSize());
+				centerN = add(centerN, NtoQ);
+			}
+			double DistanceBetweenAtoms = size(VtoNeighbor);
+			triplet VtoCenterN = add(VtoNeighbor, centerN);
+			triplet CenterVtoCenterN = subtract(VtoCenterN, centerV);
+			if (size(CenterVtoCenterN) < size(VtoNeighbor)) gh.addEdge(V.id, N);
 		}
 	}
 	return gh;
@@ -60,6 +91,10 @@ double size(triplet a){
 
 triplet add(triplet a, triplet b){
 	return triplet(get<0>(a)+get<0>(b), get<1>(a)+get<1>(b), get<2>(a)+get<2>(b));
+}
+
+triplet subtract(triplet a, triplet b){
+	return triplet(get<0>(a)-get<0>(b), get<1>(a)-get<1>(b), get<2>(a)-get<2>(b));
 }
 
 triplet mult(double c, triplet a){

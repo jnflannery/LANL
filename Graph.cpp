@@ -180,6 +180,7 @@ public:
 		}
 		for (int k = 0; k < size; ++k) {
 			if (!(vertices[k] == g.vertices[k])) {
+				cout << k << " ";
 				isTrue = false;
 
 			}

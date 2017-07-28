@@ -97,4 +97,3 @@ double Atom::EuclidianPeriodicDistance(Atom atom, double periodicBoundary) {
 	double zdif = abs(PeriodicDiffZ(atom, periodicBoundary));
 	return std::sqrt(xdif*xdif + ydif*ydif + zdif*zdif);
 }
-

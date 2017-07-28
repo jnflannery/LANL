@@ -36,6 +36,14 @@ int Molecule::GetTimestep() {
 void Molecule::AddAtom(Atom newAtom) {
 	atoms.push_back(newAtom);
 }
+int Molecule::GetStepsAdvancedPastTimestep()
+{
+	return stepsAdvancedPastTimestep;
+}
+void Molecule::SetStepsAdvancedPastTimestep(int steps)
+{
+	stepsAdvancedPastTimestep = steps;
+}
 //get atom at a certain index
 Atom Molecule::GetAtom(int i) {
 	return atoms.at(i-1);

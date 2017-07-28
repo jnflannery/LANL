@@ -17,10 +17,10 @@ struct AtomWithRadius {
 };
 
 class SoigTol {
-private:
-	Graph graph;
-public:
-	vector<AtomWithRadius> ComputeSpheresSoigTol(Molecule, double periodicBoundary);
-	int FindNeighborsSoigTol(Atom, Molecule, vector<AtomWithRadius>, double, double, Graph&);
-	int CreateGraphSoigTol(Molecule, vector<AtomWithRadius>, double, double, Graph&);
+	private:
+		Graph graph; 
+	public: 
+		vector<AtomWithRadius> ComputeSpheresSoigTol(Molecule, double periodicBoundary);
+		int FindNeighborsSoigTol(Atom, Molecule, vector<AtomWithRadius>, double, double, Graph&); 
+		int CreateGraphSoigTol(Molecule, vector<AtomWithRadius>, double, double, Graph&); 
 };

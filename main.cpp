@@ -82,9 +82,9 @@ int main()
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] = {"PtFCC", "SiDiamond"}; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
-	const string defects[] = { "Extra", "Gap" };
-	const string temperatures[] = {"500K"}; //{  "50K", "300K","500K", "750K", "1000K"};
+	const string materials[] = {"PtNanoPart"}; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
+	const string defects[] = { "Final" };
+	const string temperatures[] = {"300K"}; //{  "50K", "300K","500K", "750K", "1000K"};
 	vector<string> material(materials, materials + sizeof(materials)/sizeof(materials[0]));
 	vector<string> defect(defects, defects + sizeof(defects)/sizeof(defects[0]));
 	vector<string> temperature(temperatures, temperatures + sizeof(temperatures)/sizeof(temperatures[0]));
@@ -102,16 +102,13 @@ int main()
 	const bool makeOutputFile = (timeStep == 10);
 	
 	//Code for testing cutoff values
-	/*
-	for (double rc = 1; rc < 5; rc+=0.25){
+	for (double rc = 2; rc < 5; rc+=0.25){
 		parameters[0] = rc;
-		string path = datapath + "MgOxide/Standard/300K";
-		cout << "1";
+		string path = datapath + "PtNanoPart/Final/300K";
 		cout << analyzeData(algorithm, path, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
-		cout << "2";
 	}
 	return 0;
-	*/
+	
 
 	// Analyze data from single file (specified above)
 

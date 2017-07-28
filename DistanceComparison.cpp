@@ -14,8 +14,7 @@ struct AtomIdAndDistance3 {
 	}
 };
 bool operator<(const AtomIdAndDistance3 &s1, const AtomIdAndDistance3 &s2) {
-	return s1.distanceFromMainAtom < s2.distanceFromMainAtom;
-}
+	return s1.distanceFromMainAtom < s2.distanceFromMainAtom;}
 void AtomDistanceSort(vector<AtomIdAndDistance3>& neighborCandidates) {
 	std::sort(neighborCandidates.begin(), neighborCandidates.end());
 }
@@ -78,7 +77,7 @@ int DistanceComparison::ComputeDistAtom(Atom centralAtom, vector<Atom> potential
 	AtomDistanceSort(neighborCandidates);
 	vector<AtomIdDistanceAndDifference3> differenceCandidates = vector <AtomIdDistanceAndDifference3>();
 	double distance;
-	int num = 13;
+	int num=13;
 	if (neighborCandidates.size() < 13)
 		num = neighborCandidates.size();
 	for (int i = 1; i <= num;i++) {

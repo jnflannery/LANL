@@ -14,7 +14,7 @@ void ErrorStats::setPercentWrongVertices()
 
 void ErrorStats::setMostFrequentlyWrongAtom()
 {
-	std::vector<int> counts = std::vector <int>(mismatchedAtoms.size() + 1);
+	std::vector<int> counts = std::vector <int>(mismatchedAtoms.size()+1);
 	for (int i = 0;i < counts.size(); i++) {
 		counts.at(i) = 0;
 	}
@@ -23,7 +23,7 @@ void ErrorStats::setMostFrequentlyWrongAtom()
 			counts.at(mismatchedAtoms.at(i).at(j))++;
 		}
 	}
-	mostFrequentlyWrongAtom = -1;
+	mostFrequentlyWrongAtom =-1;
 	int mistakeCount = 0;
 	for (int i = 1; i < counts.size(); i++) {
 		if (counts.at(i) > mistakeCount) {
@@ -46,10 +46,10 @@ void ErrorStats::setAvgNumMismatched()
 	}
 	avgNumMismatched = (double)k / (double)(count);
 }
-void ErrorStats::setTimestep(int t) {
-	timeStep = t;
+void ErrorStats::setTimestep(int t){
+	timeStep=t;
 }
-int ErrorStats::getTimestep() {
+int ErrorStats::getTimestep(){
 	return timeStep;
 }
 void ErrorStats::setAll()
@@ -65,7 +65,7 @@ void ErrorStats::setCountsMismatched()
 
 void ErrorStats::initializeWithSize(int s)
 {
-	std::vector< std::vector<int> > newArray = std::vector< std::vector<int> >(s + 1);
+	std::vector< std::vector<int> > newArray = std::vector< std::vector<int> >(s+1);
 	mismatchedAtoms = newArray;
 }
 

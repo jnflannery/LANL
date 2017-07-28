@@ -24,6 +24,18 @@ Box Boxlist::GetBox(int IDx, int IDy, int IDz)
 	Box FoundBox = boxes.at(VectorIndex); // find the box with this vector index
 	return FoundBox;
 }
+Box Boxlist::GetBox(Coordinate coordinate)
+{
+	int IDx = coordinate.x;
+	int IDy = coordinate.y;
+	int IDz = coordinate.z;
+	int VectorIndex = IDx + N*IDy + N*N*IDz; // convert x, y, z coordinates into 1D vector index
+	Box FoundBox = boxes.at(VectorIndex); // find the box with this vector index
+	return FoundBox;
+}
+vector<Box> Boxlist::GetAllBoxes() {
+	return boxes;
+}
 
 // declare a Boxlist
 Boxlist::Boxlist(int newN)
@@ -81,7 +93,7 @@ double Boxlist::GetBoxSize()
 	return BoxSize;
 }
 std::vector<Atom> Boxlist::getAtomVectorOfNeighborCandidates(Box box, int boxesPerSide, Molecule molecule) {
-	std::vector<Atom> atomsInBoxes=std::vector<Atom>();
+	std::vector<Atom> atomsInBoxes = std::vector<Atom>();
 	std::vector<Box> boxNeighbors = std::vector<Box>();
 	box = FindNeighbours(box, boxesPerSide);
 	vector<Atom> largeBoxAtoms = box.getVectorOfAtomsFromBox(molecule);

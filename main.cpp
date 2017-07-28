@@ -14,6 +14,19 @@
 #include "maybetograph.h"
 #include "reader.h"
 #include "distancecomparison.h"
+#include <windows.h>
+#include <stdio.h>
+using namespace std;
+
+//auxiliary function for folder creation
+void createFolder(const char * path)
+{   
+    if(!CreateDirectory(path ,NULL))
+    {
+        return;
+    }
+}
+
 
 /* When new algorithm is added, change 'outputData' and 'compareGraphs' accordingly. */
 enum AlgorithmName
@@ -24,12 +37,28 @@ enum AlgorithmName
 	SANN,
 	SHADOW,
 };
+string getAlgorithmName(AlgorithmName algorithm){
+		switch (algorithm)
+		{ 
+		case CUTOFF:
+			return "Cutoff";
+		case CUTOFF_MAYBE:
+			return "Cutoff_Maybe";
+		case SHADOW:
+			return "Shadow";
+		case CUTOFF_FORCES:
+			return "Cutoff_Forces";
+		default:
+			cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
+			return "UNKNOWN";
+		}
+}
 
-using namespace std;
 
 double analyzeData(AlgorithmName, string, int, int, int, vector<double>, vector<string>, string outputFolder, bool output = false);
 vector<Graph> getGraphs(AlgorithmName, string, string, vector<double>, vector<string>, ErrorStats &);
 bool compareGraphs(Graph, Graph, ErrorStats &);
+
 double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<short>, string,  vector<ErrorStats>, string);
 
 int main()
@@ -39,7 +68,7 @@ int main()
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] =  { "PtFCC"};//,"SiDiamond", "PtNanoPart", "SiMelt"};
+	const string materials[] =  { "PtFCC", "SiDiamond"};//, "PtNanoPart", "SiMelt"};
 	const string defects[] = { "Extra", "Gap" };
 	const string temperatures[] = {  "50K", "300K","500K", "750K", "1000K"};
 	vector<string> material(materials, materials + sizeof(materials)/sizeof(materials[0]));
@@ -48,7 +77,7 @@ int main()
 
 	//string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
-	const string mini[] = {"tol_12","tol_10"};//, "tol_8", "tol_6", "tol_4", "tol_2", "0"}; 
+	const string mini[] = {"tol_12","tol_4"};//, "tol_8", "tol_6", "tol_4", "tol_2", "0"}; 
 	vector<string> MinimizationLevels (mini, mini + sizeof(mini)/sizeof(mini[0])); ; 
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
@@ -224,44 +253,30 @@ double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, in
 double outputData(AlgorithmName algorithm, string folderPath, vector<double> parameters, vector<short> sameTimes, vector<short> diffTimes, string MinimizationLevel, vector<ErrorStats> statsForMolecules, string outputFolder){
 
 	{
-		string outFileName = outputFolder + "TestMinimization/";
+		string outFileName = outputFolder + "SameTimeStep/";
+		createFolder(outFileName.c_str());
 		Reader reader = Reader();
 		vector<string>splitFolder = reader.split(folderPath.c_str(),'/');
+		createFolder(outFileName.c_str());
 		outFileName += splitFolder.at(splitFolder.size()-3) + "/";//material
+		createFolder(outFileName.c_str());
 
-		switch (algorithm)
-		{ 
-		case CUTOFF:
-			outFileName += "Cutoff";
-			break;
-		case CUTOFF_MAYBE:
-			outFileName += "Cutoff_Maybe";
-			break;
-		case SHADOW:
-			outFileName += "Shadow";
-			break;
-		case CUTOFF_FORCES:
-			outFileName += "Cutoff_Forces";
-			break;
-		default:
-			cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
-			break;
-		}
-		outFileName += "/";
+		outFileName += getAlgorithmName(algorithm) + "/";
+		createFolder(outFileName.c_str());
 		outFileName += splitFolder.at(splitFolder.size()-2) + "_";//defect
-		outFileName += splitFolder.at(splitFolder.size()-1) + "_";//temperature
+		outFileName += MinimizationLevel + "_";
+		outFileName += splitFolder.at(splitFolder.size()-1);//temperature
 		for (double p : parameters){
-			outFileName += to_string(p) + "_";
+			outFileName += "_" + to_string(p);
 		}
-
-		outFileName += MinimizationLevel;
+		
 		std::ofstream file = std::ofstream(outFileName);
 		if (!file)
 		{
 			std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
 			return -1;
 		} else {
-			outFileName += "main.txt";
+			outFileName += ".txt";
 			file = std::ofstream(outFileName);
 			file << outFileName << "\n";
 			int sameCount = sameTimes.size();

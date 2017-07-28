@@ -65,7 +65,7 @@ void ErrorStats::setCountsMismatched()
 
 void ErrorStats::initializeWithSize(int s)
 {
-	std::vector< std::vector<int> > newArray = std::vector< std::vector<int> >(s);
+	std::vector< std::vector<int> > newArray = std::vector< std::vector<int> >(s+1);
 	mismatchedAtoms = newArray;
 }
 

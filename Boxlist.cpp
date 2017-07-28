@@ -33,7 +33,7 @@ Box Boxlist::GetBox(Coordinate coordinate)
 	Box FoundBox = boxes.at(VectorIndex); // find the box with this vector index
 	return FoundBox;
 }
-vector<Box> Boxlist::GetAllBoxes(){
+vector<Box> Boxlist::GetAllBoxes() {
 	return boxes;
 }
 
@@ -93,7 +93,7 @@ double Boxlist::GetBoxSize()
 	return BoxSize;
 }
 std::vector<Atom> Boxlist::getAtomVectorOfNeighborCandidates(Box box, int boxesPerSide, Molecule molecule) {
-	std::vector<Atom> atomsInBoxes=std::vector<Atom>();
+	std::vector<Atom> atomsInBoxes = std::vector<Atom>();
 	std::vector<Box> boxNeighbors = std::vector<Box>();
 	box = FindNeighbours(box, boxesPerSide);
 	vector<Atom> largeBoxAtoms = box.getVectorOfAtomsFromBox(molecule);

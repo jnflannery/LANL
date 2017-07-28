@@ -15,27 +15,27 @@ Graph Shadow(Molecule molecule, double rc, double S)
 
 	// create graph object
 	Graph gh(size);
-	
+
 	// build boxes
 	BoxBuilder myBoxBuilder = BoxBuilder(rc);
 	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, rc);
 
 	// check pairs of vertices, connect if within cutoff distance
 	int edgecount = 0;
-	
+
 	vector<Box> boxes = boxlist.GetAllBoxes();
-	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox){
+	for (vector<Box>::iterator itBox = boxes.begin(); itBox != boxes.end(); ++itBox) {
 		Box box = FindNeighbours(*itBox, boxlist.NumberOfBoxes());
 		vector<Coordinate> neighborhood = box.GetNeighborList();
 		vector<int> boxAtoms = box.GetAtomsFromBox();
 		// itereate through atoms in middle box
-		for (vector<int>::iterator itAtom = boxAtoms.begin(); itAtom != boxAtoms.end(); ++itAtom){
+		for (vector<int>::iterator itAtom = boxAtoms.begin(); itAtom != boxAtoms.end(); ++itAtom) {
 			//iterate through neighbouring boxes/coordinates
-			for (vector<Coordinate>::iterator itNeighCoor = neighborhood.begin(); itNeighCoor != neighborhood.end(); ++itNeighCoor){
+			for (vector<Coordinate>::iterator itNeighCoor = neighborhood.begin(); itNeighCoor != neighborhood.end(); ++itNeighCoor) {
 				Box Nbox = boxlist.GetBox(*itNeighCoor);
 				vector<int> Natoms = Nbox.GetAtomsFromBox();
 				//itereate through potential neighboring atoms in box by given coordinate
-				for (vector<int>::iterator itNeighAtom = Natoms.begin(); itNeighAtom != Natoms.end(); ++itNeighAtom){
+				for (vector<int>::iterator itNeighAtom = Natoms.begin(); itNeighAtom != Natoms.end(); ++itNeighAtom) {
 					Atom atom = molecule.GetAtom(*itAtom);
 					Atom pot_neigh = molecule.GetAtom(*itNeighAtom);
 					if (atom.GetId() == pot_neigh.GetId()) continue;
@@ -50,10 +50,10 @@ Graph Shadow(Molecule molecule, double rc, double S)
 							break;
 						}
 					}
-					if (!shadowed){
+					if (!shadowed) {
 						gh.addEdge(atom.GetId(), pot_neigh.GetId());
 						++edgecount;
-					
+
 					}
 				}
 			}
@@ -64,15 +64,15 @@ Graph Shadow(Molecule molecule, double rc, double S)
 
 
 
-bool shadows(Atom atom, Atom pot_neigh, Atom oth_atom, double S, Molecule molecule){
+bool shadows(Atom atom, Atom pot_neigh, Atom oth_atom, double S, Molecule molecule) {
 	triplet a = atom.VectorTo(oth_atom, molecule.GetCubeSize());
 	triplet b = atom.VectorTo(pot_neigh, molecule.GetCubeSize());
 
 	if (size(a) > size(b)) return false;
 
 	double theta = acos(dot_product(a, b) / (size(a)*size(b)));
-	double alpha = asin( (S/2.0) / size(a) );
-	double beta = asin( (S/2.0) / size(b) );
+	double alpha = asin((S / 2.0) / size(a));
+	double beta = asin((S / 2.0) / size(b));
 
 	if (alpha + beta > theta) return true;
 	return false;

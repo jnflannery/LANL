@@ -64,7 +64,7 @@ void Box::AddNeighbor(Coordinate NeighborCoord)
 
 std::vector<Atom> Box::getVectorOfAtomsFromBox(Molecule molecule)
 {
-	std::vector<Atom> originalBoxAtoms =std::vector<Atom>();
+	std::vector<Atom> originalBoxAtoms = std::vector<Atom>();
 	for (int i = 0;i < GetAtomsFromBox().size();i++) {
 		originalBoxAtoms.push_back(molecule.GetAtom(GetAtomsFromBox().at(i)));
 	}

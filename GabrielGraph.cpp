@@ -62,7 +62,7 @@ int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph 
 		double sphereRadius = midpoint.EuclidianPeriodicDistance(centralAtom, periodicDistance);
 		for (int j = 0; j < i; j++) {
 			Atom potentialSphereRuiner = molecule.GetAtom(neighborCandidates.at(j).id);
-			if (midpoint.EuclidianPeriodicDistance(potentialSphereRuiner,periodicDistance)<sphereRadius) {
+			if (midpoint.EuclidianPeriodicDistance(potentialSphereRuiner, periodicDistance)<sphereRadius) {
 				atomInSphere = true;
 			}
 		}
@@ -87,7 +87,7 @@ Atom GabrielGraph::findMidpointAtom(Atom atom1, Atom atom2, double periodicBound
 	double x = findMidpointOneDimension(atom1.GetX(), atom2.GetX(), periodicBoundary);
 	double y = findMidpointOneDimension(atom1.GetY(), atom2.GetY(), periodicBoundary);
 	double z = findMidpointOneDimension(atom1.GetZ(), atom2.GetZ(), periodicBoundary);
-	return Atom(x, y,z,-1);
+	return Atom(x, y, z, -1);
 }
 
 double GabrielGraph::findMidpointOneDimension(double x1, double x2, double periodicBoundary)

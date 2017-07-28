@@ -26,13 +26,13 @@ AtomIdAndDistance SimplifyNeighborCandidate(Atom centralAtom, Atom neighborCandi
 
 int Sann::ComputeSannAtom(Atom centralAtom, vector<Atom> potentialNeighbors, Graph& g, double periodicDistance) {
 	double distanceSum, radius;
-	int count=potentialNeighbors.size(); 
+	int count = potentialNeighbors.size();
 	int i;
 	//add simplified potential neighbors to a vector
 	vector<AtomIdAndDistance> neighborCandidates = vector <AtomIdAndDistance>();
-	for (int i = 0; i < (int)potentialNeighbors.size()-1;i++) {
-		if(i!=centralAtom.GetId()-1)
-		neighborCandidates.push_back(SimplifyNeighborCandidate(centralAtom, potentialNeighbors.at(i), periodicDistance));
+	for (int i = 0; i < (int)potentialNeighbors.size() - 1;i++) {
+		if (i != centralAtom.GetId() - 1)
+			neighborCandidates.push_back(SimplifyNeighborCandidate(centralAtom, potentialNeighbors.at(i), periodicDistance));
 	}
 	////if there aren't enough neighbors to do algorithm then quit
 	if ((int)neighborCandidates.size() < 3) {
@@ -64,10 +64,10 @@ int Sann::ComputeSannAtom(Atom centralAtom, vector<Atom> potentialNeighbors, Gra
 	//g.printGraph();
 	return i;
 }
-Graph Sann::ComputeSannMolecule(Molecule molecule, Boxlist boxList){
+Graph Sann::ComputeSannMolecule(Molecule molecule, Boxlist boxList) {
 	Graph g = Graph(molecule.GetNumberOfAtoms());
 	for (int i = 0; i < molecule.GetNumberOfAtoms();i++) {
-		vector<Atom> potentialNeighbors=vector<Atom>();//get candidates from the boxes... how do we know which boxes we are going to use from the list?
+		vector<Atom> potentialNeighbors = vector<Atom>();//get candidates from the boxes... how do we know which boxes we are going to use from the list?
 		ComputeSannAtom(molecule.GetAtom(i), potentialNeighbors, g, molecule.GetCubeSize());
 	}
 	return g;

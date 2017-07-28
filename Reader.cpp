@@ -168,7 +168,7 @@ void Reader::AddForcesToMolecule(Molecule & molecule)
 		atomToSet.SetFz(fz);
 		molecule.SetAtomWithIndex(atomToSet, atomId);
 		/*if (atomId == 1) {
-			std::cout << fx << endl;
+		std::cout << fx << endl;
 		}*/
 	}
 }

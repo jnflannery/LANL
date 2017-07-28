@@ -17,10 +17,10 @@ struct AtomWithRadius {
 };
 
 class Soig {
-	private:
-		Graph graph; 
-	public: 
-		vector<AtomWithRadius> ComputeSpheresSoig(Molecule, double periodicBoundary);
-		int FindAtomNeighbors(Atom, Molecule, vector<AtomWithRadius>, double, Graph&); 
-		Graph CreateGraphSoig(Molecule, vector<AtomWithRadius>, double, Graph&); 
+private:
+	Graph graph;
+public:
+	vector<AtomWithRadius> ComputeSpheresSoig(Molecule, double periodicBoundary);
+	int FindAtomNeighbors(Atom, Molecule, vector<AtomWithRadius>, double, Graph&);
+	Graph CreateGraphSoig(Molecule, vector<AtomWithRadius>, double, Graph&);
 };

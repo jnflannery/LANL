@@ -1,19 +1,20 @@
-#include "cutoffmaybe.h"
+#include "cutoffwithforces.h"
 #include "boxbuilder.h"
 #include "coordinate.h"
-#include "maybetograph.h"
 #include <tuple>
 #include <math.h>
 
 using namespace std;
 typedef tuple<double, double, double> triplet;
 
- Graph CutoffMaybe(Molecule molecule, double rc, double Rc)
+ Graph CutoffWithForces(Molecule molecule, double rc, double Rc)
 {
 	vector<Atom> atoms = molecule.GetAtomVector();
 	int size = molecule.GetNumberOfAtoms();
+
 	// create graph object
 	Graph gh(size);
+
 	// build boxes
 	BoxBuilder myBoxBuilder = BoxBuilder(Rc);
 	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, Rc);
@@ -34,6 +35,7 @@ typedef tuple<double, double, double> triplet;
 					Atom atom1 = molecule.GetAtom(*itAtom);
 					Atom atom2 = molecule.GetAtom(*itNeighAtom);
 					if (atom1.GetId() < atom2.GetId()) { //use '<' to avoid adding edge twice. this assumes graph is undirected.
+						
 						double dist = atom1.EuclidianPeriodicDistance(atom2, molecule.GetCubeSize());
 						if (dist < rc){
 							gh.addEdge(atom1.GetId(), atom2.GetId());
@@ -46,21 +48,6 @@ typedef tuple<double, double, double> triplet;
 			}
 		}
 	}
-	return gh;
+	return MaybeToGraphForces(gh, molecule);
 }
 
- Graph CutoffWithForces(Molecule mol, double rc, double Rc){
-	Graph gh = CutoffMaybe(mol, rc, Rc);
-	return MaybeToGraphForces(gh, mol);
- }
-
- Graph CutoffCentroid(Molecule mol, double rc, double Rc){
-	Graph gh = CutoffMaybe(mol, rc, Rc);
-	cout << "C";
-	return MaybeToGraphCentroid(gh, mol);
- }
-
- Graph CutoffDoubleCentroid(Molecule mol, double rc, double Rc){
-	 Graph gh = CutoffMaybe(mol, rc, Rc);
-	 return MaybeToGraphDoubleCentroid(gh, mol);
- }

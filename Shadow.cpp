@@ -3,7 +3,7 @@
 #include "coordinate.h"
 #include <tuple> 
 #include <math.h>
-#include "maybetographcentroid.h"
+#include "maybetograph.h"
 
 using namespace std;
 typedef tuple<double, double, double> triplet;
@@ -77,4 +77,3 @@ bool shadows(Atom atom, Atom pot_neigh, Atom oth_atom, double S, Molecule molecu
 	if (alpha + beta > theta) return true;
 	return false;
 }
-

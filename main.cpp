@@ -16,6 +16,7 @@
 #include "distancecomparison.h"
 #include <windows.h>
 #include <stdio.h>
+#include "soig.h"
 using namespace std;
 
 //auxiliary function for folder creation
@@ -36,6 +37,8 @@ enum AlgorithmName
 	CUTOFF_FORCES,
 	SANN,
 	SHADOW,
+	CUTOFF_DOUBLECENTROID,
+	SOIG
 };
 string getAlgorithmName(AlgorithmName algorithm){
 		switch (algorithm)
@@ -48,6 +51,8 @@ string getAlgorithmName(AlgorithmName algorithm){
 			return "Shadow";
 		case CUTOFF_FORCES:
 			return "Cutoff_Forces";
+		case CUTOFF_DOUBLECENTROID:
+			return "Cutoff_DoubleCentroid";
 		default:
 			cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
 			return "UNKNOWN";
@@ -68,35 +73,48 @@ double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<s
 int main()
 {
 	AlgorithmName algorithm = CUTOFF;
+	double rc = 2.000;
+	double Rc = 3.350;
+	vector<double> parameters;
+	parameters.push_back(rc);
+	parameters.push_back(Rc);
 
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] =  { "PtFCC", "SiDiamond"};//, "PtNanoPart", "SiMelt"};
+	const string materials[] = {"PtFCC", "SiDiamond"}; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
 	const string defects[] = { "Extra", "Gap" };
-	const string temperatures[] = {  "50K", "300K","500K", "750K", "1000K"};
+	const string temperatures[] = {"500K"}; //{  "50K", "300K","500K", "750K", "1000K"};
 	vector<string> material(materials, materials + sizeof(materials)/sizeof(materials[0]));
 	vector<string> defect(defects, defects + sizeof(defects)/sizeof(defects[0]));
 	vector<string> temperature(temperatures, temperatures + sizeof(temperatures)/sizeof(temperatures[0]));
 
 	//string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
-	const string mini[] = {"tol_12","tol_4"};//, "tol_8", "tol_6", "tol_4", "tol_2", "0"}; 
+	const string mini[] = {"tol_12", "tol_2"}; //"tol_10", "tol_8", "tol_6", "tol_4", "tol_2", "0"}; 
 	vector<string> MinimizationLevels (mini, mini + sizeof(mini)/sizeof(mini[0])); ; 
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 5000;
-	const int firstTimeForDifferentTimeStep = 5010;
-	const int lastTimeForDifferentTimeStep = 5100;
+	const int timeStep = 1000;
+	const int firstTimeForDifferentTimeStep = 5150;
+	const int lastTimeForDifferentTimeStep = 5250;
 	const bool makeOutputFile = (timeStep == 10);
+	
+	//Code for testing cutoff values
+	/*
+	for (double rc = 1; rc < 5; rc+=0.25){
+		parameters[0] = rc;
+		string path = datapath + "MgOxide/Standard/300K";
+		cout << "1";
+		cout << analyzeData(algorithm, path, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
+		cout << "2";
+	}
+	return 0;
+	*/
 
 	// Analyze data from single file (specified above)
-	double rc = 3.348;
-	double Rc = 3.380;
-	vector<double> parameters;
-	parameters.push_back(rc);
-	parameters.push_back(Rc);
+
 	int numberRanPerTemp = 10000 / timeStep;
 	string folderPath;
 	string description;
@@ -128,13 +146,14 @@ int main()
 		else {
 			for (int k = 0;k < temperature.size();k++) {
 				//same thing except it doesn't include defects
+
 				folderPath = datapath;
 				folderPath.append(material.at(i) + "/");
 				folderPath.append(temperature.at(k));
 				description = material.at(i);
 				description.append(temperature.at(k));
 				//summaryWriter << "Material: " << material.at(i) <<  " Temperature: " << temperature.at(k) << " Number of Runs: " << numberRanPerTemp << endl;
-				cout << analyzeData(CUTOFF_FORCES, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
+				cout << analyzeData(CUTOFF_DOUBLECENTROID, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
 				cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
 				//summaryWriter << endl;
 			}
@@ -193,6 +212,11 @@ Graph getGraph(AlgorithmName algorithm, string fileName, string ForceFileName, v
 			myReader.Initialize(ForceFileName);
 			myReader.AddForcesToMolecule(molecule);
 			gh = CutoffWithForces(molecule, rc, Rc); 
+			break;
+		case CUTOFF_DOUBLECENTROID:
+			rc = parameters[0];
+			Rc = parameters[1];
+			gh = CutoffDoubleCentroid(molecule, rc, Rc);
 			break;
 		default:
 			cout << "UNKNOWN ALGORITHM.\n";
@@ -343,7 +367,6 @@ double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, in
 
 
 	for (int time = firstTime; time <= lastTime; time+=timeStep){
-		
 		vector<Graph> graphs = getGraphsWithToleranceLevel(algorithm, folderPath, time, parameters, MinimizationLevels);
 		int molecule_size = graphs[0].GetNumberOfVertices();
 		for(int i = 1; i < graphs_to_compare; i++){

@@ -40,6 +40,7 @@ enum AlgorithmName
 	CUTOFF_DOUBLECENTROID,
 	SOIG
 };
+
 string getAlgorithmName(AlgorithmName algorithm){
 		switch (algorithm)
 		{ 
@@ -57,7 +58,60 @@ string getAlgorithmName(AlgorithmName algorithm){
 			cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
 			return "UNKNOWN";
 		}
-}
+};
+
+vector<double> GetParameters(AlgorithmName algorithm, string material)
+{
+	vector<double> parameters;
+	if(algorithm == CUTOFF)
+	{
+		if(material == "PtFCC")
+		{
+			double rc = 3.348;
+			parameters.push_back(rc);
+		}
+		if(material == "SiDiamond")
+		{
+			double rc = 3.2;
+			parameters.push_back(rc);
+		}
+	}
+	if(algorithm == CUTOFF_MAYBE)
+	{
+		if(material == "PtFCC")
+		{
+			double rc = 3.320;
+			double Rc = 3.380;
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+		if(material == "SiDiamond")
+		{
+			double rc = 3.14;
+			double Rc = 3.19; // placeholder
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+	}
+	if(algorithm == CUTOFF_DOUBLECENTROID)
+	{
+		if(material == "PtFCC")
+		{
+			double rc = 3.348;
+			double Rc = 3.500;
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+		if(material == "SiDiamond")
+		{
+			double rc = 3.200;
+			double Rc = 3.240; // placeholder
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+	}
+	return parameters;
+};
 
 
 double analyzeData(AlgorithmName, string, int, int, int, vector<double>, vector<string>, string outputFolder, bool output = false);
@@ -72,35 +126,37 @@ double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<s
 
 int main()
 {
-	AlgorithmName algorithm = CUTOFF;
-	double rc = 2.000;
+	AlgorithmName algorithm = CUTOFF_MAYBE;
+	
+	/* double rc = 2.000;
 	double Rc = 3.350;
 	vector<double> parameters;
 	parameters.push_back(rc);
-	parameters.push_back(Rc);
+	parameters.push_back(Rc); */
 
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] = {"PtNanoPart"}; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
-	const string defects[] = { "Final" };
-	const string temperatures[] = {"300K"}; //{  "50K", "300K","500K", "750K", "1000K"};
+	const string materials[] = {"PtFCC", "SiDiamond"}; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
+	const string defects[] = { "Gap", "Extra" };
+	const string temperatures[] = {"50K", "150K", "300K","500K", "750K", "1000K"};
 	vector<string> material(materials, materials + sizeof(materials)/sizeof(materials[0]));
 	vector<string> defect(defects, defects + sizeof(defects)/sizeof(defects[0]));
 	vector<string> temperature(temperatures, temperatures + sizeof(temperatures)/sizeof(temperatures[0]));
 
 	//string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
-	const string mini[] = {"tol_12", "tol_2"}; //"tol_10", "tol_8", "tol_6", "tol_4", "tol_2", "0"}; 
+	const string mini[] = {"tol_12", /*"tol_10",*/ "tol_8", /*"tol_6",*/ "tol_4", "tol_2", "0"}; 
 	vector<string> MinimizationLevels (mini, mini + sizeof(mini)/sizeof(mini[0])); ; 
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 1000;
-	const int firstTimeForDifferentTimeStep = 5150;
-	const int lastTimeForDifferentTimeStep = 5250;
-	const bool makeOutputFile = (timeStep == 10);
+	const int timeStep = 10;
+	const int firstTimeForDifferentTimeStep = 5010;
+	const int lastTimeForDifferentTimeStep = 15000;
+	const bool makeOutputFile = (timeStep == 9000);
 	
+	/*
 	//Code for testing cutoff values
 	for (double rc = 2; rc < 5; rc+=0.25){
 		parameters[0] = rc;
@@ -108,7 +164,7 @@ int main()
 		cout << analyzeData(algorithm, path, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
 	}
 	return 0;
-	
+	*/
 
 	// Analyze data from single file (specified above)
 
@@ -118,6 +174,7 @@ int main()
 	string outputSummaryFile = outputFolder + "AggregateSummary.txt";
 	for (int i = 0; i < material.size();i++) {
 		//PtNanoPart and SiMelt don't have gap or extra so their code is done in the else statement
+		vector<double> parameters = GetParameters(algorithm, material.at(i));
 		if (i < 2) {
 			for (int j = 0;j < defect.size();j++) {
 				for (int k = 0;k < temperature.size();k++) {
@@ -135,7 +192,7 @@ int main()
 					//run the analysis function, which writes to your summary file and writes to individual files in the folder more specific information
 					//summaryWriter << "Material: " << material.at(i) << " Defect: " << defect.at(j) << " Temperature: " << temperature.at(k) << " Number of Runs: " << numberRanPerTemp<< endl;
 					cout << analyzeData(algorithm, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
-					cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
+					//cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
 					//summaryWriter << endl;
 				}
 			}
@@ -151,7 +208,7 @@ int main()
 				description.append(temperature.at(k));
 				//summaryWriter << "Material: " << material.at(i) <<  " Temperature: " << temperature.at(k) << " Number of Runs: " << numberRanPerTemp << endl;
 				cout << analyzeData(CUTOFF_DOUBLECENTROID, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
-				cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
+				//cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
 				//summaryWriter << endl;
 			}
 		}
@@ -285,8 +342,8 @@ int outputDataSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, in
 		createFolder(outFileName.c_str());
 		outFileName += splitFolder.at(splitFolder.size()-2) + "_";//defect
 		outFileName += splitFolder.at(splitFolder.size()-1);//temperature
-		outFileName += "_t0-" + to_string(firstTime);
-		outFileName += "_t1-" + to_string(lastTime);
+		outFileName += "times" + to_string(firstTime);
+		outFileName += "-" + to_string(lastTime);
 		for (double p : parameters){
 			outFileName += "_" + to_string(p);
 		}
@@ -344,7 +401,7 @@ int outputDataSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, in
 
 
 bool compareGraphs(Graph min, Graph pre, ErrorStats & stats){
-	cout<<"we are comparing a graph"<<endl;
+	//cout<<"we are comparing a graph"<<endl;
 	if (min == pre) return true;
 	else {
 		min.compareAndReturnMismatches(pre, stats);
@@ -382,7 +439,7 @@ double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, in
 	//output data
 	for (int i = 1; i < graphs_to_compare; i++){
 		if (true) 
-			return outputData(algorithm, folderPath, parameters, sameTimes[i], diffTimes[i], MinimizationLevels[i], statsForMolecules[i], outputFolder);
+			outputData(algorithm, folderPath, parameters, sameTimes[i], diffTimes[i], MinimizationLevels[i], statsForMolecules[i], outputFolder);
 		else
 			return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
 	} 

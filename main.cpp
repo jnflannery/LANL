@@ -192,7 +192,7 @@ int main()
 					//run the analysis function, which writes to your summary file and writes to individual files in the folder more specific information
 					//summaryWriter << "Material: " << material.at(i) << " Defect: " << defect.at(j) << " Temperature: " << temperature.at(k) << " Number of Runs: " << numberRanPerTemp<< endl;
 					cout << analyzeData(algorithm, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
-					//cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
+					cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
 					//summaryWriter << endl;
 				}
 			}
@@ -208,7 +208,7 @@ int main()
 				description.append(temperature.at(k));
 				//summaryWriter << "Material: " << material.at(i) <<  " Temperature: " << temperature.at(k) << " Number of Runs: " << numberRanPerTemp << endl;
 				cout << analyzeData(CUTOFF_DOUBLECENTROID, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
-				//cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
+				cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
 				//summaryWriter << endl;
 			}
 		}
@@ -498,6 +498,7 @@ double outputData(AlgorithmName algorithm, string folderPath, vector<double> par
 				file << endl;
 				file << endl;
 			}
+			cout << outFileName << endl;
 			return double(sameCount)/double(totalCount);
 		}
 	}

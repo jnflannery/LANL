@@ -165,7 +165,7 @@ public:
 
 			}
 		}
-		cout << endl;
+		//cout << endl;
 		return isTrue;
 	}
 
@@ -184,8 +184,8 @@ public:
 				isTrue = false;
 
 			}
+			cout << endl;
 		}
-		cout << endl;
 		return isTrue;
 	}
 	void writeGraphAsDumpFile(std::string myFileName, Molecule m) {

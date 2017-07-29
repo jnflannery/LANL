@@ -441,8 +441,9 @@ double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, in
 		if (true) 
 			outputData(algorithm, folderPath, parameters, sameTimes[i], diffTimes[i], MinimizationLevels[i], statsForMolecules[i], outputFolder);
 		else
-			return float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
+			float(sameTimes.size())/float(sameTimes.size() + diffTimes.size());
 	} 
+	return 0;
 }
 double outputData(AlgorithmName algorithm, string folderPath, vector<double> parameters, vector<short> sameTimes, vector<short> diffTimes, string MinimizationLevel, vector<ErrorStats> statsForMolecules, string outputFolder){
 

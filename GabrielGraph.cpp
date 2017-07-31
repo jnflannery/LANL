@@ -28,7 +28,7 @@ AtomIdAndDistance2 SimplifyNeighborCandidate(Atom centralAtom, Atom neighborCand
 	return pair;
 }
 
-int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph & g,double theta, double periodicDistance)
+int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph & g, double theta, double periodicDistance)
 {
 	if (centralAtom.GetId() == 1000)
 	{
@@ -78,13 +78,13 @@ int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph 
 //theta determines the thickness of ellipse
 bool GabrielGraph::isOtherNeighborInEllipse(Atom TargetAtom, Atom ClosestNeighbor, Atom OtherAtom, double theta, double periodicDistance)
 {
-	triplet a = TargetAtom.VectorTo(OtherAtom, periodicDistance); //distanceAtomPeriodic(TargetAtom, OtherAtom);
-	triplet b = TargetAtom.VectorTo(ClosestNeighbor, periodicDistance); //distanceAtomPeriodic(TargetAtom, ClosestNeighbor);
-	double projX = dot_product(a, b) / size(a);
-	if (projX < 0 && projX > size(b)) {
+	triplet a = TargetAtom.VectorTo(OtherAtom, periodicDistance); 
+	triplet b = TargetAtom.VectorTo(ClosestNeighbor, periodicDistance); 
+	double projX = dot_product(a, b) / size(b);
+	if (projX < 0) {
 		return false;
 	}
-	double radiusSq = (theta*theta)*(abs(projX)*(1 - abs(projX)));
+	double radiusSq = (theta*theta)*(projX*(size(b) - projX));
 	double dSq = pow(size(a), 2) - pow(projX, 2);
 		if (dSq < radiusSq) {
 			return true;

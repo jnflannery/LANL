@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "sann.h"
+#include "gabrielgraph.h"
 #include "Atom.h"
 #include "Molecule.h"
 #include "shadow.h"
@@ -38,7 +39,8 @@ enum AlgorithmName
 	SANN,
 	SHADOW,
 	CUTOFF_DOUBLECENTROID,
-	SOIG
+	SOIG,
+	GABRIEL,
 };
 
 string getAlgorithmName(AlgorithmName algorithm){
@@ -54,6 +56,8 @@ string getAlgorithmName(AlgorithmName algorithm){
 			return "Cutoff_Forces";
 		case CUTOFF_DOUBLECENTROID:
 			return "Cutoff_DoubleCentroid";
+		case GABRIEL:
+			return "Gabriel";
 		default:
 			cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
 			return "UNKNOWN";
@@ -138,7 +142,7 @@ int main()
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
 	const string materials[] = {"PtFCC", "SiDiamond"}; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
-	const string defects[] = { "Gap", "Extra" };
+	const string defects[] = { "Extra"};//, "Gap" };
 	const string temperatures[] = {"50K", "150K", "300K","500K", "750K", "1000K"};
 	vector<string> material(materials, materials + sizeof(materials)/sizeof(materials[0]));
 	vector<string> defect(defects, defects + sizeof(defects)/sizeof(defects[0]));
@@ -260,6 +264,12 @@ Graph getGraph(AlgorithmName algorithm, string fileName, string ForceFileName, v
 			S = parameters[1];
 			gh = Shadow(molecule, rc, S);
 			break;
+		case GABRIEL:
+			double theta;
+			theta = parameters[0];
+			GabrielGraph gg;
+			gh = gg.ComputeGabrielMolecule(molecule, theta);
+			break;
 		case CUTOFF_FORCES:
 			rc = parameters[0];
 			Rc = parameters[1];
@@ -311,7 +321,7 @@ int CompareSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int f
 		ErrorStats stats = ErrorStats();
 		stats.initializeWithSize(molecule_size);
 
-		cout << time << "\n";
+		//cout << time << "\n";
 		fileName = folderPath + "/minimize_tol_12_" + to_string(time) + ".data";
 		ForceFileName = folderPath + "forces_tol_12_" + to_string(time) + ".data";
 		Graph NextGraph = getGraph(algorithm, fileName, ForceFileName, parameters);

@@ -5,7 +5,7 @@ using namespace std;
 #include <vector>
 #include <iterator>
 
-std::vector<std::string> split(const char *str, char c = ' ')
+std::vector<std::string> Reader::split(const char *str, char c = ' ')
 {
 	std::vector<std::string> result;
 
@@ -86,6 +86,21 @@ Atom Reader::ParseAtomLine(std::string line) {
 	atom.SetZ(z);
 	return atom;
 }
+Atom Reader::ParseMgOxAtomLine(std::string line) {
+	int id;
+	double x, y, z;
+	std::vector<std::string> outputAsStrings = split(line.c_str(), ' ');
+	id = stoi(outputAsStrings.at(0));
+	x = ScientificNotationToFloat(outputAsStrings.at(2));
+	y = ScientificNotationToFloat(outputAsStrings.at(3));
+	z = ScientificNotationToFloat(outputAsStrings.at(4));
+	Atom atom = Atom();
+	atom.SetId(id);
+	atom.SetX(x);
+	atom.SetY(y);
+	atom.SetZ(z);
+	return atom;
+}
 /*
 turn a string that looks like this: "2.2556317953628206e+001"
 into a double like 22.55631...
@@ -127,15 +142,6 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	*/
 	Molecule molecule = Molecule(numberOfAtoms);
 	molecule.SetTimestep(timestep);
-	vector<string> fileNameVector = split(fileName.c_str(), '/');
-	vector<string> fileEnd = split(fileNameVector.at(fileNameVector.size() - 1).c_str(), '_');
-	vector<string> splitFileEnd = split(fileEnd.at(fileEnd.size()-1).c_str(), '.');
-	//string newTimestep = splitFileEnd.at(0).substr(9, splitFileEnd.at(0).size() - 9);
-	try { molecule.SetStepsAdvancedPastTimestep(stoi(splitFileEnd.at(0))); }
-	catch (exception e) {
-		cout << "file has formatting preventing timestep from being read" << endl;
-		molecule.SetStepsAdvancedPastTimestep(-1);
-	}
 	//iterate over lines with no good info except for the line that has the size
 	for (int i = 0;i < 13;i++) {
 		getline(file, line);
@@ -145,6 +151,35 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	for (int i = 0;i < numberOfAtoms;i++) {
 		getline(file, line);
 		Atom atom = ParseAtomLine(line);
+		molecule.SetAtomWithIndex(atom, atom.GetId());
+	}
+	return molecule;
+}
+Molecule Reader::GetMgOxideFromOutputFile()
+{
+	int numberOfAtoms, timestep;
+	std::string line;
+	getline(file, line);
+	int timestepLocation = line.find("timestep");
+	timestep = stoi(line.substr(timestepLocation + 11, line.length() - (timestepLocation + 11)));
+	getline(file, line);
+	file >> numberOfAtoms;
+	/*
+	below we create the molecule now that we know how many atoms there will be
+	we will read each atom, and then put it into the molecule's atom vector in
+	the spot at Atom.id-1
+	*/
+	Molecule molecule = Molecule(numberOfAtoms);
+	molecule.SetTimestep(timestep);
+	//iterate over lines with no good info except for the line that has the size
+	for (int i = 0;i < 19;i++) {
+		getline(file, line);
+		if (i == 4)
+			molecule.setCubeSize(GetCubeSizeFromLine(line));
+	}
+	for (int i = 0;i < numberOfAtoms;i++) {
+		getline(file, line);
+		Atom atom = ParseMgOxAtomLine(line);
 		molecule.SetAtomWithIndex(atom, atom.GetId());
 	}
 	return molecule;
@@ -176,8 +211,12 @@ void Reader::AddForcesToMolecule(Molecule & molecule)
 		atomToSet.SetFy(fy);
 		atomToSet.SetFz(fz);
 		molecule.SetAtomWithIndex(atomToSet, atomId);
-		if (atomId == 1) {
+		/*if (atomId == 1) {
 			std::cout << fx << endl;
-		}
+		}*/
 	}
+}
+
+void Reader::AddForcesToMgOxide(Molecule & molecule)
+{
 }

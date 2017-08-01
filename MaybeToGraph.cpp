@@ -78,15 +78,15 @@
  }
 
  triplet Atom::VectorTo(Atom atom, double periodicBoundary){
-	return triplet(PeriodicDiffX(atom, periodicBoundary), atom.PeriodicDiffY(atom, periodicBoundary), atom.PeriodicDiffZ(atom, periodicBoundary));
+	 return triplet(PeriodicDiffX(atom, periodicBoundary), PeriodicDiffY(atom, periodicBoundary), PeriodicDiffZ(atom, periodicBoundary));
 }
 
 double dot_product(triplet a, triplet b){
-	return sqrt(get<0>(a)*get<0>(b) + get<1>(a)*get<1>(b) + get<2>(a)*get<2>(b));
+	return (get<0>(a)*get<0>(b) + get<1>(a)*get<1>(b) + get<2>(a)*get<2>(b));
 }
 
 double size(triplet a){
-	return dot_product(a, a);
+	return sqrt(dot_product(a, a));
 }
 
 triplet add(triplet a, triplet b){

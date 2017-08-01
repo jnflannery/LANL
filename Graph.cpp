@@ -182,9 +182,7 @@ public:
 			if (!(vertices[k] == g.vertices[k])) {
 				cout << k << " ";
 				isTrue = false;
-
 			}
-			cout << endl;
 		}
 		return isTrue;
 	}

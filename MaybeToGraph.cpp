@@ -1,9 +1,9 @@
 #include "maybetograph.h"
 
 
- Graph MaybeToGraphCentroid(Graph gh, Molecule mol){
+Graph MaybeToGraphCentroid(Graph gh, Molecule mol){
 	for (auto V : gh.getAllVertices()){
-		
+
 		triplet center(0, 0, 0);
 		double weight = V.neighbors.size();
 		for (auto N : V.neighbors){
@@ -24,29 +24,28 @@
 		}
 	}
 	return gh;
- }
+}
 
-  Graph MaybeToGraphForces(Graph gh, Molecule mol){
+Graph MaybeToGraphForces(Graph gh, Molecule mol){
 	for (auto V : gh.getAllVertices()){
-		
+
 		for (auto N : V.maybeNeighbors){
 			Atom Vatom = mol.GetAtom(V.id);
 			Atom Natom = mol.GetAtom(N);
 			triplet VtoN = Vatom.VectorTo(Natom, mol.GetCubeSize());
+			double VtoNsize = size(VtoN);
 			triplet ForceVectorEdgeAtom(Natom.GetFx(), Natom.GetFy(), Natom.GetFz());
 			triplet ForceVectorCenterAtom(Vatom.GetFx(), Vatom.GetFy(), Vatom.GetFz());
-			ForceVectorCenterAtom = mult(-1, ForceVectorCenterAtom);
-			triplet ForceVector = add(ForceVectorEdgeAtom, ForceVectorCenterAtom);
-			double projection = dot_product(VtoN, ForceVectorEdgeAtom)/Vatom.EuclidianPeriodicDistance(Natom, mol.GetCubeSize());
-			//add an edge if it is
-			double epsilon = 0.2;
-			if (projection > epsilon) gh.addEdge(V.id, N);
+			triplet ForceVector = subtract(ForceVectorEdgeAtom, ForceVectorCenterAtom);
+			triplet VtoNforced = add(VtoN, ForceVector);
+			double VtoNforcedSize = size(VtoNforced);
+			if (VtoNforcedSize < VtoNsize-0.05) gh.addEdge(V.id, N);
 		}
 	}
 	return gh;
- }
+}
 
-   Graph MaybeToGraphDoubleCentroid(Graph gh, Molecule mol){
+Graph MaybeToGraphDoubleCentroid(Graph gh, Molecule mol){
 	for (auto V : gh.getAllVertices()){
 		triplet centerV(0, 0, 0);
 		double weight = V.neighbors.size();
@@ -75,18 +74,18 @@
 		}
 	}
 	return gh;
- }
+}
 
- triplet Atom::VectorTo(Atom atom, double periodicBoundary){
-	return triplet(PeriodicDiffX(atom, periodicBoundary), atom.PeriodicDiffY(atom, periodicBoundary), atom.PeriodicDiffZ(atom, periodicBoundary));
+triplet Atom::VectorTo(Atom atom, double periodicBoundary){
+	return triplet(PeriodicDiffX(atom, periodicBoundary), PeriodicDiffY(atom, periodicBoundary), PeriodicDiffZ(atom, periodicBoundary));
 }
 
 double dot_product(triplet a, triplet b){
-	return sqrt(get<0>(a)*get<0>(b) + get<1>(a)*get<1>(b) + get<2>(a)*get<2>(b));
+	return (get<0>(a)*get<0>(b) + get<1>(a)*get<1>(b) + get<2>(a)*get<2>(b));
 }
 
 double size(triplet a){
-	return dot_product(a, a);
+	return sqrt(dot_product(a, a));
 }
 
 triplet add(triplet a, triplet b){

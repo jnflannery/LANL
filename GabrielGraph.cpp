@@ -1,4 +1,6 @@
 #include "gabrielgraph.h"
+#include "maybetograph.h"
+
 struct AtomIdAndDistance2 {
 	int id;
 	double distanceFromMainAtom;
@@ -26,7 +28,7 @@ AtomIdAndDistance2 SimplifyNeighborCandidate(Atom centralAtom, Atom neighborCand
 	return pair;
 }
 
-int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph & g, double periodicDistance)
+int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph & g, double theta, double periodicDistance)
 {
 	if (centralAtom.GetId() == 1000)
 	{
@@ -39,7 +41,7 @@ int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph 
 	//add simplified potential neighbors to a vector
 	vector<AtomIdAndDistance2> neighborCandidates = vector <AtomIdAndDistance2>();
 	AtomIdAndDistance2 newCandidate;
-	for (int i = 0; i < (int)potentialNeighbors.size();i++) {
+	for (int i = 0; i < (int)potentialNeighbors.size(); i++) {
 		if (potentialNeighbors.at(i).GetId() != centralAtom.GetId()) {
 			newCandidate = SimplifyNeighborCandidate(centralAtom, potentialNeighbors.at(i), periodicDistance);
 			if (newCandidate.distanceFromMainAtom<6)
@@ -52,17 +54,18 @@ int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph 
 	}
 	//potentially check verlet list if we have not done so already
 	//sort candidates by their distance
-	AtomDistanceSort(neighborCandidates);
+	//AtomDistanceSort(neighborCandidates);
 
 	for (int i = 0; i < neighborCandidates.size(); i++) {
 		bool atomInSphere = false;
 		Atom toTest = molecule.GetAtom(neighborCandidates.at(i).id);
-		Atom midpoint = findMidpointAtom(centralAtom, toTest, periodicDistance);
+		//Atom midpoint = findMidpointAtom(centralAtom, toTest, periodicDistance);
 		double distance = toTest.EuclidianPeriodicDistance(centralAtom, periodicDistance);
-		double sphereRadius = midpoint.EuclidianPeriodicDistance(centralAtom, periodicDistance);
-		for (int j = 0; j < i; j++) {
+		//double sphereRadius = midpoint.EuclidianPeriodicDistance(centralAtom, periodicDistance);
+		for (int j = 0; j < neighborCandidates.size(); j++) {
+			if (j==i) continue;
 			Atom potentialSphereRuiner = molecule.GetAtom(neighborCandidates.at(j).id);
-			if (midpoint.EuclidianPeriodicDistance(potentialSphereRuiner, periodicDistance)<sphereRadius) {
+			if (isOtherNeighborInEllipse(centralAtom, toTest, potentialSphereRuiner,theta, periodicDistance)) {
 				atomInSphere = true;
 			}
 		}
@@ -73,12 +76,38 @@ int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph 
 	return 0;
 }
 
-Graph GabrielGraph::ComputeGabrielMolecule(Molecule molecule)
+//theta determines the thickness of ellipse
+bool GabrielGraph::isOtherNeighborInEllipse(Atom TargetAtom, Atom ClosestNeighbor, Atom OtherAtom, double theta, double periodicDistance)
+{
+	triplet a = TargetAtom.VectorTo(OtherAtom, periodicDistance); 
+	//cout << "a " << get<0>(a) << " " << get<1>(a) << " " << get<2>(a) << endl;
+	triplet b = TargetAtom.VectorTo(ClosestNeighbor, periodicDistance); 
+	//cout << "b " << get<0>(b) << " " << get<1>(b) << " " << get<2>(b) << endl;
+	double projX = dot_product(a, b) /size(b);
+	//cout << "x " << projX << "\n";
+	if (projX < 0){
+		return false;}
+	double radiusSq = (theta*theta)*(projX*(size(b) - projX));
+	if (radiusSq < 0){
+		return false;}
+	triplet vectorprojX = mult(projX/size(b), b);
+	triplet d = subtract(vectorprojX, a);
+	double dSq = pow(size(d), 2);
+	//double dSq = pow(size(a), 2) - pow(projX, 2);
+	//cout << projX << "\n";
+	//if (dSq > 0) cout << dSq << "\n";
+	if (dSq < radiusSq){
+		return true;}
+	else{
+		return false;}
+}
+
+Graph GabrielGraph::ComputeGabrielMolecule(Molecule molecule, double theta)
 {
 	Graph g = Graph(molecule.GetNumberOfAtoms());
-	for (int i = 1;i <= molecule.GetNumberOfAtoms();i++)
-		ComputeGabrielAtom(molecule.GetAtom(i), molecule, g, molecule.GetCubeSize());
-	g.printGraph();
+	for (int i = 1; i <= molecule.GetNumberOfAtoms(); i++)
+		ComputeGabrielAtom(molecule.GetAtom(i), molecule, g, theta, molecule.GetCubeSize());
+	//g.printGraph();
 	return g;
 }
 

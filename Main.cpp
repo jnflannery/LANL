@@ -130,7 +130,7 @@ double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<s
 
 int main()
 {
-	AlgorithmName algorithm = GABRIEL;
+	AlgorithmName algorithm = CUTOFF_FORCES;
 
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";

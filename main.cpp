@@ -23,10 +23,10 @@ using namespace std;
 //auxiliary function for folder creation
 void createFolder(const char * path)
 {   
-    if(!CreateDirectory(path ,NULL))
-    {
-        return;
-    }
+	if(!CreateDirectory(path ,NULL))
+	{
+		return;
+	}
 }
 
 
@@ -44,24 +44,24 @@ enum AlgorithmName
 };
 
 string getAlgorithmName(AlgorithmName algorithm){
-		switch (algorithm)
-		{ 
-		case CUTOFF:
-			return "Cutoff";
-		case CUTOFF_MAYBE:
-			return "Cutoff_Maybe";
-		case SHADOW:
-			return "Shadow";
-		case CUTOFF_FORCES:
-			return "Cutoff_Forces";
-		case CUTOFF_DOUBLECENTROID:
-			return "Cutoff_DoubleCentroid";
-		case GABRIEL:
-			return "Gabriel";
-		default:
-			cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
-			return "UNKNOWN";
-		}
+	switch (algorithm)
+	{ 
+	case CUTOFF:
+		return "Cutoff";
+	case CUTOFF_MAYBE:
+		return "Cutoff_Maybe";
+	case SHADOW:
+		return "Shadow";
+	case CUTOFF_FORCES:
+		return "Cutoff_Forces";
+	case CUTOFF_DOUBLECENTROID:
+		return "Cutoff_DoubleCentroid";
+	case GABRIEL:
+		return "Gabriel";
+	default:
+		cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
+		return "UNKNOWN";
+	}
 };
 
 vector<double> GetParameters(AlgorithmName algorithm, string material)
@@ -89,7 +89,7 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 			parameters.push_back(rc);
 			parameters.push_back(Rc);
 		}
-		if(material == "SiDiamond")
+		if(material == "SiDiamond" || material == "SiMelt")
 		{
 			double rc = 3.14;
 			double Rc = 3.19; // placeholder
@@ -106,7 +106,7 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 			parameters.push_back(rc);
 			parameters.push_back(Rc);
 		}
-		if(material == "SiDiamond")
+		if(material == "SiDiamond" || material == "SiMelt")
 		{
 			double rc = 3.200;
 			double Rc = 3.240; // placeholder
@@ -114,6 +114,12 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 			parameters.push_back(Rc);
 		}
 	}
+	if (algorithm == GABRIEL){
+		//TBD. 1.0 for now.
+		double theta = 1.0;
+		parameters.push_back(theta);
+	}
+
 	return parameters;
 };
 
@@ -130,14 +136,14 @@ double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<s
 
 int main()
 {
-	AlgorithmName algorithm = CUTOFF;
+	AlgorithmName algorithm = CUTOFF_FORCES;
 
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] = {"PtFCC"}; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
-	const string defects[] = { "Gap"};//, "Extra" };
-	const string temperatures[] = {"50K"};//, "150K", "300K","500K", "750K", "1000K"};
+	const string materials[] = { "PtFCC", "SiDiamond", "SiMelt"};
+	const string defects[] = { "Extra"};//, "Gap" };
+	const string temperatures[] = {"50K", "150K", "300K","500K", "750K", "1000K"};
 	vector<string> material(materials, materials + sizeof(materials)/sizeof(materials[0]));
 	vector<string> defect(defects, defects + sizeof(defects)/sizeof(defects[0]));
 	vector<string> temperature(temperatures, temperatures + sizeof(temperatures)/sizeof(temperatures[0]));
@@ -149,12 +155,12 @@ int main()
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 1000;
+	const int timeStep = 10;
 	const int firstTimeForDifferentTimeStep = 5010;
 	const int lastTimeForDifferentTimeStep = 15000;
 	const bool makeOutputFile = (timeStep == 9000);
-	
-	
+
+
 	// Analyze data from single file (specified above)
 
 	int numberRanPerTemp = 10000 / timeStep;
@@ -167,7 +173,7 @@ int main()
 		if (i < 2) {
 			for (int j = 0;j < defect.size();j++) {
 				for (int k = 0;k < temperature.size();k++) {
-					cout<<temperature.at(k)<< endl;
+					cout<<material.at(i)<<" "<<defect.at(j)<<" "<<temperature.at(k)<< endl;
 					//this creates the location of the files you wish to read
 					folderPath = datapath;
 					folderPath.append(material.at(i) + "/");
@@ -213,6 +219,7 @@ int main()
 Graph getGraph(AlgorithmName algorithm, string fileName, string ForceFileName, vector<double> parameters){
 	Graph gh; 
 	Reader myReader = Reader();
+
 	if (myReader.Initialize(fileName)) {
 		Molecule molecule = myReader.GetMoleculeFromOutputFile();
 		int moleculeSize = molecule.GetNumberOfAtoms();
@@ -257,10 +264,10 @@ Graph getGraph(AlgorithmName algorithm, string fileName, string ForceFileName, v
 		default:
 			cout << "UNKNOWN ALGORITHM.\n";
 			break;
-			}
 		}
-	return gh;
 	}
+	return gh;
+}
 
 vector<Graph> getGraphsWithToleranceLevel(AlgorithmName algorithm, string folderPath, int time, vector<double> parameters, vector<string> MinimizationLevels){
 	int number_oftests = sizeof(MinimizationLevels)-1;
@@ -283,7 +290,7 @@ int CompareSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int f
 	vector<double> HashValues;
 	vector<double> TimeSteps;
 	string fileName = folderPath + "/minimize_tol_12_" + to_string(firstTime) + ".data";
-	string ForceFileName = folderPath + "forces_tol_12_" + to_string(firstTime) + ".data";
+	string ForceFileName = folderPath + "/forces_tol_12_" + to_string(firstTime) + ".force";
 	Graph CurrentGraph = getGraph(algorithm, fileName, ForceFileName, parameters);
 	HashValues.push_back(CurrentGraph.getHashValue());
 	TimeSteps.push_back(firstTime);
@@ -295,9 +302,9 @@ int CompareSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int f
 
 		//cout << time << "\n";
 		fileName = folderPath + "/minimize_tol_12_" + to_string(time) + ".data";
-		ForceFileName = folderPath + "forces_tol_12_" + to_string(time) + ".data";
+		ForceFileName = folderPath + "/forces_tol_12_" + to_string(time) + ".data";
 		Graph NextGraph = getGraph(algorithm, fileName, ForceFileName, parameters);
-		
+
 		int molecule_size = NextGraph.GetNumberOfVertices();
 		if(!compareGraphs(CurrentGraph, NextGraph, stats)){
 			TransitionTimes.push_back(time);
@@ -314,69 +321,69 @@ int CompareSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int f
 
 int outputDataSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int firstTime, int lastTime, vector<double> parameters, vector<int> TransitionTimes, vector<double> HashValues, vector<double> TimeSteps, string outputFolder, vector<ErrorStats> statsForMolecules){
 	string outFileName = outputFolder + "DifferentTimeStep/";
-		createFolder(outFileName.c_str());
-		Reader reader = Reader();
-		vector<string>splitFolder = reader.split(folderPath.c_str(),'/');
-		createFolder(outFileName.c_str());
-		outFileName += splitFolder.at(splitFolder.size()-3) + "/";//material
-		createFolder(outFileName.c_str());
-		outFileName += getAlgorithmName(algorithm) + "/";
-		createFolder(outFileName.c_str());
-		outFileName += splitFolder.at(splitFolder.size()-2) + "_";//defect
-		outFileName += splitFolder.at(splitFolder.size()-1);//temperature
-		outFileName += "times" + to_string(firstTime);
-		outFileName += "-" + to_string(lastTime);
-		for (double p : parameters){
-			outFileName += "_" + to_string(p);
-		}
-		string outFileNameTransitions = outFileName + ".transitions";
-		string outFileNameHashValues = outFileName + ".hash";
+	createFolder(outFileName.c_str());
+	Reader reader = Reader();
+	vector<string>splitFolder = reader.split(folderPath.c_str(),'/');
+	createFolder(outFileName.c_str());
+	outFileName += splitFolder.at(splitFolder.size()-3) + "/";//material
+	createFolder(outFileName.c_str());
+	outFileName += getAlgorithmName(algorithm) + "/";
+	createFolder(outFileName.c_str());
+	outFileName += splitFolder.at(splitFolder.size()-2) + "_";//defect
+	outFileName += splitFolder.at(splitFolder.size()-1);//temperature
+	outFileName += "times" + to_string(firstTime);
+	outFileName += "-" + to_string(lastTime);
+	for (double p : parameters){
+		outFileName += "_" + to_string(p);
+	}
+	string outFileNameTransitions = outFileName + ".transitions";
+	string outFileNameHashValues = outFileName + ".hash";
 	std::ofstream file = std::ofstream(outFileNameTransitions);
 	if (!file)
-			{
-				std::cout << outFileNameTransitions << " cannot be accessed and/or written to. Terminating process";
-				return -1;
-		} else {
-			file = std::ofstream(outFileNameTransitions);
-			file << outFileNameTransitions << "\n";
-			int NumberofTransitions = TransitionTimes.size();
-			int NumberofComparisons = HashValues.size();
-			file << NumberofComparisons << " states checked" << endl;
-			file << NumberofTransitions << " state transitions detected" << endl;
-			file << "\n TIMESTEPS AT WHICH TRANSITIONS OCCURED: \n";
-			for(int i = 0; i < NumberofTransitions; i++){
-				file << TransitionTimes.at(i) << endl;
+	{
+		std::cout << outFileNameTransitions << " cannot be accessed and/or written to. Terminating process";
+		return -1;
+	} else {
+		file = std::ofstream(outFileNameTransitions);
+		file << outFileNameTransitions << "\n";
+		int NumberofTransitions = TransitionTimes.size();
+		int NumberofComparisons = HashValues.size();
+		file << NumberofComparisons << " states checked" << endl;
+		file << NumberofTransitions << " state transitions detected" << endl;
+		file << "\n TIMESTEPS AT WHICH TRANSITIONS OCCURED: \n";
+		for(int i = 0; i < NumberofTransitions; i++){
+			file << TransitionTimes.at(i) << endl;
 
-			}
-			file<< endl<<endl;
-			for (int j = 0; j < statsForMolecules.size();j++) {
-				file << statsForMolecules.at(j).getTimestep() << endl;
+		}
+		file<< endl<<endl;
+		for (int j = 0; j < statsForMolecules.size();j++) {
+			file << statsForMolecules.at(j).getTimestep() << endl;
 
-				file << "Percent vertices wrong: " << statsForMolecules.at(j).getPercentWrongVertices() << endl;
-				file << "Avg number edges mismatched: " << statsForMolecules.at(j).getAvgNumMismatched() << endl;
-				file << "Most frequently mismatched atom: " << statsForMolecules.at(j).getMostFrequentlyWrongAtom() << endl;
-				file << "Percent who mistakenly added mismatched atom: " << statsForMolecules.at(j).getPercentWrongForMostFrequentlyWrong() << endl;
-				file << "Wrong atoms are: ";
-				for (int k = 0; k < statsForMolecules.at(j).mismatchedAtoms.size(); k++) {
-					if (statsForMolecules.at(j).mismatchedAtoms.at(k).size() > 0) {
-						file << k << ", ";
-					}
+			file << "Percent vertices wrong: " << statsForMolecules.at(j).getPercentWrongVertices() << endl;
+			file << "Avg number edges mismatched: " << statsForMolecules.at(j).getAvgNumMismatched() << endl;
+			file << "Most frequently mismatched atom: " << statsForMolecules.at(j).getMostFrequentlyWrongAtom() << endl;
+			file << "Percent who mistakenly added mismatched atom: " << statsForMolecules.at(j).getPercentWrongForMostFrequentlyWrong() << endl;
+			file << "Wrong atoms are: ";
+			for (int k = 0; k < statsForMolecules.at(j).mismatchedAtoms.size(); k++) {
+				if (statsForMolecules.at(j).mismatchedAtoms.at(k).size() > 0) {
+					file << k << ", ";
 				}
-				file << endl;
-				file << endl;
 			}
+			file << endl;
+			file << endl;
+		}
 	}
 	std::ofstream file2 = std::ofstream(outFileNameHashValues);
 	if(!file2)
-		{
-				std::cout << outFileNameHashValues << " cannot be accessed and/or written to. Terminating process";
-				return -1;
-		} else {
-			file2 = std::ofstream(outFileNameHashValues);
-			int NumberofComparisons = HashValues.size();
-			for(int j = 0; j < NumberofComparisons; j++){
-				file2 << TimeSteps.at(j) << " " << HashValues.at(j) << endl;
-			}
+	{
+		std::cout << outFileNameHashValues << " cannot be accessed and/or written to. Terminating process";
+		return -1;
+	} else {
+		file2 = std::ofstream(outFileNameHashValues);
+		int NumberofComparisons = HashValues.size();
+		for(int j = 0; j < NumberofComparisons; j++){
+			file2 << TimeSteps.at(j) << " " << HashValues.at(j) << endl;
+		}
 	}
 	return 0;
 };
@@ -453,7 +460,7 @@ double outputData(AlgorithmName algorithm, string folderPath, vector<double> par
 			std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
 			return -1;
 		} else {
-			
+
 			file = std::ofstream(outFileName);
 			file << outFileName << "\n";
 			int sameCount = sameTimes.size();

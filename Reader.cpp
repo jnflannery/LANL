@@ -86,6 +86,21 @@ Atom Reader::ParseAtomLine(std::string line) {
 	atom.SetZ(z);
 	return atom;
 }
+Atom Reader::ParseMgOxAtomLine(std::string line) {
+	int id;
+	double x, y, z;
+	std::vector<std::string> outputAsStrings = split(line.c_str(), ' ');
+	id = stoi(outputAsStrings.at(0));
+	x = ScientificNotationToFloat(outputAsStrings.at(3));
+	y = ScientificNotationToFloat(outputAsStrings.at(4));
+	z = ScientificNotationToFloat(outputAsStrings.at(5));
+	Atom atom = Atom();
+	atom.SetId(id);
+	atom.SetX(x);
+	atom.SetY(y);
+	atom.SetZ(z);
+	return atom;
+}
 /*
 turn a string that looks like this: "2.2556317953628206e+001"
 into a double like 22.55631...
@@ -140,6 +155,35 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	}
 	return molecule;
 }
+Molecule Reader::GetMgOxideFromOutputFile()
+{
+	int numberOfAtoms, timestep;
+	std::string line;
+	getline(file, line);
+	int timestepLocation = line.find("timestep");
+	timestep = stoi(line.substr(timestepLocation + 11, line.length() - (timestepLocation + 11)));
+	getline(file, line);
+	file >> numberOfAtoms;
+	/*
+	below we create the molecule now that we know how many atoms there will be
+	we will read each atom, and then put it into the molecule's atom vector in
+	the spot at Atom.id-1
+	*/
+	Molecule molecule = Molecule(numberOfAtoms);
+	molecule.SetTimestep(timestep);
+	//iterate over lines with no good info except for the line that has the size
+	for (int i = 0;i < 19;i++) {
+		getline(file, line);
+		if (i == 4)
+			molecule.setCubeSize(GetCubeSizeFromLine(line));
+	}
+	for (int i = 0;i < numberOfAtoms;i++) {
+		getline(file, line);
+		Atom atom = ParseMgOxAtomLine(line);
+		molecule.SetAtomWithIndex(atom, atom.GetId());
+	}
+	return molecule;
+}
 /*
 remember to initilze to your new file when you do this
 */
@@ -172,3 +216,7 @@ void Reader::AddForcesToMolecule(Molecule & molecule)
 		}*/
 	}
 }
+
+void Reader::AddForcesToMgOxide(Molecule & molecule)
+{
+} 

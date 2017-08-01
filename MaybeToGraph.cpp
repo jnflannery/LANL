@@ -39,7 +39,7 @@ Graph MaybeToGraphForces(Graph gh, Molecule mol){
 			triplet ForceVector = subtract(ForceVectorEdgeAtom, ForceVectorCenterAtom);
 			triplet VtoNforced = add(VtoN, ForceVector);
 			double VtoNforcedSize = size(VtoNforced);
-			if (VtoNforcedSize < VtoNsize-0.05) gh.addEdge(V.id, N);
+			if (VtoNforcedSize < VtoNsize-0.01) gh.addEdge(V.id, N);
 		}
 	}
 	return gh;

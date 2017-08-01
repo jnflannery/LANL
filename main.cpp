@@ -80,7 +80,7 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 			parameters.push_back(rc);
 		}
 	}
-	if(algorithm == CUTOFF_MAYBE)
+	if(algorithm == CUTOFF_MAYBE || algorithm == CUTOFF_FORCES)
 	{
 		if(material == "PtFCC")
 		{
@@ -130,7 +130,7 @@ double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<s
 
 int main()
 {
-	AlgorithmName algorithm = CUTOFF_FORCES;
+	AlgorithmName algorithm = CUTOFF;
 
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
@@ -270,8 +270,8 @@ vector<Graph> getGraphsWithToleranceLevel(AlgorithmName algorithm, string folder
 		string force = folderPath + "/forces_" + tol + "_" + to_string(time) + ".force";
 		Reader myReader = Reader();
 		if (myReader.Initialize(file)) {
-			Molecule molecule = myReader.GetMoleculeFromOutputFile();
-			int moleculeSize = molecule.GetNumberOfAtoms();
+			//Molecule molecule = myReader.GetMoleculeFromOutputFile();
+			//int moleculeSize = molecule.GetNumberOfAtoms();
 			graphs.push_back(getGraph(algorithm, file, force, parameters)); 
 		}
 	}

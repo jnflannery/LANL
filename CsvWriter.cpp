@@ -3,13 +3,13 @@
 
 string CSVWriter::CreateDifferentStepInputFile(std::string material, std::string algo, std::string defect, string temp)
 {
-	string file=inputDirectory;
+	string file = inputDirectory;
 	file += "DifferentTimeStep/";
 	file += material + "/";
 	file += algo + "/";
 	file += defect + "_";
 	file += temp + "times5010-15000";
-	if (algo=="Cutoff") {
+	if (algo == "Cutoff") {
 		file += "_3.348000";
 	}
 	else if (algo == "Cutoff_DoubleCentroid") {
@@ -46,20 +46,20 @@ string CSVWriter::CreateSameStepInputFile(std::string material, std::string algo
 void CSVWriter::createCsvForSameTimesteps(string material, string defect) {
 	ResultsReader reader = ResultsReader();
 	double score;
-	string outputFile = outputDirectory + material + defect + ".csv";
+	string outputFile = outputDirectory + material + defect + "_same.csv";
 	cout << outputFile << endl;
 	std::ofstream file = std::ofstream(outputFile);
 	//ifstream inputFile;
 	vector<vector < vector< double> >  >scores = vector < vector <vector <double> > >();
 	file << ",";
-	for(int j = 0;j < algorithms.size();j++) {
+	for (int j = 0;j < algorithms.size();j++) {
 		for (int k = 0; k < minimizationLevels.size();k++) {
 			file << algorithms.at(j) + "_" + minimizationLevels.at(k) + ",";
 		}
 	}
 	file << "\n";
 	for (int i = 0;i < temperatures.size();i++) {
-		file << temperatures.at(i)+",";
+		file << temperatures.at(i) + ",";
 		scores.push_back(vector <vector<double>>());
 		for (int j = 0;j < algorithms.size();j++) {
 			scores.at(i).push_back(vector<double>());
@@ -79,16 +79,51 @@ void CSVWriter::createCsvForSameTimesteps(string material, string defect) {
 		file << "\n";
 	}
 	file.close();
-	
+
+}
+void CSVWriter::createCsvForDifferentTimesteps(string material, string defect) {
+	ResultsReader reader = ResultsReader();
+	int score;
+	string outputFile = outputDirectory + material + defect + "_transitions.csv";
+	cout << outputFile << endl;
+	std::ofstream file = std::ofstream(outputFile);
+	//ifstream inputFile;
+	vector<vector <int>  >scores = vector <vector <int> >();
+	file << ",";
+	for (int j = 0;j < algorithms.size();j++) {
+		file << algorithms.at(j) + ",";
+	}
+
+	file << "\n";
+	for (int i = 0;i < temperatures.size();i++) {
+		file << temperatures.at(i) + ",";
+		scores.push_back(vector<int>());
+		for (int j = 0;j < algorithms.size();j++) {
+				std::ifstream myFile(CreateDifferentStepInputFile(material, algorithms.at(j), defect, temperatures.at(i)));
+				if (!myFile)
+				{
+					file << "";
+				}
+				else {
+					score = reader.GetNumberOfTransitions(myFile);
+					file << score;
+				}
+				file << ",";
+			
+		}
+		file << "\n";
+	}
+	file.close();
+
 }
 void CSVWriter::initializeInputDirectory(std::string directory)
 {
 	const string materialarray[] = { "PtNanoPart","MgOxide", "SiMelted", "PtFCC", "SiDiamond" };
 	const string temperaturearray[] = { "50K", "150K", "300K","500K", "750K", "1000K" };
 	//ADD MORE ALGOS LATER
-	const string algorithmarray[] = { "Jump", "Sann","Cutoff", "Cutoff_Maybe", "Gabriel", "Cutoff_DoubleCentroid","Sphere_of_Influence"};
+	const string algorithmarray[] = { "Jump", "Sann","Cutoff", "Cutoff_Maybe", "Gabriel", "Cutoff_DoubleCentroid","Sphere_of_Influence" };
 	algorithms = vector<string>(algorithmarray, algorithmarray + sizeof(algorithmarray) / sizeof(algorithmarray[0]));
-	vector<string> material (materialarray, materialarray + sizeof(materialarray) / sizeof(materialarray[0]));
+	vector<string> material(materialarray, materialarray + sizeof(materialarray) / sizeof(materialarray[0]));
 	materials = material;
 	vector<string> temperature(temperaturearray, temperaturearray + sizeof(temperaturearray) / sizeof(temperaturearray[0]));
 	temperatures = temperature;

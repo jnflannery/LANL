@@ -74,7 +74,7 @@ string getAlgorithmName(AlgorithmName algorithm){
 	}
 };
 
-vector<double> GetParameters(AlgorithmName algorithm, string material)
+vector<double> GetParameters(AlgorithmName algorithm, string material, string defect)
 {
 	vector<double> parameters;
 	if(algorithm == CUTOFF || algorithm == CUTOFF_NOBOXES)
@@ -88,6 +88,29 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 		{
 			double rc = 3.2;
 			parameters.push_back(rc);
+		}
+		if(material == "MgOxide")
+		{
+			double rc = 2.300;
+			parameters.push_back(rc);
+		}
+		if(material == "SiMelted")
+		{
+			double rc = 2.850;
+			parameters.push_back(rc);
+		}
+		if(material == "PtNanoPart")
+		{
+			if(defect == "Final")
+			{
+				double rc = 3.100;
+				parameters.push_back(rc);
+			}
+			if(defect == "Halfway")
+			{
+				double rc = 3.150;
+				parameters.push_back(rc);
+			}
 		}
 	}
 	if(algorithm == CUTOFF_MAYBE || algorithm == CUTOFF_MAYBE_NOBOXES)
@@ -106,6 +129,37 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 			parameters.push_back(rc);
 			parameters.push_back(Rc);
 		}
+		if(material == "MgOxide")
+		{
+			double rc = 2.300;
+			double Rc = 2.415;
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+		if(material == "SiMelted")
+		{
+			double rc = 2.850;
+			double Rc = 3.000;
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+		if(material == "PtNanoPart")
+		{
+			if(defect == "Final")
+			{
+				double rc = 3.100;
+				double Rc = 3.255;
+				parameters.push_back(rc);
+				parameters.push_back(Rc);
+			}
+			if(defect == "Halfway")
+			{
+				double rc = 3.150;
+				double Rc = 3.3075;
+				parameters.push_back(rc);
+				parameters.push_back(Rc);
+			}
+		}
 	}
 	if(algorithm == CUTOFF_DOUBLECENTROID || CUTOFF_DOUBLECENTROID_NOBOXES)
 	{
@@ -122,6 +176,37 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 			double Rc = 3.240; // placeholder
 			parameters.push_back(rc);
 			parameters.push_back(Rc);
+		}
+		if(material == "MgOxide")
+		{
+			double rc = 2.300;
+			double Rc = 2.415;
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+		if(material == "SiMelted")
+		{
+			double rc = 2.850;
+			double Rc = 3.000;
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+		if(material == "PtNanoPart")
+		{
+			if(defect == "Final")
+			{
+				double rc = 3.100;
+				double Rc = 3.255;
+				parameters.push_back(rc);
+				parameters.push_back(Rc);
+			}
+			if(defect == "Halfway")
+			{
+				double rc = 3.150;
+				double Rc = 3.3075;
+				parameters.push_back(rc);
+				parameters.push_back(Rc);
+			}
 		}
 	}
 	return parameters;
@@ -142,7 +227,7 @@ int outputDistributionFunction(string, string, string);
 
 int main()
 {
-	AlgorithmName algorithm = CUTOFF;
+	AlgorithmName algorithm = CUTOFF_DOUBLECENTROID_NOBOXES;
 
 	/* double rc = 2.000;
 	double Rc = 3.350;
@@ -153,7 +238,7 @@ int main()
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] = { "PtFCC", "SiDiamond" }; //PtFCC", "SiDiamond" }; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
+	const string materials[] = { "PtNanoPart" }; //PtFCC", "SiDiamond" }; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
 	// const string defects[] = { "Standard", "Final", "Halfway" "Extra", "Gap" };
 	const string temperatures[] = { "50K", "150K", "300K","500K", "750K", "1000K" };
 	vector<string> material(materials, materials + sizeof(materials) / sizeof(materials[0]));
@@ -183,46 +268,50 @@ int main()
 	}
 	//string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
-	const string mini[] = { "tol_12", "tol_6" };
+	const string mini[] = { "tol_12", "tol_8" };
 	vector<string> MinimizationLevels(mini, mini + sizeof(mini) / sizeof(mini[0])); ;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 10;
+	const int timeStep = 1000;
 	const int firstTimeForDifferentTimeStep = 5010;
 	const int lastTimeForDifferentTimeStep = 15000;
 	const bool makeOutputFile = (timeStep == true);
 
-	/*
+
 	//Code for testing cutoff values
-	double rc = 2.25;
-	for (double Rc = rc+0.05; Rc < rc+0.20; Rc+=0.01)
+	/*
+	for(double rc = 3.1; rc <= 3.2; rc +=0.05)
 	{
+	double Rc = 1.05*rc;
 	vector<double> parameters;
 	parameters.push_back(rc);
 	parameters.push_back(Rc);
-	string path = datapath + "MgOxide/Standard/150K";
+	string path = datapath + "PtNanoPart/Halfway/150K";
 	cout << analyzeData(algorithm, path, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
+
 	}
 	return 0;
 	*/
 
 	//Code for calculating pair distribution function
 	/*
-	string path = datapath + "SiMelted/Standard/300K";
+	string path = datapath + "SiDiamond/Extra/300K";
 	string fileNameDistribution = path + "/minimize_tol_12_15000.data";
 	int out = outputDistributionFunction(fileNameDistribution, outputFolder, path);
 	*/
 
 	// Analyze data from single file (specified above)
+
 	int numberRanPerTemp = 10000 / timeStep;
 	string folderPath;
 	string description;
 	string outputSummaryFile = outputFolder + "AggregateSummary.txt";
 	for (int i = 0; i < material.size();i++) {
 		//PtNanoPart and SiMelt don't have gap or extra so their code is done in the else statement
-		vector<double> parameters = GetParameters(algorithm, material.at(i));
+		// vector<double> parameters = GetParameters(algorithm, material.at(i));
 		for (int j = 0;j < defect.at(i).size();j++) {
+			vector<double> parameters = GetParameters(algorithm, material.at(i), defect.at(i).at(j));
 			for (int k = 0;k < temperature.size();k++) {
 				cout << temperature.at(k) << endl;
 				//this creates the location of the files you wish to read
@@ -240,7 +329,7 @@ int main()
 			}
 		}
 	};
-	
+
 
 
 	// Run on multiple temperatures

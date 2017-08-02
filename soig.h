@@ -7,8 +7,9 @@
 #include "atom.h"
 #include <algorithm>
 #include "molecule.h"
-#include "sann.h"
+// #include "sann.h"
 #include "boxlist.h"
+#include "Graph.cpp"
 
 struct AtomWithRadius {
 	int id;
@@ -21,5 +22,5 @@ class Soig {
 	public: 
 		vector<AtomWithRadius> ComputeSpheresSoig(Molecule, double periodicBoundary);
 		int FindAtomNeighbors(Atom, Molecule, vector<AtomWithRadius>, double, Graph&); 
-		int CreateGraphSoig(Molecule, vector<AtomWithRadius>, double, Graph&); 
+		Graph CreateGraphSoig(Molecule); 
 };

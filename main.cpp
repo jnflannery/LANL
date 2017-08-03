@@ -161,11 +161,11 @@ double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<s
 
 int main()
 {
-	AlgorithmName algorithm = CUTOFF_FORCES;
+	AlgorithmName algorithm = GABRIEL;
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] = { /*"PtFCC", "SiDiamond", "PtNanoPart", "MgOxide",*/ "SiMelted" };//PtFCC", "SiDiamond" }; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
+	const string materials[] = { /*"PtFCC", */"SiDiamond", "PtNanoPart", "MgOxide", "SiMelted" };
 	const string defects[] = { "Standard", "Final", "Halfway" "Extra", "Gap" };
 	const string temperatures[] = { "50K", "150K", "300K", "500K", "750K", "1000K" };
 	vector<string> material(materials, materials + sizeof(materials) / sizeof(materials[0]));
@@ -199,7 +199,7 @@ int main()
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 10;
+	const int timeStep = 100;
 	const int firstTimeForDifferentTimeStep = 5010;
 	const int lastTimeForDifferentTimeStep = 15000;
 	const bool makeOutputFile = (timeStep == 9000);
@@ -229,7 +229,7 @@ int main()
 				description.append(temperature.at(k));
 				//run the analysis function, which writes to your summary file and writes to individual files in the folder more specific information
 				cout << analyzeData(algorithm, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
-				cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
+				//cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
 			}
 		}
 

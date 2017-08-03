@@ -17,6 +17,8 @@ private:
 	vector< vector<string> > defects;
 public:
 	string CreateDifferentStepInputFile(std::string material, std::string algo, std::string defect, string temp);
+	string CreateDifferentStepInputFile(std::string material, std::string algo, std::string defect, string temp, string param);
+	string CreateSameStepInputFile(std::string material, std::string algo, std::string defect, string tol, string temp, string param);
 	string CreateSameStepInputFile(std::string material, std::string algo, std::string defect, string tol, string temp);
 	void createCsvForDifferentTimesteps(string material, string defect);
 	void createCsvForSameTimesteps(string material, string defect);

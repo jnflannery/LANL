@@ -29,7 +29,6 @@ void createFolder(const char * path)
 	}
 }
 
-
 /* When new algorithm is added, change 'outputData' and 'compareGraphs' accordingly. */
 enum AlgorithmName
 {
@@ -63,8 +62,7 @@ string getAlgorithmName(AlgorithmName algorithm){
 		return "UNKNOWN";
 	}
 };
-
-vector<double> GetParameters(AlgorithmName algorithm, string material)
+vector<double> GetParameters(AlgorithmName algorithm, string material, string defect)
 {
 	vector<double> parameters;
 	if(algorithm == CUTOFF)
@@ -89,12 +87,43 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 			parameters.push_back(rc);
 			parameters.push_back(Rc);
 		}
-		if(material == "SiDiamond" || material == "SiMelt")
+		if(material == "SiDiamond")
 		{
 			double rc = 3.14;
 			double Rc = 3.19; // placeholder
 			parameters.push_back(rc);
 			parameters.push_back(Rc);
+		}
+		if(material == "MgOxide")
+		{
+			double rc = 2.300;
+			double Rc = 2.415;
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+		if(material == "SiMelted")
+		{
+			double rc = 2.850;
+			double Rc = 3.000;
+			parameters.push_back(rc);
+			parameters.push_back(Rc);
+		}
+		if(material == "PtNanoPart")
+		{
+			if(defect == "Final")
+			{
+				double rc = 3.100;
+				double Rc = 3.255;
+				parameters.push_back(rc);
+				parameters.push_back(Rc);
+			}
+			if(defect == "Halfway")
+			{
+				double rc = 3.150;
+				double Rc = 3.3075;
+				parameters.push_back(rc);
+				parameters.push_back(Rc);
+			}
 		}
 	}
 	if(algorithm == CUTOFF_DOUBLECENTROID)
@@ -115,15 +144,12 @@ vector<double> GetParameters(AlgorithmName algorithm, string material)
 		}
 	}
 	if (algorithm == GABRIEL){
-		//TBD. 1.0 for now.
-		double theta = 1.0;
+		double theta = 1.3;
 		parameters.push_back(theta);
 	}
 
 	return parameters;
 };
-
-
 double analyzeData(AlgorithmName, string, int, int, int, vector<double>, vector<string>, string outputFolder, bool output = false);
 vector<Graph> getGraphs(AlgorithmName, string, string, vector<double>, vector<string>);
 bool compareGraphs(Graph, Graph, ErrorStats &);
@@ -131,27 +157,45 @@ Graph getGraph(AlgorithmName, string, string, vector<double>);
 vector<Graph> getGraphsWithToleranceLevel(AlgorithmName, string, string, vector<double>, vector<string>);
 int outputDataSuccessiveTimesteps(AlgorithmName, string, int, int, vector<double>, vector<int>, vector<double>, vector<double>, string, vector<ErrorStats>);
 int CompareSuccessiveTimesteps(AlgorithmName, string, int, int, vector<double>, string);
-
 double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<short>, string,  vector<ErrorStats>, string);
 
 int main()
 {
 	AlgorithmName algorithm = CUTOFF_FORCES;
-
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] = { "PtFCC", "SiDiamond", "SiMelt"};
-	const string defects[] = { "Extra"};//, "Gap" };
-	const string temperatures[] = {"50K", "150K", "300K","500K", "750K", "1000K"};
-	vector<string> material(materials, materials + sizeof(materials)/sizeof(materials[0]));
-	vector<string> defect(defects, defects + sizeof(defects)/sizeof(defects[0]));
-	vector<string> temperature(temperatures, temperatures + sizeof(temperatures)/sizeof(temperatures[0]));
-
+	const string materials[] = { /*"PtFCC", "SiDiamond", "PtNanoPart", "MgOxide",*/ "SiMelted" };//PtFCC", "SiDiamond" }; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
+	const string defects[] = { "Standard", "Final", "Halfway" "Extra", "Gap" };
+	const string temperatures[] = { "50K", "150K", "300K", "500K", "750K", "1000K" };
+	vector<string> material(materials, materials + sizeof(materials) / sizeof(materials[0]));
+	vector<string> temperature(temperatures, temperatures + sizeof(temperatures) / sizeof(temperatures[0]));
+	vector< vector<string> > defect = vector < vector<string> >();
+	for (int i = 0; i < material.size();i++) {
+		defect.push_back(vector < string>());
+		if (material.at(i) == "PtNanoPart") {
+			defect.at(i).push_back("Final");
+			defect.at(i).push_back("Halfway");
+		}
+		if (material.at(i) == "MgOxide") {
+			defect.at(i).push_back("Standard");
+		}
+		if (material.at(i) == "SiMelted") {
+			defect.at(i).push_back("Standard");
+		}
+		if (material.at(i) == "SiDiamond") {
+			defect.at(i).push_back("Extra");
+			defect.at(i).push_back("Gap");
+		}
+		if (material.at(i) == "PtFCC") {
+			defect.at(i).push_back("Extra");
+			defect.at(i).push_back("Gap");
+		}
+	}
 	//string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
-	const string mini[] = {"tol_12", /*"tol_10",*/ "tol_8", /*"tol_6",*/ "tol_4", "tol_2", "0"}; 
-	vector<string> MinimizationLevels (mini, mini + sizeof(mini)/sizeof(mini[0])); ; 
+	const string mini[] = { "tol_12", "tol_8", "tol_4", "tol_2", "0" };
+	vector<string> MinimizationLevels(mini, mini + sizeof(mini) / sizeof(mini[0])); ;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
@@ -159,7 +203,6 @@ int main()
 	const int firstTimeForDifferentTimeStep = 5010;
 	const int lastTimeForDifferentTimeStep = 15000;
 	const bool makeOutputFile = (timeStep == 9000);
-
 
 	// Analyze data from single file (specified above)
 
@@ -169,59 +212,45 @@ int main()
 	string outputSummaryFile = outputFolder + "AggregateSummary.txt";
 	for (int i = 0; i < material.size();i++) {
 		//PtNanoPart and SiMelt don't have gap or extra so their code is done in the else statement
-		vector<double> parameters = GetParameters(algorithm, material.at(i));
-		if (i < 2) {
-			for (int j = 0;j < defect.size();j++) {
-				for (int k = 0;k < temperature.size();k++) {
-					cout<<material.at(i)<<" "<<defect.at(j)<<" "<<temperature.at(k)<< endl;
-					//this creates the location of the files you wish to read
-					folderPath = datapath;
-					folderPath.append(material.at(i) + "/");
-					folderPath.append(defect.at(j) + "/");
-					folderPath.append(temperature.at(k));
 
-					//create a description of the files independent of the location
-					description = material.at(i);
-					description.append(defect.at(j));
-					description.append(temperature.at(k));
-					//run the analysis function, which writes to your summary file and writes to individual files in the folder more specific information
-					//summaryWriter << "Material: " << material.at(i) << " Defect: " << defect.at(j) << " Temperature: " << temperature.at(k) << " Number of Runs: " << numberRanPerTemp<< endl;
-					cout << analyzeData(algorithm, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
-					cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
-					//summaryWriter << endl;
-				}
-			}
-		}
-		else {
+		for (int j = 0;j < defect.at(i).size();j++) {
+			vector<double> parameters = GetParameters(algorithm, material.at(i), defect.at(i).at(j));
 			for (int k = 0;k < temperature.size();k++) {
-				//same thing except it doesn't include defects
-
+				cout<<material.at(i)<<" "<<defect.at(i).at(j)<<" "<<temperature.at(k)<< " "<<getAlgorithmName(algorithm)<<endl;
+				//this creates the location of the files you wish to read
 				folderPath = datapath;
 				folderPath.append(material.at(i) + "/");
+				folderPath.append(defect.at(i).at(j) + "/");
 				folderPath.append(temperature.at(k));
+
+				//create a description of the files independent of the location
 				description = material.at(i);
+				description.append(defect.at(i).at(j));
 				description.append(temperature.at(k));
-				//summaryWriter << "Material: " << material.at(i) <<  " Temperature: " << temperature.at(k) << " Number of Runs: " << numberRanPerTemp << endl;
+				//run the analysis function, which writes to your summary file and writes to individual files in the folder more specific information
 				cout << analyzeData(algorithm, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
 				cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
-				//summaryWriter << endl;
 			}
 		}
-	}
 
+	}
 
 	cout << "\nDone.";
 	cin.get();
 
 	return 0;
 }
-
 Graph getGraph(AlgorithmName algorithm, string fileName, string ForceFileName, vector<double> parameters){
 	Graph gh; 
+	Molecule molecule;
 	Reader myReader = Reader();
-
 	if (myReader.Initialize(fileName)) {
-		Molecule molecule = myReader.GetMoleculeFromOutputFile();
+		if (fileName.find("MgOxide") != std::string::npos) {
+			molecule = myReader.GetMgOxideFromOutputFile();
+		}
+		else {
+			molecule = myReader.GetMoleculeFromOutputFile();
+		}
 		int moleculeSize = molecule.GetNumberOfAtoms();
 		switch (algorithm)
 		{ 
@@ -244,8 +273,7 @@ Graph getGraph(AlgorithmName algorithm, string fileName, string ForceFileName, v
 			break;
 		case GABRIEL:
 			double theta;
-			theta = 1;
-			//parameters[0] = theta;
+			theta = parameters[0];
 			GabrielGraph gg;
 			gh = gg.ComputeGabrielMolecule(molecule, theta);
 			break;
@@ -302,7 +330,7 @@ int CompareSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int f
 
 		//cout << time << "\n";
 		fileName = folderPath + "/minimize_tol_12_" + to_string(time) + ".data";
-		ForceFileName = folderPath + "/forces_tol_12_" + to_string(time) + ".data";
+		ForceFileName = folderPath + "/forces_tol_12_" + to_string(time) + ".force";
 		Graph NextGraph = getGraph(algorithm, fileName, ForceFileName, parameters);
 
 		int molecule_size = NextGraph.GetNumberOfVertices();
@@ -415,6 +443,7 @@ double analyzeData(AlgorithmName algorithm, string folderPath, int firstTime, in
 		for(int i = 1; i < graphs_to_compare; i++){
 			ErrorStats stats = ErrorStats();
 			stats.initializeWithSize(molecule_size);
+
 			bool same = compareGraphs(graphs[0], graphs[i], stats);
 			if (same)
 				sameTimes[i].push_back(time);

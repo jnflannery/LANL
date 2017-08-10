@@ -165,9 +165,9 @@ int main()
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] = { /*"PtFCC", */"SiDiamond", "PtNanoPart", "MgOxide", "SiMelted" };
+	const string materials[] = { /*"PtFCC", */"SiDiamond"/*, "MgOxide", "PtNanoPart", "SiMelted"*/ };
 	const string defects[] = { "Standard", "Final", "Halfway" "Extra", "Gap" };
-	const string temperatures[] = { "50K", "150K", "300K", "500K", "750K", "1000K" };
+	const string temperatures[] = { /*"50K", "150K", "300K", "500K", "750K",*/ "1000K"/* */};
 	vector<string> material(materials, materials + sizeof(materials) / sizeof(materials[0]));
 	vector<string> temperature(temperatures, temperatures + sizeof(temperatures) / sizeof(temperatures[0]));
 	vector< vector<string> > defect = vector < vector<string> >();
@@ -194,7 +194,7 @@ int main()
 	}
 	//string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
-	const string mini[] = { "tol_12", "tol_8", "tol_4", "tol_2", "0" };
+	const string mini[] = { "tol_12", /*"0", "tol_2", "tol_4",*/ "tol_6"/*, "tol_8"*/ };
 	vector<string> MinimizationLevels(mini, mini + sizeof(mini) / sizeof(mini[0])); ;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;

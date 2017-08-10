@@ -21,7 +21,7 @@ using namespace std;
 	// create graph object
 	Graph gh(size);
 
-	// build boxes
+	// build boxes to store atoms
 	BoxBuilder myBoxBuilder = BoxBuilder(Rc);
 	Boxlist boxlist = myBoxBuilder.BuildBoxes(molecule, Rc);	
 	vector<Box> boxes = boxlist.GetAllBoxes();

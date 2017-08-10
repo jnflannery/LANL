@@ -5,7 +5,9 @@
 */
 Graph MaybeToGraphCentroid(Graph gh, Molecule mol){
 	for (auto V : gh.getAllVertices()){
-		//compute position of centroid of the atom V
+		/*Compute position of centroid of the atom V. (To simplify computation, we
+    sum the neighbors rather than average - this does not affect the distance
+    comparison.)*/
 		triplet center(0, 0, 0);
 		double weight = V.neighbors.size();
 		for (auto N : V.neighbors){
@@ -69,11 +71,11 @@ Graph MaybeToGraphDoubleCentroid(Graph gh, Molecule mol){
 			Atom Vatom = mol.GetAtom(V.id);
 			Atom Natom = mol.GetAtom(N);
 			triplet VtoN = Vatom.VectorTo(Natom, mol.GetCubeSize());
-			centerV = add(centerV, VtoN);
-      centerV = mult(1/weight, centerV);
+			centerV = add(centerV, VtoN);  
 		}
-
-		for (auto N : V.maybeNeighbors){
+    centerV = mult(1/weight, centerV);
+		
+    for (auto N : V.maybeNeighbors){
 			// compute centroid for neighbors of potential neighbor N with 
 			// respect to the position of N
 			triplet centerN(0,0,0);
@@ -86,8 +88,9 @@ Graph MaybeToGraphDoubleCentroid(Graph gh, Molecule mol){
 				Atom Qatom = mol.GetAtom(Q);
 				triplet NtoQ = Natom.VectorTo(Qatom, mol.GetCubeSize());
 				centerN = add(centerN, NtoQ);
-        centerN = mult(1/weight, centerN);
-			}
+      }
+			centerN = mult(1/weight, centerN);
+
 			//compare distances between atoms to distances between centroids
 			double DistanceBetweenAtoms = size(VtoNeighbor);
 			triplet VtoCenterN = add(VtoNeighbor, centerN);
@@ -109,23 +112,23 @@ triplet Atom::VectorTo(Atom atom, double periodicBoundary){
 				   PeriodicDiffY(atom, periodicBoundary), 
 				   PeriodicDiffZ(atom, periodicBoundary));
 }
-
+//returns dot product
 double dot_product(triplet a, triplet b){
 	return (get<0>(a)*get<0>(b) + get<1>(a)*get<1>(b) + get<2>(a)*get<2>(b));
 }
-
+//returns size of a vector
 double size(triplet a){
 	return sqrt(dot_product(a, a));
 }
-
+//vector addition
 triplet add(triplet a, triplet b){
 	return triplet(get<0>(a)+get<0>(b), get<1>(a)+get<1>(b), get<2>(a)+get<2>(b));
 }
-
+//vector difference
 triplet subtract(triplet a, triplet b){
 	return triplet(get<0>(a)-get<0>(b), get<1>(a)-get<1>(b), get<2>(a)-get<2>(b));
 }
-
+//multiply vector by scalar
 triplet mult(double c, triplet a){
 	return triplet(get<0>(a)*c, get<1>(a)*c, get<2>(a)*c);
 }

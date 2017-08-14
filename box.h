@@ -1,6 +1,7 @@
 #pragma once
 #include<vector>
-
+#include "atom.h"
+#include "molecule.h"
 struct Coordinate {
 	int x;
 	int y;
@@ -26,4 +27,6 @@ public:
 	int GetIDz();
 	std::vector<Coordinate> GetNeighborList();
 	void AddNeighbor(Coordinate);
+	std::vector<Atom> getVectorOfAtomsFromBox(Molecule molecule);
+
 };

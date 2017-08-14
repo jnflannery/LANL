@@ -1,4 +1,3 @@
-
 #include "coordinate.h"
 
 #include <iostream>

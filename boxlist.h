@@ -1,8 +1,8 @@
-
 #pragma once
 #include "box.h"
+#include "coordinate.h"
+#include <iostream>
 #include "molecule.h"
-#include <vector>
 
 class Boxlist {
 private:
@@ -14,7 +14,10 @@ public:
 	void AddBox(Box);
 	void AssignBoxSize(double);
 	double GetBoxSize();
+	std::vector<Atom> getAtomVectorOfNeighborCandidates(Box box, int boxesPerSide, Molecule molecule);
 	Box GetBox(int, int, int);
+	Box GetBox(Coordinate);
+	std::vector<Box> GetAllBoxes();
 	int FindBoxLocationX(int);
 	int FindBoxLocationY(int);
 	int FindBoxLocationZ(int);

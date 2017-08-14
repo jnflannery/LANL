@@ -2,6 +2,8 @@
 #include "molecule.h"
 #include "box.h"
 #include "boxlist.h"
+#include <iostream>
+#include "math.h"
 
 class BoxBuilder
 {

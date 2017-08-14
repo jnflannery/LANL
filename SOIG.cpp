@@ -39,25 +39,16 @@ vector<AtomWithRadius> Soig::ComputeSpheresSoig(Molecule mol, double periodicBou
 int Soig::FindAtomNeighbors(Atom atomIN, Molecule mol, vector<AtomWithRadius> sphereList, double periodicBoundary, Graph& g)
 {
 	int atomID = atomIN.GetId();
-	// cout << "atomIN id = " << atomID << "\n";
 	double CenterAtomRadius = sphereList.at(atomID-1).radius; // retrieve the radius of the input atom from the sphere list
-	// cout << CenterAtomRadius << "\n";
-	// cout << "1 \n";
-	// cout << "Number of atoms = " << mol.GetNumberOfAtoms();
 	for(int i=atomID; i <= mol.GetNumberOfAtoms(); i++)
 	{
 		if (i != atomID)
 		{
-			// int thingtooutput = mol.GetAtom(i).GetId();
-			// cout << "i = " << i << "\n";
-			// cout << thingtooutput << "\n";
 			double OtherAtomRadius = sphereList.at(i-1).radius; // retrieve the radius for the neighbor candidate from the spherelist
 			double DistanceBetweenAtoms = atomIN.EuclidianPeriodicDistance(mol.GetAtom(i), periodicBoundary);
-			// cout << "Inner i = " << i << "\n";
 			if(DistanceBetweenAtoms < CenterAtomRadius+OtherAtomRadius)
 			{
 				g.addEdge(atomIN.GetId(), mol.GetAtom(i).GetId());
-			    // cout << "added edge \n";
 			}
 
 		}
@@ -66,12 +57,15 @@ int Soig::FindAtomNeighbors(Atom atomIN, Molecule mol, vector<AtomWithRadius> sp
 }
 
 // iterate through atoms to create the full graph
-Graph Soig::CreateGraphSoig(Molecule mol, vector<AtomWithRadius> sphereList, double periodicBoundary, Graph& g)
+Graph Soig::CreateGraphSoig(Molecule mol)
 {
+	int size = mol.GetNumberOfAtoms();
+	Graph gh(size); 
+	double periodicBoundary = mol.GetCubeSize();
+	vector<AtomWithRadius> sphereList = ComputeSpheresSoig(mol, periodicBoundary);
 	for(int i=1; i <= mol.GetNumberOfAtoms(); i++)
 	{
-		int output = FindAtomNeighbors(mol.GetAtom(i), mol, sphereList, periodicBoundary, g);
-		// cout << "Outer i = " << i << "\n";
+		int output = FindAtomNeighbors(mol.GetAtom(i), mol, sphereList, periodicBoundary, gh);
 	}
-	return g;
+	return gh;
 }

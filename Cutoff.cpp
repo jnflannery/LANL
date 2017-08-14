@@ -1,12 +1,4 @@
-#include <math.h>
-
-#include "boxbuilder.h"
-#include "coordinate.h"
 #include "cutoff.h"
-#include "cutoffmaybe.h"
-
-
-using namespace std;
 
 /*
 	Creates and returns a graph from given molecule using cutoff criteria.

@@ -22,5 +22,5 @@ class Soig {
 	public: 
 		vector<AtomWithRadius> ComputeSpheresSoig(Molecule, double periodicBoundary);
 		int FindAtomNeighbors(Atom, Molecule, vector<AtomWithRadius>, double, Graph&); 
-		Graph CreateGraphSoig(Molecule, vector<AtomWithRadius>, double, Graph&); 
+		Graph CreateGraphSoig(Molecule); 
 };

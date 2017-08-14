@@ -33,7 +33,10 @@ void ErrorStats::setMostFrequentlyWrongAtom()
 	}
 	percentWrongForMostFrequentlyWrong = (double)mistakeCount / (double)(mismatchedAtoms.size());
 }
-
+double ErrorStats::getPercentWrongForMostFrequentlyWrong()
+{
+	return percentWrongForMostFrequentlyWrong;
+}
 void ErrorStats::setAvgNumMismatched()
 {
 	int k = 0;
@@ -92,9 +95,4 @@ double ErrorStats::getAvgPercentMismatched()
 vector<int> ErrorStats::getCountsMismatched()
 {
 	return countsMismatched;
-}
-
-double ErrorStats::getPercentWrongForMostFrequentlyWrong()
-{
-	return percentWrongForMostFrequentlyWrong;
 }

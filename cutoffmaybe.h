@@ -1,8 +1,8 @@
 #pragma once
 
-#include "molecule.h"
 #include "atom.h"
 #include "Graph.cpp"
+#include "molecule.h"
 
 Graph CutoffMaybe(Molecule molecule, double rc, double Rc);
 Graph CutoffWithForces(Molecule molecule, double rc, double Rc);

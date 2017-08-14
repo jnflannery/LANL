@@ -81,7 +81,7 @@ double Atom::PeriodicDiffY(Atom atom, double periodicBoundary){
 double Atom::PeriodicDiffZ(Atom atom, double periodicBoundary){
 	return (abs(z - atom.GetZ()) < abs(periodicBoundary - abs(z - atom.GetZ()))) ? (atom.GetZ()-z) : ((z<atom.GetZ() ? atom.GetZ()-periodicBoundary-z : atom.GetZ()+periodicBoundary-z));
 }
-double Atom::getPeriodicDistanceOneD(double x, double y, double periodicDist)
+double Atom::getPeriodicDistanceOneDimension(double x, double y, double periodicDist)
 {
 	double dx = x - y;
 	if (dx > periodicDist * 0.5)

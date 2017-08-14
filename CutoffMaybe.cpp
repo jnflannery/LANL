@@ -12,7 +12,6 @@ using namespace std;
 	potential neighbors.
 	This algorithm uses boxes of size R_c to avoid computing all the distances.
 */
-
  Graph CutoffMaybe(Molecule molecule, double rc, double Rc)
 {
 	vector<Atom> atoms = molecule.GetAtomVector();

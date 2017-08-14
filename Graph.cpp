@@ -1,6 +1,3 @@
-/*
-	Stores information about graphs and vertices.
-*/
 #ifndef GRAPH_CPP
 #define GRAPH_CPP
 
@@ -15,7 +12,6 @@
 #include "molecule.h"
 
 using namespace std;
-
 
 /*
 	Store information about vertex: 
@@ -181,7 +177,6 @@ public:
 		}
 		for (int k = 0; k < size; ++k) {
 			if (!(vertices[k] == g.vertices[k])) {
-				cout << k << " ";
 				isTrue = false;
 			}
 		}
@@ -260,7 +255,6 @@ public:
 
 			}
 		}
-		cout << endl;
 		return isTrue;
 	}
 };

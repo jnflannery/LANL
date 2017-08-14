@@ -1,6 +1,9 @@
 #include "gabrielgraph.h"
 #include "maybetograph.h"
 
+/*
+Struct to store atom ID and its distance
+*/
 struct AtomIdAndDistance2 {
 	int id;
 	double distanceFromMainAtom;
@@ -79,10 +82,9 @@ int GabrielGraph::ComputeGabrielAtom(Atom centralAtom, Molecule molecule, Graph 
 //theta determines the thickness of ellipse
 bool GabrielGraph::isOtherNeighborInEllipse(Atom TargetAtom, Atom ClosestNeighbor, Atom OtherAtom, double theta, double periodicDistance)
 {
-	triplet a = TargetAtom.VectorTo(OtherAtom, periodicDistance); 
-	//cout << "a " << get<0>(a) << " " << get<1>(a) << " " << get<2>(a) << endl;
-	triplet b = TargetAtom.VectorTo(ClosestNeighbor, periodicDistance); 
-	//cout << "b " << get<0>(b) << " " << get<1>(b) << " " << get<2>(b) << endl;
+	triplet a = TargetAtom.VectorTo(OtherAtom, periodicDistance);
+	triplet b = TargetAtom.VectorTo(ClosestNeighbor, periodicDistance);
+  //project a onto b
 	double projX = dot_product(a, b) /size(b);
 	//cout << "x " << projX << "\n";
 	if (projX < 0){
@@ -127,7 +129,7 @@ double GabrielGraph::findMidpointOneDimension(double x1, double x2, double perio
 		x1 = x2;
 		x2 = temp;
 	}
-	double dx = atom.getPeriodicDistanceOneD(x1, x2, periodicBoundary);
+	double dx = atom.getPeriodicDistanceOneDimension(x1, x2, periodicBoundary);
 	if (x2 - x1 > periodicBoundary*.5) {
 		dx = x2 + (dx*.5);
 		if (dx > periodicBoundary) {

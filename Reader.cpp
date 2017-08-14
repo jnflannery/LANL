@@ -217,6 +217,33 @@ void Reader::AddForcesToMolecule(Molecule & molecule)
 	}
 }
 
+
 void Reader::AddForcesToMgOxide(Molecule & molecule)
 {
-} 
+	int numberOfAtoms, atomId, force, atomType;
+	double fx, fy, fz;
+	std::string line;
+	getline(file, line);
+	getline(file, line);
+	getline(file, line);
+	file >> numberOfAtoms;
+	for (int i = 0;i < 6;i++) {
+		getline(file, line);
+	}
+	for (int i = 0;i < numberOfAtoms;i++) {
+		file >> atomId;
+		file >> atomType;
+		file >> fx;
+		file >> fy;
+		file >> fz;
+		getline(file, line);
+		Atom atomToSet = molecule.GetAtom(atomId);
+		atomToSet.SetFx(fx);
+		atomToSet.SetFy(fy);
+		atomToSet.SetFz(fz);
+		molecule.SetAtomWithIndex(atomToSet, atomId);
+		/*if (atomId == 1) {
+		std::cout << fx << endl;
+		}*/
+	}
+}

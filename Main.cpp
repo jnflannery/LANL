@@ -188,7 +188,7 @@ double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<s
 
 int main()
 {
-  AlgorithmName algorithm = CUTOFF_DOUBLECENTROID;
+  AlgorithmName algorithm = CUTOFF;
   //choose data to run the algorithm on
   const string datapath = "R://LANL/DataUpdatedAgain/";
   const string outputFolder = "R://LANL/AlgorithmTesting/814test/";
@@ -226,9 +226,9 @@ int main()
   // choose timestamps. available data: from 5010 to 15000, timestep 10.
   const int firstTime = 5010;
   const int lastTime = 15000;
-  const int timeStep = 10000;
+  const int timeStep = 10;
   const int firstTimeForDifferentTimeStep = 5010;
-  const int lastTimeForDifferentTimeStep = 5020;
+  const int lastTimeForDifferentTimeStep = 15000;
 
   const bool makeOutputFile = true;
 
@@ -239,9 +239,6 @@ int main()
   string description;
   string outputSummaryFile = outputFolder + "AggregateSummary.txt";
 
-  for ( int algo = GAP; algo <= GAP; algo++ )
-  {
-    AlgorithmName algorithm = static_cast<AlgorithmName>(algo);
   for (int i = 0; i < material.size();i++) {
     //PtNanoPart and SiMelt don't have gap or extra so their code is done in the else statement
 
@@ -265,9 +262,7 @@ int main()
         CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
       }
     }
-
   }
-    }
   std::cout << "\nDone.";
 
   return 0;

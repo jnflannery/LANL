@@ -5,6 +5,7 @@
 #include <fstream>
 #include <vector>
 
+#include "distribution.h"
 #include "cutoffmaybenoboxes.h"
 #include "sann.h"
 #include "gabrielgraph.h"
@@ -185,6 +186,7 @@ vector<Graph> getGraphsWithToleranceLevel(AlgorithmName, string, string, vector<
 int outputDataSuccessiveTimesteps(AlgorithmName, string, int, int, vector<double>, vector<int>, vector<double>, vector<double>, string, vector<ErrorStats>);
 int CompareSuccessiveTimesteps(AlgorithmName, string, int, int, vector<double>, string);
 double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<short>, string,  vector<ErrorStats>, string);
+int outputDistributionFunction(string fileName, string outputFolder, string folderPath);
 
 int main()
 {
@@ -232,6 +234,13 @@ int main()
 
   const bool makeOutputFile = true;
 
+  //Code for calculating pair distribution function 
+	/*
+	// Specify fileNameDistribution to access the .data file you want to calculate the pair distribution function of. 
+	string path = datapath + "PtNanoPart/Halfway/300K";
+	string fileNameDistribution = path + "/minimize_tol_12_15000.data";
+	int out = outputDistributionFunction(fileNameDistribution, outputFolder, path);
+  */
   // Analyze data from single file (specified above)
 
   int numberRanPerTemp = 10000 / timeStep;
@@ -267,6 +276,50 @@ int main()
 
   return 0;
 }
+
+// Opens the .data file with the given file name, computes all of the pairwise distances in the system, and writes these distances to a .txt file so that 
+// the pair distribution function can be plotted (e.g. with MATLAB). This is used for choosing the cutoff distance to use for a given system. 
+int outputDistributionFunction(string fileName, string outputFolder, string folderPath)
+{
+	Molecule molecule;
+	vector<double> distances;
+	Reader myReader = Reader();
+	if (myReader.Initialize(fileName)) {
+		if (fileName.find("MgOxide") != std::string::npos) {
+			molecule = myReader.GetMgOxideFromOutputFile();
+		}
+		else {
+			molecule = myReader.GetMoleculeFromOutputFile();
+		}
+		distances = GetDistancesBetweenAllAtoms(molecule);
+		string outFileName = outputFolder + "DistributionFunction/";
+		createFolder(outFileName.c_str());
+		Reader reader = Reader();
+		vector<string>splitFolder = reader.split(folderPath.c_str(),'/');
+		createFolder(outFileName.c_str());
+		outFileName += splitFolder.at(splitFolder.size()-3) + "/";//material
+		createFolder(outFileName.c_str());
+		outFileName += splitFolder.at(splitFolder.size()-2) + "_";//defect
+		outFileName += splitFolder.at(splitFolder.size()-1);//temperature
+		outFileName += ".txt";
+		std::ofstream file = std::ofstream(outFileName);
+		if (!file)
+		{
+			std::cout << outFileName << " cannot be accessed and/or written to. Terminating process";
+			return -1;
+		} else {
+
+			file = std::ofstream(outFileName);
+			for(int i = 0; i < distances.size(); i++)
+			{
+				file << distances.at(i) << endl;
+			}
+
+		}
+	}
+	return 0;
+};
+
 Graph getGraph(AlgorithmName algorithm, string fileName, string ForceFileName, vector<double> parameters){
   Graph gh; 
   Molecule molecule;

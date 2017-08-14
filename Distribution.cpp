@@ -18,3 +18,31 @@ vector<double> GetDistancesBetweenAllAtoms(Molecule mol){
 	}
 	return distances;
 };
+
+vector<vector<int>> CompareDistancesBetweenAllAtoms(Molecule molA, Molecule molB){
+	vector<vector<int>> MissedPairs;
+	double tol = 0.01;
+	bool same = true;
+	for(int i = 1; i <= molA.GetNumberOfAtoms(); i++)
+	{
+		vector<int> MissedAtoms;
+		Atom atomA1 = molA.GetAtom(i);
+		Atom atomB1 = molB.GetAtom(i);
+		for(int j = 1; j<= molA.GetNumberOfAtoms(); j++)
+		{
+			if(j != i)
+			{
+				Atom atomA2 = molA.GetAtom(j);
+				Atom atomB2 = molB.GetAtom(j);
+				double distanceA = atomA1.EuclidianPeriodicDistance(atomA2, molA.GetCubeSize());
+				double distanceB = atomB1.EuclidianPeriodicDistance(atomB2, molB.GetCubeSize());
+				if(abs(distanceA-distanceB)/distanceA > tol)
+				{
+					MissedAtoms.push_back(j);
+				}
+			}
+		}
+		MissedPairs.push_back(MissedAtoms);
+	}
+	return MissedPairs;
+};

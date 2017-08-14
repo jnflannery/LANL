@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include "distribution.h"
 #include "soig.h"
+#include "gabrielgraph.h"
 using namespace std;
 
 //auxiliary function for folder creation
@@ -44,7 +45,8 @@ enum AlgorithmName
 	SHADOW,
 	CUTOFF_DOUBLECENTROID,
 	CUTOFF_DOUBLECENTROID_NOBOXES,
-	SOIG
+	SOIG,
+	GABRIEL
 };
 
 string getAlgorithmName(AlgorithmName algorithm){
@@ -68,6 +70,8 @@ string getAlgorithmName(AlgorithmName algorithm){
 		return "Cutoff_DoubleCentroid_NoBoxes";
 	case SOIG:
 		return "Sphere_of_Influence";
+	case GABRIEL:
+		return "Gabriel";
 	default:
 		cout << "UNKNOWN ALGORITHM TO OUTPUT.\n";
 		return "UNKNOWN";
@@ -113,7 +117,7 @@ vector<double> GetParameters(AlgorithmName algorithm, string material, string de
 			}
 		}
 	}
-	if(algorithm == CUTOFF_MAYBE || algorithm == CUTOFF_MAYBE_NOBOXES)
+	else if(algorithm == CUTOFF_MAYBE || algorithm == CUTOFF_MAYBE_NOBOXES)
 	{
 		if(material == "PtFCC")
 		{
@@ -161,7 +165,7 @@ vector<double> GetParameters(AlgorithmName algorithm, string material, string de
 			}
 		}
 	}
-	if(algorithm == CUTOFF_DOUBLECENTROID || CUTOFF_DOUBLECENTROID_NOBOXES)
+	else if(algorithm == CUTOFF_DOUBLECENTROID || algorithm == CUTOFF_DOUBLECENTROID_NOBOXES)
 	{
 		if(material == "PtFCC")
 		{
@@ -209,6 +213,10 @@ vector<double> GetParameters(AlgorithmName algorithm, string material, string de
 			}
 		}
 	}
+	if (algorithm == GABRIEL){
+		double theta = 1.3;
+		parameters.push_back(theta);
+	}
 	return parameters;
 };
 
@@ -218,8 +226,11 @@ vector<Graph> getGraphs(AlgorithmName, string, string, vector<double>, vector<st
 bool compareGraphs(Graph, Graph, ErrorStats &);
 Graph getGraph(AlgorithmName, string, string, vector<double>);
 vector<Graph> getGraphsWithToleranceLevel(AlgorithmName, string, string, vector<double>, vector<string>);
-int outputDataSuccessiveTimesteps(AlgorithmName, string, int, int, vector<double>, vector<int>, vector<double>, vector<double>, string, vector<ErrorStats>);
+int outputDataSuccessiveTimesteps(AlgorithmName, string, int, int, vector<double>, vector<int>, vector<double>, vector<int>, string, vector<ErrorStats>);
 int CompareSuccessiveTimesteps(AlgorithmName, string, int, int, vector<double>, string);
+
+int CompareSuccessiveTimeStepsAbsolutely(string, int, int, string);
+int outputDataSuccessiveTimestepsAbsolutely(string, int, int, vector<int>, vector<vector<vector<int>>>, string);
 
 double outputData(AlgorithmName, string, vector<double>, vector<short>, vector<short>, string,  vector<ErrorStats>, string);
 
@@ -227,7 +238,7 @@ int outputDistributionFunction(string, string, string);
 
 int main()
 {
-	AlgorithmName algorithm = CUTOFF_DOUBLECENTROID_NOBOXES;
+	AlgorithmName algorithm = CUTOFF_DOUBLECENTROID;
 
 	/* double rc = 2.000;
 	double Rc = 3.350;
@@ -238,9 +249,9 @@ int main()
 	//choose data to run the algorithm on
 	const string datapath = "R://LANL/DataUpdatedAgain/";
 	const string outputFolder = "R://LANL/AlgorithmTesting/ConsolidatedTest/";
-	const string materials[] = { "PtNanoPart" }; //PtFCC", "SiDiamond" }; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
+	const string materials[] = { "MgOxide"}; // "MgOxide", "PtNanoPart", "SiMelted" }; //PtFCC", "SiDiamond" }; //{ "PtFCC"}; //"SiDiamond"};//, "PtNanoPart", "SiMelt"};
 	// const string defects[] = { "Standard", "Final", "Halfway" "Extra", "Gap" };
-	const string temperatures[] = { "50K", "150K", "300K","500K", "750K", "1000K" };
+	const string temperatures[] = { "50K", "150K", "300K" };
 	vector<string> material(materials, materials + sizeof(materials) / sizeof(materials[0]));
 	vector<string> temperature(temperatures, temperatures + sizeof(temperatures) / sizeof(temperatures[0]));
 	vector< vector<string> > defect = vector < vector<string> >();
@@ -268,12 +279,12 @@ int main()
 	}
 	//string folderPath = datapath + material + "/" + defect + "/" + temperature;
 	// Choose the level of minimization you want to compare to the fully minimized state. "0" = no minimization. Other options are "tol_2", "tol_4", and "tol_6" for 10^-2, etc.
-	const string mini[] = { "tol_12", "tol_8" };
+	const string mini[] = { "tol_12", "tol_8", "tol_6", "tol_4", "tol_2", "0" };
 	vector<string> MinimizationLevels(mini, mini + sizeof(mini) / sizeof(mini[0])); ;
 	// choose timestamps. available data: from 5010 to 15000, timestep 10.
 	const int firstTime = 5010;
 	const int lastTime = 15000;
-	const int timeStep = 1000;
+	const int timeStep = 10;
 	const int firstTimeForDifferentTimeStep = 5010;
 	const int lastTimeForDifferentTimeStep = 15000;
 	const bool makeOutputFile = (timeStep == true);
@@ -325,7 +336,9 @@ int main()
 				description.append(temperature.at(k));
 				//run the analysis function, which writes to your summary file and writes to individual files in the folder more specific information
 				cout << analyzeData(algorithm, folderPath, firstTime, lastTime, timeStep, parameters, MinimizationLevels, outputFolder, makeOutputFile) << endl;
-				//cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
+				cout << CompareSuccessiveTimesteps(algorithm, folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, parameters, outputFolder);
+				// CompareSuccessiveTimeStepsAbsolutely(folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, outputFolder);
+
 			}
 		}
 	};
@@ -455,6 +468,12 @@ Graph getGraph(AlgorithmName algorithm, string fileName, string ForceFileName, v
 				gh = soig.CreateGraphSoig(molecule);
 				break;
 			}
+		case GABRIEL:
+			double theta;
+			theta = parameters[0];
+			GabrielGraph gg;
+			gh = gg.ComputeGabrielMolecule(molecule, theta);
+			break;
 		default:
 			cout << "UNKNOWN ALGORITHM.\n";
 			break;
@@ -482,7 +501,7 @@ vector<Graph> getGraphsWithToleranceLevel(AlgorithmName algorithm, string folder
 int CompareSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int firstTime, int lastTimeForDifferentTimeStep, vector<double> parameters, string outputFolder){
 	vector<int> TransitionTimes;
 	vector<double> HashValues;
-	vector<double> TimeSteps;
+	vector<int> TimeSteps;
 	string fileName = folderPath + "/minimize_tol_12_" + to_string(firstTime) + ".data";
 	string ForceFileName = folderPath + "/forces_tol_12_" + to_string(firstTime) + ".data";
 	Graph CurrentGraph = getGraph(algorithm, fileName, ForceFileName, parameters);
@@ -513,7 +532,7 @@ int CompareSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int f
 	return TransitionTimes.size();
 };
 
-int outputDataSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int firstTime, int lastTime, vector<double> parameters, vector<int> TransitionTimes, vector<double> HashValues, vector<double> TimeSteps, string outputFolder, vector<ErrorStats> statsForMolecules){
+int outputDataSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, int firstTime, int lastTime, vector<double> parameters, vector<int> TransitionTimes, vector<double> HashValues, vector<int> TimeSteps, string outputFolder, vector<ErrorStats> statsForMolecules){
 	string outFileName = outputFolder + "DifferentTimeStep/";
 	createFolder(outFileName.c_str());
 	Reader reader = Reader();
@@ -582,9 +601,97 @@ int outputDataSuccessiveTimesteps(AlgorithmName algorithm, string folderPath, in
 	return 0;
 };
 
+int CompareSuccessiveTimeStepsAbsolutely(string folderPath, int firstTimeForDifferentTimeStep, int lastTimeForDifferentTimeStep, string outputFolder)
+{
+	vector<int> TransitionTimes;
+	vector<vector<vector <int>>> MissedAtomsAllTimeSteps;
+	string fileName = folderPath + "/minimize_tol_12_" + to_string(firstTimeForDifferentTimeStep) + ".data";
+	Molecule moleculeCurrent;
+	Molecule moleculeNext;
+	Reader myReader = Reader();
+	if (myReader.Initialize(fileName)) {
+		if (fileName.find("MgOxide") != std::string::npos) {
+			moleculeCurrent = myReader.GetMgOxideFromOutputFile();
+		}
+		else {
+			moleculeCurrent = myReader.GetMoleculeFromOutputFile();
+		}
+	}
+	for(int time = firstTimeForDifferentTimeStep+10; time <= lastTimeForDifferentTimeStep; time+=10){
+		cout << time << "\n";
+		fileName = folderPath + "/minimize_tol_12_" + to_string(time) + ".data";
+		if (myReader.Initialize(fileName)) {
+			if (fileName.find("MgOxide") != std::string::npos) {
+				moleculeNext = myReader.GetMgOxideFromOutputFile();
+			}
+			else {
+				moleculeNext = myReader.GetMoleculeFromOutputFile();
+			}
+		}
+		vector<vector<int>> MissedPairs = CompareDistancesBetweenAllAtoms(moleculeCurrent, moleculeNext);
+
+		if(MissedPairs.size() > 0){
+			TransitionTimes.push_back(time);
+			MissedAtomsAllTimeSteps.push_back(MissedPairs);
+		}
+	}
+	outputDataSuccessiveTimestepsAbsolutely(folderPath, firstTimeForDifferentTimeStep, lastTimeForDifferentTimeStep, TransitionTimes, MissedAtomsAllTimeSteps, outputFolder);
+	return 0;
+};
+
+int outputDataSuccessiveTimestepsAbsolutely(string folderPath, int firstTime, int lastTime, vector<int> TransitionTimes, vector<vector<vector <int>>> MissedAtomsAllTimeSteps, string outputFolder){
+	string outFileName = outputFolder + "DifferentTimeStep/";
+	createFolder(outFileName.c_str());
+	Reader reader = Reader();
+	vector<string>splitFolder = reader.split(folderPath.c_str(),'/');
+	createFolder(outFileName.c_str());
+	outFileName += splitFolder.at(splitFolder.size()-3) + "/";//material
+	createFolder(outFileName.c_str());
+	outFileName += "Absolute/";
+	createFolder(outFileName.c_str());
+	outFileName += splitFolder.at(splitFolder.size()-2) + "_";//defect
+	outFileName += splitFolder.at(splitFolder.size()-1);//temperature
+	outFileName += "times" + to_string(firstTime);
+	outFileName += "-" + to_string(lastTime);
+	string outFileNameTransitions = outFileName + ".transitions";
+	std::ofstream file = std::ofstream(outFileNameTransitions);
+	if (!file)
+	{
+		std::cout << outFileNameTransitions << " cannot be accessed and/or written to. Terminating process";
+		return -1;
+	} else {
+		file = std::ofstream(outFileNameTransitions);
+		file << outFileNameTransitions << "\n";
+		int NumberofTransitions = TransitionTimes.size();
+		file << "1000 states checked" << endl;
+		file << NumberofTransitions << " state transitions detected" << endl;
+		file << "\n TIMESTEPS AT WHICH TRANSITIONS OCCURED: \n";
+		for(int i = 0; i < NumberofTransitions; i++){
+			file << TransitionTimes.at(i) << endl;
+
+		}
+		file<< endl<<endl;
+	}
+	for(int j = 0; j < TransitionTimes.size(); j++){
+		file << "TimeStep: " << TransitionTimes.at(j) << endl;
+		for(int k = 0; k < MissedAtomsAllTimeSteps.at(j).size(); k++)
+		{
+			if(MissedAtomsAllTimeSteps.at(j).at(k).size()>0)
+			{
+				file << "Atom " << k+1 << ":";
+				for(int l = 0; l < MissedAtomsAllTimeSteps.at(j).at(k).size(); l++)
+				{
+					file << MissedAtomsAllTimeSteps.at(j).at(k).at(l) << " ";
+				}
+				file << endl;
+			}
+		}
+	}
+};
+
 
 bool compareGraphs(Graph min, Graph pre, ErrorStats & stats){
-	cout<<"cold like Minnesota"<<endl;
+	cout<<"didnt hit em back"<<endl;
 	if (min == pre) return true;
 	else {
 		min.compareAndReturnMismatches(pre, stats);

@@ -1,6 +1,8 @@
 #pragma once
 #include "distribution.h"
 
+
+// Compute all pairwise distances between atoms in the input molecule. To be used for choosing cutoff value.
 vector<double> GetDistancesBetweenAllAtoms(Molecule mol){
 	vector<double> distances;
 	for(int i = 1; i <= mol.GetNumberOfAtoms(); i++)
@@ -19,6 +21,7 @@ vector<double> GetDistancesBetweenAllAtoms(Molecule mol){
 	return distances;
 };
 
+/*
 vector<vector<int>> CompareDistancesBetweenAllAtoms(Molecule molA, Molecule molB){
 	vector<vector<int>> MissedPairs;
 	double tol = 0.01;
@@ -46,3 +49,4 @@ vector<vector<int>> CompareDistancesBetweenAllAtoms(Molecule molA, Molecule molB
 	}
 	return MissedPairs;
 };
+*/

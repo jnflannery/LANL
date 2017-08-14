@@ -4,4 +4,4 @@
 #include <math.h>
 
 vector<double> GetDistancesBetweenAllAtoms(Molecule);
-vector<vector<int>> CompareDistancesBetweenAllAtoms(Molecule, Molecule);
+// vector<vector<int>> CompareDistancesBetweenAllAtoms(Molecule, Molecule);

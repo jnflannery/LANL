@@ -305,8 +305,9 @@ int main()
 	return 0;
 	*/
 
-	//Code for calculating pair distribution function
+	//Code for calculating pair distribution function 
 	/*
+	// Specify fileNameDistribution to access the .data file you want to calculate the pair distribution function of. 
 	string path = datapath + "SiDiamond/Extra/300K";
 	string fileNameDistribution = path + "/minimize_tol_12_15000.data";
 	int out = outputDistributionFunction(fileNameDistribution, outputFolder, path);
@@ -365,6 +366,8 @@ int main()
 	return 0;
 }
 
+// Opens the .data file with the given file name, computes all of the pairwise distances in the system, and writes these distances to a .txt file so that 
+// the pair distribution function can be plotted (e.g. with MATLAB). This is used for choosing the cutoff distance to use for a given system. 
 int outputDistributionFunction(string fileName, string outputFolder, string folderPath)
 {
 	Molecule molecule;

@@ -8,12 +8,12 @@ Molecule::Molecule()
 }
 /*
 declare a molecule where you know how many atoms there will be
-useful for having atoms in order such that if you want atom with 
-number 522, you can later say "molecule.GetAtom(521) to get that
+useful for having atoms in order such that if you want atom with
+number 522, you can later say "molecule.GetAtom(522) to get that
 atom specifically
 */
 Molecule::Molecule(int numberOfAtoms) {
-	std::vector<Atom> atomsWithSize (numberOfAtoms);
+	std::vector<Atom> atomsWithSize(numberOfAtoms);
 	atoms = atomsWithSize;
 	cubeSize = 0;
 	timestep = 0;
@@ -36,13 +36,21 @@ int Molecule::GetTimestep() {
 void Molecule::AddAtom(Atom newAtom) {
 	atoms.push_back(newAtom);
 }
+int Molecule::GetStepsAdvancedPastTimestep()
+{
+	return stepsAdvancedPastTimestep;
+}
+void Molecule::SetStepsAdvancedPastTimestep(int steps)
+{
+	stepsAdvancedPastTimestep = steps;
+}
 //get atom at a certain index
 Atom Molecule::GetAtom(int i) {
-	return atoms.at(i);
+	return atoms.at(i-1);
 }
 //put atom into certain index
 void Molecule::SetAtomWithIndex(Atom atom, int i) {
-	atoms.at(i) = atom;
+	atoms.at(i-1) = atom;
 }
 std::vector<Atom> Molecule::GetAtomVector() {
 	return atoms;

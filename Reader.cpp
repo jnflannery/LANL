@@ -1,10 +1,11 @@
 #include "reader.h"
 #include <string>
+using namespace std;
 #include <sstream>
 #include <vector>
 #include <iterator>
 
-std::vector<std::string> split(const char *str, char c = ' ')
+std::vector<std::string> Reader::split(const char *str, char c = ' ')
 {
 	std::vector<std::string> result;
 
@@ -22,7 +23,7 @@ std::vector<std::string> split(const char *str, char c = ' ')
 }
 bool Reader::Initialize(std::string myFileName) {
 	fileName = myFileName;
-	
+
 	std::ifstream myFile(myFileName);
 	if (!myFile)
 	{
@@ -39,7 +40,7 @@ std::vector<Molecule> Reader::GetMoleculesFromDump() {
 	std::string line;
 	file >> numberOfAtoms;
 	getline(file, line);
-	std::vector<Molecule> molecules=std::vector<Molecule>();
+	std::vector<Molecule> molecules = std::vector<Molecule>();
 	while (getline(file, line)) {
 		int timestepLocation = line.find("Timestep");
 		if (timestepLocation > 0 && timestepLocation < 3000) {
@@ -85,6 +86,21 @@ Atom Reader::ParseAtomLine(std::string line) {
 	atom.SetZ(z);
 	return atom;
 }
+Atom Reader::ParseMgOxAtomLine(std::string line) {
+	int id;
+	double x, y, z;
+	std::vector<std::string> outputAsStrings = split(line.c_str(), ' ');
+	id = stoi(outputAsStrings.at(0));
+	x = ScientificNotationToFloat(outputAsStrings.at(3));
+	y = ScientificNotationToFloat(outputAsStrings.at(4));
+	z = ScientificNotationToFloat(outputAsStrings.at(5));
+	Atom atom = Atom();
+	atom.SetId(id);
+	atom.SetX(x);
+	atom.SetY(y);
+	atom.SetZ(z);
+	return atom;
+}
 /*
 turn a string that looks like this: "2.2556317953628206e+001"
 into a double like 22.55631...
@@ -112,11 +128,11 @@ double Reader::GetCubeSizeFromLine(std::string line) {
 	return cubeSize;
 }
 Molecule Reader::GetMoleculeFromOutputFile() {
-	int numberOfAtoms, timestep; 
+	int numberOfAtoms, timestep;
 	std::string line;
 	getline(file, line);
 	int timestepLocation = line.find("timestep");
-	timestep = stoi(line.substr(timestepLocation+11, line.length() - (timestepLocation+11)));
+	timestep = stoi(line.substr(timestepLocation + 11, line.length() - (timestepLocation + 11)));
 	getline(file, line);
 	file >> numberOfAtoms;
 	/*
@@ -124,7 +140,7 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	we will read each atom, and then put it into the molecule's atom vector in
 	the spot at Atom.id-1
 	*/
-	Molecule molecule = Molecule(numberOfAtoms); 
+	Molecule molecule = Molecule(numberOfAtoms);
 	molecule.SetTimestep(timestep);
 	//iterate over lines with no good info except for the line that has the size
 	for (int i = 0;i < 13;i++) {
@@ -135,7 +151,99 @@ Molecule Reader::GetMoleculeFromOutputFile() {
 	for (int i = 0;i < numberOfAtoms;i++) {
 		getline(file, line);
 		Atom atom = ParseAtomLine(line);
-		molecule.SetAtomWithIndex(atom, atom.GetId()-1);
+		molecule.SetAtomWithIndex(atom, atom.GetId());
 	}
 	return molecule;
+}
+Molecule Reader::GetMgOxideFromOutputFile()
+{
+	int numberOfAtoms, timestep;
+	std::string line;
+	getline(file, line);
+	int timestepLocation = line.find("timestep");
+	timestep = stoi(line.substr(timestepLocation + 11, line.length() - (timestepLocation + 11)));
+	getline(file, line);
+	file >> numberOfAtoms;
+	/*
+	below we create the molecule now that we know how many atoms there will be
+	we will read each atom, and then put it into the molecule's atom vector in
+	the spot at Atom.id-1
+	*/
+	Molecule molecule = Molecule(numberOfAtoms);
+	molecule.SetTimestep(timestep);
+	//iterate over lines with no good info except for the line that has the size
+	for (int i = 0;i < 19;i++) {
+		getline(file, line);
+		if (i == 4)
+			molecule.setCubeSize(GetCubeSizeFromLine(line));
+	}
+	for (int i = 0;i < numberOfAtoms;i++) {
+		getline(file, line);
+		Atom atom = ParseMgOxAtomLine(line);
+		molecule.SetAtomWithIndex(atom, atom.GetId());
+	}
+	return molecule;
+}
+/*
+remember to initilze to your new file when you do this
+*/
+void Reader::AddForcesToMolecule(Molecule & molecule)
+{
+	int numberOfAtoms, atomId, force, atomType;
+	double fx, fy, fz;
+	std::string line;
+	getline(file, line);
+	getline(file, line);
+	getline(file, line);
+	file >> numberOfAtoms;
+	for (int i = 0;i < 6;i++) {
+		getline(file, line);
+	}
+	for (int i = 0;i < numberOfAtoms;i++) {
+		file >> atomId;
+		file >> atomType;
+		file >> fx;
+		file >> fy;
+		file >> fz;
+		getline(file, line);
+		Atom atomToSet = molecule.GetAtom(atomId);
+		atomToSet.SetFx(fx);
+		atomToSet.SetFy(fy);
+		atomToSet.SetFz(fz);
+		molecule.SetAtomWithIndex(atomToSet, atomId);
+		/*if (atomId == 1) {
+			std::cout << fx << endl;
+		}*/
+	}
+}
+
+
+void Reader::AddForcesToMgOxide(Molecule & molecule)
+{
+	int numberOfAtoms, atomId, force, atomType;
+	double fx, fy, fz;
+	std::string line;
+	getline(file, line);
+	getline(file, line);
+	getline(file, line);
+	file >> numberOfAtoms;
+	for (int i = 0;i < 6;i++) {
+		getline(file, line);
+	}
+	for (int i = 0;i < numberOfAtoms;i++) {
+		file >> atomId;
+		file >> atomType;
+		file >> fx;
+		file >> fy;
+		file >> fz;
+		getline(file, line);
+		Atom atomToSet = molecule.GetAtom(atomId);
+		atomToSet.SetFx(fx);
+		atomToSet.SetFy(fy);
+		atomToSet.SetFz(fz);
+		molecule.SetAtomWithIndex(atomToSet, atomId);
+		/*if (atomId == 1) {
+		std::cout << fx << endl;
+		}*/
+	}
 }
